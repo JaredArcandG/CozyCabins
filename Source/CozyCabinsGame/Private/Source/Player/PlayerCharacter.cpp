@@ -75,6 +75,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	CHECK(InputActions);
 	pInputComponent->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 	pInputComponent->BindAction(InputActions->InputLook, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+	pInputComponent->BindAction(InputActions->InputMap, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerMap);
+	pInputComponent->BindAction(InputActions->InputJournal, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerJournal);
+	pInputComponent->BindAction(InputActions->InputFlashlight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerFlashlight);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -129,4 +132,31 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 	{
 		AddControllerPitchInput(-1 * LookValue.Y);
 	}
+}
+
+/// <summary>
+/// Triggered when character opens/closes the map via the 'm' key
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::TriggerMap(const FInputActionValue& InputValue)
+{
+	OnMapPress();
+}
+
+/// <summary>
+/// Triggered when character opens/closes the journal via the 'j' key
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::TriggerJournal(const FInputActionValue& InputValue)
+{
+	OnJournalPress();
+}
+
+/// <summary>
+/// Triggered when character starts/turns off the flashlight via the 'f' key
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::TriggerFlashlight(const FInputActionValue& InputValue)
+{
+	OnFlashlightPress();
 }

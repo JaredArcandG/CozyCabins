@@ -51,6 +51,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMapPress();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnJournalPress();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFlashlightPress();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -61,5 +70,14 @@ protected:
 
 	// Handle look input
 	void Look(const FInputActionValue& InputValue);
+
+	// Handle show/hide map
+	void TriggerMap(const FInputActionValue& InputValue);
+
+	// Handle show/hide journal
+	void TriggerJournal(const FInputActionValue& InputValue);
+
+	// Handle start/turn off flashlight
+	void TriggerFlashlight(const FInputActionValue& InputValue);
 
 };
