@@ -17,15 +17,15 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	// Follow camera 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
+	TObjectPtr<class UCameraComponent> FollowCamera;
+
 protected:
 
 	// Camera boom positioning the camera behind the character
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> SpringArm;
-
-	// Follow camera 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
-	TObjectPtr<class UCameraComponent> FollowCamera;
 
 	// Scales turning functionality
 	UPROPERTY(VisibleAnywhere, BlueprintReadonly, Category = "Enhanced Input")

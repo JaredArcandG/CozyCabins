@@ -21,10 +21,13 @@ public:
 	TObjectPtr<class USphereComponent> CollisionSphere;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How far in units the component can detect the target"))
-	float ActorFindRadius;
+	float ActorFindRadius = 200.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How frequently to perform the raycast checks. Increase time to improve performance."))
-	float RaycastFreqSecs;
+	float RaycastFreqSecs = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How far in units the component can interact with the target"))
+	float ActorInteractRadius = 200.f;
 
 protected:
 

@@ -6,18 +6,19 @@
 #include <Source/Utils/CheckUtils.h>
 #include <Source/Components/IInteractable.h>
 #include <Source/Player/PlayerCharacter.h>
+#include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
 UInteractableComponent::UInteractableComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractiveCollider"));
-
-	ActorFindRadius = 100.f;
-	RaycastFreqSecs = 1.f;
+	
+	CHECK(CollisionSphere);
+	CollisionSphere->SetSphereRadius(ActorFindRadius);
 }
 
 
@@ -31,6 +32,8 @@ void UInteractableComponent::BeginPlay()
 	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &UInteractableComponent::OnOverlapBegin);
 	CollisionSphere->OnComponentEndOverlap.AddDynamic(this, &UInteractableComponent::OnOverlapEnd);
 
+	CollisionSphere->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+
 	GetWorld()->GetTimerManager().SetTimer(RaycastHandle, this, &UInteractableComponent::ApplyRaycast, RaycastFreqSecs, true, 0.0f);
 	
 }
@@ -40,6 +43,10 @@ void UInteractableComponent::BeginPlay()
 void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	CHECK(CollisionSphere);
+	FVector SphereLocation = CollisionSphere->GetComponentLocation(); // Get the current location of the sphere 
+	DrawDebugSphere(GetWorld(), SphereLocation, ActorFindRadius, 12, FColor::Green, false, -1, 0, 2);
 }
 
 /// <summary>
@@ -115,19 +122,39 @@ void UInteractableComponent::ApplyRaycast()
 	// 2. If actor found && actor in overlapped actors, set as target actor
 	CHECK(GetOwner());
 
-	FVector vRayStart = GetOwner()->GetActorLocation();
-	FVector vForward = GetOwner()->GetActorForwardVector();
-	FVector vRayEnd = vRayStart + (vForward * ActorFindRadius);
+	TObjectPtr<APlayerCharacter> pCharacter = Cast<APlayerCharacter>(GetOwner());
+	CHECK(pCharacter);
+	CHECK(pCharacter->FollowCamera);
 
-	FHitResult HitResult; 
+	FVector vRayStart = pCharacter->FollowCamera->GetComponentLocation();
+	FVector vForward = pCharacter->FollowCamera->GetForwardVector();
+	FVector vRayEnd = vRayStart + (vForward * ActorInteractRadius);
+
+	TArray<FHitResult> hitResults; 
 	FCollisionQueryParams CollisionParams; 
 	CollisionParams.AddIgnoredActor(GetOwner());
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, vRayStart, vRayEnd, ECC_Visibility, CollisionParams);
+	GetWorld()->LineTraceMultiByChannel(hitResults, vRayStart, vRayEnd, ECC_Visibility, CollisionParams);
 
-	if (OverlappedInteractableActors.Contains(HitResult.GetActor()))
+	DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
+
+	bool bFoundActor = false;
+
+	for (FHitResult hitResult : hitResults)
 	{
-		TargetActor = HitResult.GetActor();
+		TObjectPtr<AActor> pHitActor = hitResult.GetActor();
+
+		if (pHitActor && OverlappedInteractableActors.Contains(pHitActor))
+		{
+			bFoundActor = true;
+			TargetActor = pHitActor;
+			break;
+		}
+	}
+
+	if (!bFoundActor)
+	{
+		TargetActor = nullptr;
 	}
 
 }

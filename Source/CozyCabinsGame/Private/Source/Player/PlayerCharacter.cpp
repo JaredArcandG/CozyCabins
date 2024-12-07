@@ -51,6 +51,8 @@ APlayerCharacter::APlayerCharacter()
 	pMovementComponent->RotationRate = FRotator(0.f, 540.f, 0.f);
 
 	InteractionComp = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractionComponent"));
+	CHECK(InteractionComp);
+
 }
 
 /// <summary>
@@ -86,6 +88,10 @@ void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CHECK(InteractionComp);
+
+	InteractionComp->RegisterComponent();
 	
 }
 
