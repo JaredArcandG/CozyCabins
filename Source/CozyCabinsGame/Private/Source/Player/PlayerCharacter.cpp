@@ -15,6 +15,9 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	bCanMove = true;
+	bCanLook = true;
+
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	// Create camera boom
@@ -44,6 +47,16 @@ APlayerCharacter::APlayerCharacter()
 
 	pMovementComponent->bOrientRotationToMovement = true;
 	pMovementComponent->RotationRate = FRotator(0.f, 540.f, 0.f);
+}
+
+void APlayerCharacter::AllowPlayerMove(const bool& bCanMoveState)
+{
+	bCanMove = bCanMoveState;
+}
+
+void APlayerCharacter::AllowPlayerLook(const bool& bCanLookState)
+{
+	bCanLook = bCanLookState;
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +106,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 /// <param name="InputValue"></param>
 void APlayerCharacter::Move(const FInputActionValue& InputValue)
 {
+	if (!bCanMove)
+	{
+		return;
+	}
+	
 	const FVector2D MoveValue = InputValue.Get<FVector2D>();
 	const FRotator MovementRotation = FRotator(0, Controller->GetControlRotation().Yaw, 0);
 
@@ -121,6 +139,11 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 /// <param name="InputValue"></param>
 void APlayerCharacter::Look(const FInputActionValue& InputValue)
 {
+	if (!bCanLook)
+	{
+		return;
+	}
+
 	const FVector2D LookValue = InputValue.Get<FVector2D>();
 
 	if (LookValue.X != 0.f)

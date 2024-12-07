@@ -43,6 +43,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
 	TObjectPtr<class UInputConfigData> InputActions;
 
+	// Whether the character is allowed to move or not
+	bool bCanMove;
+
+	// Whether the character can look or not
+	bool bCanLook;
+
 public:
 
 	// Called every frame
@@ -59,6 +65,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFlashlightPress();
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Allow Player Move", ToolTip = "Enables or disables the player's ability to move."))
+	void AllowPlayerMove(const bool& bCanMoveState);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Allow Player Look", ToolTip = "Enables or disables the player's ability to look."))
+	void AllowPlayerLook(const bool& bCanLookState);
 
 protected:
 
