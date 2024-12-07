@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include <Source/Utils/CheckUtils.h>
 #include <Source/Components/IInteractable.h>
+#include <Source/Player/PlayerCharacter.h>
 
 // Sets default values for this component's properties
 UInteractableComponent::UInteractableComponent()
@@ -85,6 +86,19 @@ void UInteractableComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedCompone
 }
 
 /// <summary>
+/// OnInteract
+/// </summary>
+void UInteractableComponent::OnInteractTriggered()
+{
+	CHECK(TargetActor);
+
+	if (TargetActor->Implements<UInteractable>())
+	{ 
+		IInteractable::Execute_OnInteract(TargetActor, GetWorld(), Cast<ACharacter>(GetOwner()));
+	}
+}
+
+/// <summary>
 /// Applies a raycast to the environment at a certain distance
 /// If the raycast hits a valid overlapped actor, we select it as the "target actor"
 /// There is only one "target actor" at a time that the player can interact with
@@ -97,8 +111,24 @@ void UInteractableComponent::ApplyRaycast()
 	}
 
 	// TODO:
-	// 1. Raycast based on the cast length
+	// 1. Raycast based on the actor find radius
 	// 2. If actor found && actor in overlapped actors, set as target actor
+	CHECK(GetOwner());
+
+	FVector vRayStart = GetOwner()->GetActorLocation();
+	FVector vForward = GetOwner()->GetActorForwardVector();
+	FVector vRayEnd = vRayStart + (vForward * ActorFindRadius);
+
+	FHitResult HitResult; 
+	FCollisionQueryParams CollisionParams; 
+	CollisionParams.AddIgnoredActor(GetOwner());
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, vRayStart, vRayEnd, ECC_Visibility, CollisionParams);
+
+	if (OverlappedInteractableActors.Contains(HitResult.GetActor()))
+	{
+		TargetActor = HitResult.GetActor();
+	}
 
 }
 

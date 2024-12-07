@@ -43,11 +43,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
 	TObjectPtr<class UInputConfigData> InputActions;
 
+	// Handles interaction with the environment
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UInteractableComponent> InteractionComp;
+
 	// Whether the character is allowed to move or not
 	bool bCanMove;
 
 	// Whether the character can look or not
 	bool bCanLook;
+
+	// Whether character can interact or not
+	bool bCanInteract;
 
 public:
 
@@ -72,6 +79,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Allow Player Look", ToolTip = "Enables or disables the player's ability to look."))
 	void AllowPlayerLook(const bool& bCanLookState);
 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Allow Player Look", ToolTip = "Enables or disables the player's ability to look."))
+	void AllowPlayerInteract(const bool& bCanInteractState);
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -82,6 +92,9 @@ protected:
 
 	// Handle look input
 	void Look(const FInputActionValue& InputValue);
+
+	// Handle interact input
+	void Interact(const FInputActionValue& InputValue);
 
 	// Handle show/hide map
 	void TriggerMap(const FInputActionValue& InputValue);

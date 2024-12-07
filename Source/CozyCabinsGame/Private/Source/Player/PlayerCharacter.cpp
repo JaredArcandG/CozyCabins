@@ -8,6 +8,7 @@
 #include <EnhancedInputSubsystems.h>
 #include <Source/Player/Input/InputConfigData.h>
 #include <EnhancedInputComponent.h>
+#include "Source/Components/InteractableComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -17,6 +18,7 @@ APlayerCharacter::APlayerCharacter()
 
 	bCanMove = true;
 	bCanLook = true;
+	bCanInteract = true;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -47,16 +49,37 @@ APlayerCharacter::APlayerCharacter()
 
 	pMovementComponent->bOrientRotationToMovement = true;
 	pMovementComponent->RotationRate = FRotator(0.f, 540.f, 0.f);
+
+	InteractionComp = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractionComponent"));
 }
 
+/// <summary>
+/// Toggles whether player can move or not 
+/// Can use for cutscenes, pause menus, etc.
+/// </summary>
+/// <param name="bCanMoveState"></param>
 void APlayerCharacter::AllowPlayerMove(const bool& bCanMoveState)
 {
 	bCanMove = bCanMoveState;
 }
 
+/// <summary>
+/// Toggles whether player can look or not
+/// Can use for cutscenes, pause menus, etc.
+/// </summary>
+/// <param name="bCanLookState"></param>
 void APlayerCharacter::AllowPlayerLook(const bool& bCanLookState)
 {
 	bCanLook = bCanLookState;
+}
+
+/// <summary>
+/// Toggles whether player can interact with environment or not
+/// </summary>
+/// <param name="bCanLookState"></param>
+void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
+{
+	bCanInteract = bCanInteractState;
 }
 
 // Called when the game starts or when spawned
@@ -91,6 +114,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	pInputComponent->BindAction(InputActions->InputMap, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerMap);
 	pInputComponent->BindAction(InputActions->InputJournal, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerJournal);
 	pInputComponent->BindAction(InputActions->InputFlashlight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerFlashlight);
+	pInputComponent->BindAction(InputActions->InputConfirm, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -155,6 +179,21 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 	{
 		AddControllerPitchInput(-1 * LookValue.Y);
 	}
+}
+
+/// <summary>
+/// Triggered when character attempts to interact with environment
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::Interact(const FInputActionValue& InputValue)
+{
+	CHECK(InteractionComp);
+
+	if (bCanInteract)
+	{
+		InteractionComp->OnInteractTriggered();
+	}
+
 }
 
 /// <summary>
