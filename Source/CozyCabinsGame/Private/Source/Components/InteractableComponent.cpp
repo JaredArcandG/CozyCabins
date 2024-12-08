@@ -7,6 +7,8 @@
 #include <Source/Components/IInteractable.h>
 #include <Source/Player/PlayerCharacter.h>
 #include "Camera/CameraComponent.h"
+#include "Source/Constants/TraceChannel.h"
+#include "EngineUtils.h"
 
 // Sets default values for this component's properties
 UInteractableComponent::UInteractableComponent()
@@ -126,15 +128,30 @@ void UInteractableComponent::ApplyRaycast()
 	CHECK(pCharacter);
 	CHECK(pCharacter->FollowCamera);
 
+	ECollisionChannel interactableChannel = ECC_InteractableChannel;
+
 	FVector vRayStart = pCharacter->FollowCamera->GetComponentLocation();
 	FVector vForward = pCharacter->FollowCamera->GetForwardVector();
 	FVector vRayEnd = vRayStart + (vForward * ActorInteractRadius);
+
+	UE_LOG(LogTemp, Warning, TEXT("Ray Start: %s, Ray End: %s"), *vRayStart.ToString(), *vRayEnd.ToString());
 
 	TArray<FHitResult> hitResults; 
 	FCollisionQueryParams CollisionParams; 
 	CollisionParams.AddIgnoredActor(GetOwner());
 
-	GetWorld()->LineTraceMultiByChannel(hitResults, vRayStart, vRayEnd, ECC_Visibility, CollisionParams);
+	for (TSubclassOf<AActor> ignoreClass : IgnoredActorClasses) 
+	{ 
+		for (TActorIterator<AActor> It(GetWorld(), ignoreClass); It; ++It)
+		{
+			TObjectPtr<AActor> pIgnoredActor = *It;
+			CollisionParams.AddIgnoredActor(pIgnoredActor);
+			UE_LOG(LogTemp, Warning, TEXT("Ignoring Actor: %s"), *pIgnoredActor->GetName());
+		} 
+	}
+	
+
+	GetWorld()->LineTraceMultiByChannel(hitResults, vRayStart, vRayEnd, interactableChannel, CollisionParams);
 
 	DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
 
@@ -143,6 +160,23 @@ void UInteractableComponent::ApplyRaycast()
 	for (FHitResult hitResult : hitResults)
 	{
 		TObjectPtr<AActor> pHitActor = hitResult.GetActor();
+
+		if (pHitActor)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s, Class: %s, Location: %s, Component: %s"), *pHitActor->GetName(), *pHitActor->GetClass()->GetName(), *hitResult.ImpactPoint.ToString(), *hitResult.Component->GetName());
+
+			// Log collision response for each component 
+			for (UActorComponent* Component : pHitActor->GetComponents()) 
+			{
+				UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Component); 
+
+				if (PrimitiveComponent) 
+				{ 
+					ECollisionResponse Response = PrimitiveComponent->GetCollisionResponseToChannel(ECC_InteractableChannel); 
+					UE_LOG(LogTemp, Warning, TEXT("Component: %s, CollisionResponse to Interactable: %d"), *PrimitiveComponent->GetName(), Response);
+				} 
+			}
+		}
 
 		if (pHitActor && OverlappedInteractableActors.Contains(pHitActor))
 		{
@@ -158,4 +192,3 @@ void UInteractableComponent::ApplyRaycast()
 	}
 
 }
-

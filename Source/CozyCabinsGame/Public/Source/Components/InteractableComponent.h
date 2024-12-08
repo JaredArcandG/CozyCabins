@@ -17,17 +17,20 @@ public:
 	// Sets default values for this component's properties
 	UInteractableComponent();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<class USphereComponent> CollisionSphere;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How far in units the component can detect the target"))
 	float ActorFindRadius = 200.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How frequently to perform the raycast checks. Increase time to improve performance."))
-	float RaycastFreqSecs = 1.0f;
+	float RaycastFreqSecs = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ToolTip = "How far in units the component can interact with the target"))
 	float ActorInteractRadius = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Raycast Settings", meta = (ToolTip = "Actor classes to ignore for the raycast"))
+	TArray<TSubclassOf<AActor>> IgnoredActorClasses;
 
 protected:
 
