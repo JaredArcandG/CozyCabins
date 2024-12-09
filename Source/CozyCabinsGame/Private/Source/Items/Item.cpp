@@ -5,6 +5,7 @@
 #include <Source/Utils/CheckUtils.h>
 #include "Components/StaticMeshComponent.h"
 #include "Source/Constants/TraceChannel.h"
+#include "Engine/DataTable.h"
 
 // Sets default values
 AItem::AItem()
@@ -26,7 +27,24 @@ AItem::AItem()
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CHECK(DataTable);
+
+	FString ContextString;
+	auto pData = DataTable->FindRow<FItemData>(ItemDataRowName, ContextString);
+
+    if (pData)
+    {
+		CachedItemData = *pData;
+
+        // Log the item data for debugging
+        UE_LOG(LogTemp, Warning, TEXT("Item Initialized: %s, Name: %s, Description: %s"),
+            *ItemDataRowName.ToString(), *CachedItemData.Name, *CachedItemData.Description);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to find item data for row: %s"), *ItemDataRowName.ToString());
+    }
 }
 
 // Called every frame
@@ -36,3 +54,12 @@ void AItem::Tick(float DeltaTime)
 
 }
 
+/// <summary>
+/// Gets the cached item data
+/// Returns the default item ctor values if invalid
+/// </summary>
+/// <returns></returns>
+FItemData AItem::GetData()
+{
+	return CachedItemData;
+}
