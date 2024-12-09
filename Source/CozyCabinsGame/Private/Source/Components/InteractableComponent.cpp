@@ -48,7 +48,10 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	CHECK(CollisionSphere);
 	FVector SphereLocation = CollisionSphere->GetComponentLocation(); // Get the current location of the sphere 
+
+#ifdef UE_BUILD_DEBUG
 	DrawDebugSphere(GetWorld(), SphereLocation, ActorFindRadius, 12, FColor::Green, false, -1, 0, 2);
+#endif
 }
 
 /// <summary>
@@ -153,7 +156,9 @@ void UInteractableComponent::ApplyRaycast()
 
 	GetWorld()->LineTraceMultiByChannel(hitResults, vRayStart, vRayEnd, interactableChannel, CollisionParams);
 
-	DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, 1.0f, 0, 1.0f);
+#ifdef UE_BUILD_DEBUG
+	DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, RaycastFreqSecs, 0, 1.0f);
+#endif
 
 	bool bFoundActor = false;
 
@@ -166,13 +171,13 @@ void UInteractableComponent::ApplyRaycast()
 			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s, Class: %s, Location: %s, Component: %s"), *pHitActor->GetName(), *pHitActor->GetClass()->GetName(), *hitResult.ImpactPoint.ToString(), *hitResult.Component->GetName());
 
 			// Log collision response for each component 
-			for (UActorComponent* Component : pHitActor->GetComponents()) 
+			for (TObjectPtr<UActorComponent> Component : pHitActor->GetComponents()) 
 			{
-				UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Component); 
+				TObjectPtr<UPrimitiveComponent> PrimitiveComponent = Cast<UPrimitiveComponent>(Component); 
 
-				if (PrimitiveComponent) 
+				if (PrimitiveComponent)
 				{ 
-					ECollisionResponse Response = PrimitiveComponent->GetCollisionResponseToChannel(ECC_InteractableChannel); 
+					ECollisionResponse Response = PrimitiveComponent->GetCollisionResponseToChannel(ECC_InteractableChannel);
 					UE_LOG(LogTemp, Warning, TEXT("Component: %s, CollisionResponse to Interactable: %d"), *PrimitiveComponent->GetName(), Response);
 				} 
 			}
