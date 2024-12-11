@@ -2,6 +2,7 @@
 
 
 #include "Source/Components/InventoryComponent.h"
+#include "Engine/DataTable.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -202,13 +203,24 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 	return true;
 }
 
-void UInventoryComponent::TryGetItem(const FGuid& Itemid, FItemData ResultData)
+bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData ResultData)
 {
-	return;
-}
+	if (!DataTable || !ItemCacheMap.Contains(ItemId))
+	{
+		return false;
+	}
 
-void UInventoryComponent::TryGetItemAtIndex(const FGuid& Itemid, const int& ArrIdx, FItemData ResultData)
-{
-	return;
-}
+	const TMap<FName, uint8*>& RowMap = DataTable->GetRowMap();
 
+	for (const auto RowPair : RowMap)
+	{
+		FItemData* pItemData = reinterpret_cast<FItemData*>(RowPair.Value); 
+		if (pItemData && pItemData->Id == ItemId)
+		{
+			ResultData = *pItemData;
+			return true;
+		}
+	}
+
+	return false;
+}

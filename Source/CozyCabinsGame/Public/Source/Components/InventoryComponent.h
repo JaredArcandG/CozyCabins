@@ -38,6 +38,9 @@ protected:
 	// Keep track of the current array size
 	int CurrentSize;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<class UDataTable> DataTable;
+
 protected:
 
 	// Called when the game starts
@@ -62,11 +65,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory for a specific index. Returns true if successful, false otherwise"))
 	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the inventory. ResultData is null if item not found or invalid."))
-	void TryGetItem(const FGuid& Itemid, FItemData ResultData);
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid."))
+	bool TryGetItem(const FGuid& ItemId, FItemData ResultData);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the inventory for a specific index. ResultData is null if item not found or invalid."))
-	void TryGetItemAtIndex(const FGuid& Itemid, const int& ArrIdx, FItemData ResultData);
-
-		
 };
