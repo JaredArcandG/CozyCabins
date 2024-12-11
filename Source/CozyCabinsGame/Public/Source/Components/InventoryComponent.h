@@ -50,17 +50,17 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory. Returns true if successful, false otherwise"))
-	bool TryAddAtIndex(const FGuid& ItemId);
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory. Returns true if successful, false otherwise"))
+	bool TryAdd(const FGuid& ItemId, const int& Quantity);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory. Returns true if successful, false otherwise"))
-	bool TryRemove(const FGuid & ItemId);
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to remove the 'quantity' number of items from the inventory. Returns true if successful, false otherwise"))
+	bool TryRemove(const FGuid & ItemId, const int& Quantity);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory for a specific index. Returns true if successful, false otherwise"))
+	bool TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory for a specific index. Returns true if successful, false otherwise"))
-	bool TryAdd(const FGuid& ItemId, const int& ArrIdx);
-
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory for a specific index. Returns true if successful, false otherwise"))
-	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx);
+	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the inventory. ResultData is null if item not found or invalid."))
 	void TryGetItem(const FGuid& Itemid, FItemData ResultData);

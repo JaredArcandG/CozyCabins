@@ -49,8 +49,12 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId)
+bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 {
+	if (Quantity > MaxItemStackSize || Quantity <= 0)
+	{
+		return false;
+	}
 
 	// Case: Item exists, needs to be added
 	if (ItemCacheMap.Contains(ItemId))
@@ -59,25 +63,16 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId)
 
 		for (int candidateIdx : arrValidIndexes)
 		{
-			if (!ItemArr.IsValidIndex(candidateIdx))
+			if (TryAddAtIndex(ItemId, candidateIdx, Quantity))
 			{
-				continue;
-			}
-
-			if (ItemArr[candidateIdx] >= MaxItemStackSize)
-			{
-				continue;
-			}
-
-			ItemArr[candidateIdx]++;
-			return true;
-
+				return true;
+			}  
 		}
 
 		// Item needs to be added in a new index
 
 		// No space, can't add
-		if (CurrentSize == MaxInventorySize)
+		if (CurrentSize == MaxInventorySize || Quantity > MaxItemStackSize)
 		{
 			return false;
 		}
@@ -91,10 +86,7 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId)
 			return false;
 		}
 
-		ItemArr[candidateIdx] = 1;
-		ItemCacheMap[ItemId].Add(candidateIdx);
-		CurrentSize++;
-		return true;
+		return TryAddAtIndex(ItemId, candidateIdx, Quantity);
 	}
 
 	// Case: Item does not exist, No more space in the inventory
@@ -119,19 +111,95 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId)
 
 }
 
-bool UInventoryComponent::TryRemove(const FGuid& ItemId)
+bool UInventoryComponent::TryRemove(const FGuid& ItemId, const int& Quantity)
 {
-	return false;
+	// Case Item does not exist, quantity is invalid
+	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0)
+	{
+		return false;
+	}
+	
+	int arrIdx = ItemCacheMap[ItemId].Num() - 1;
+
+	if (arrIdx == -1)
+	{
+		return false;
+	}
+
+	int candidateIdx = ItemCacheMap[ItemId][arrIdx];
+
+	return TryRemoveAtIndex(ItemId, candidateIdx, Quantity);
+
 }
 
-bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& ArrIdx)
+bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
-	return false;
+	// Case Invalid Index, Large quantity
+	if (!ItemArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0)
+	{
+		return false;
+	}
+	
+	// Case adding new item 
+	if (!ItemCacheMap.Contains(ItemId))
+	{
+		// Different item exists in that index
+		if (ItemArr[ArrIdx] != -1)
+		{
+			return false;
+		}
+
+		ItemArr[ArrIdx] = Quantity;
+		TTuple<FGuid, TArray<int>> kvp = MakeTuple(ItemId, TArray<int>{ ArrIdx });
+		ItemCacheMap.Add(kvp);
+		CurrentSize++;
+		return true;
+	}
+
+	// Case addint to existing idx
+	if (ItemArr[ArrIdx] + Quantity > MaxItemStackSize)
+	{
+		return false;
+	}
+
+	ItemArr[ArrIdx] = Quantity;
+	return true;
 }
 
-bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx)
+bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
-	return false;
+	// Item does not exist, quantity too large/small, invalid arr index
+	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemArr.IsValidIndex(ArrIdx) || Quantity <= 0)
+	{
+		return false;
+	}
+
+	// Removing index from wrong item, quantity too large
+	if (!ItemCacheMap[ItemId].Contains(ArrIdx) || ItemArr[ArrIdx] - Quantity < 0)
+	{
+		return false;
+	}
+
+	// Remove item from slot scenario
+	if (ItemArr[ArrIdx] - Quantity == 0)
+	{
+		ItemArr[ArrIdx] = -1;
+		ItemCacheMap[ItemId].Remove(ArrIdx);
+
+		// Remove key if no more slots with this item left
+		if (ItemCacheMap[ItemId].Num() == 0)
+		{
+			ItemCacheMap.Remove(ItemId);
+			CurrentSize--;
+			return true;
+		}
+
+		return true;	
+	}
+
+	// Remove, item stacks still remain
+	ItemArr[ArrIdx] -= Quantity;
+	return true;
 }
 
 void UInventoryComponent::TryGetItem(const FGuid& Itemid, FItemData ResultData)
