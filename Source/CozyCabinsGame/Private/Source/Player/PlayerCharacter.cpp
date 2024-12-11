@@ -9,6 +9,7 @@
 #include <Source/Player/Input/InputConfigData.h>
 #include <EnhancedInputComponent.h>
 #include "Source/Components/InteractableComponent.h"
+#include "Source/Components/InventoryComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -51,7 +52,8 @@ APlayerCharacter::APlayerCharacter()
 	pMovementComponent->RotationRate = FRotator(0.f, 540.f, 0.f);
 
 	InteractionComp = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractionComponent"));
-	CHECK(InteractionComp);
+
+	InventoryComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
 }
 
@@ -82,6 +84,11 @@ void APlayerCharacter::AllowPlayerLook(const bool& bCanLookState)
 void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
 {
 	bCanInteract = bCanInteractState;
+}
+
+UInventoryComponent* APlayerCharacter::GetInventoryComponent()
+{
+	return InventoryComp;
 }
 
 // Called when the game starts or when spawned

@@ -12,6 +12,7 @@ UInventoryComponent::UInventoryComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	CurrentSize = 0;
+	bCanUseInventory = true;
 
 	// -1 represents empty space
 	for (int i = 0; i < MaxInventorySize; i++)
@@ -52,7 +53,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 {
-	if (Quantity > MaxItemStackSize || Quantity <= 0)
+	if (Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
@@ -115,7 +116,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 bool UInventoryComponent::TryRemove(const FGuid& ItemId, const int& Quantity)
 {
 	// Case Item does not exist, quantity is invalid
-	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0)
+	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
@@ -136,7 +137,7 @@ bool UInventoryComponent::TryRemove(const FGuid& ItemId, const int& Quantity)
 bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
 	// Case Invalid Index, Large quantity
-	if (!ItemArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0)
+	if (!ItemArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
@@ -167,10 +168,17 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 	return true;
 }
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="ArrIdx"></param>
+/// <param name="Quantity"></param>
+/// <returns></returns>
 bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
 	// Item does not exist, quantity too large/small, invalid arr index
-	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemArr.IsValidIndex(ArrIdx) || Quantity <= 0)
+	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemArr.IsValidIndex(ArrIdx) || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
@@ -203,24 +211,48 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 	return true;
 }
 
+/// <summary>
+/// Tries to get the item data of an item in the inventory
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="ResultData"></param>
+/// <returns></returns>
 bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData ResultData)
 {
-	if (!DataTable || !ItemCacheMap.Contains(ItemId))
+	if (!DataTable || !ItemCacheMap.Contains(ItemId) || !bCanUseInventory)
 	{
 		return false;
 	}
 
-	const TMap<FName, uint8*>& RowMap = DataTable->GetRowMap();
+	FString sContextString;
+	auto pItemData = DataTable->FindRow<FItemData>(FName(ItemId.ToString()), sContextString);
 
-	for (const auto RowPair : RowMap)
+	if (pItemData && pItemData->Id == ItemId)
 	{
-		FItemData* pItemData = reinterpret_cast<FItemData*>(RowPair.Value); 
-		if (pItemData && pItemData->Id == ItemId)
-		{
-			ResultData = *pItemData;
-			return true;
-		}
+		ResultData = *pItemData;
+		return true;
+	}
+	
+	return false;
+}
+
+/// <summary>
+/// Increases the size of the inventory
+/// Note: Can only increase the inventory size for now
+/// </summary>
+/// <param name="NewMaxSize">The new inventory size</param>
+/// <returns></returns>
+bool UInventoryComponent::Resize(const int& NewMaxSize)
+{
+	if (NewMaxSize <= MaxInventorySize)
+	{
+		return false;
 	}
 
-	return false;
+	for (int i = 0; i < NewMaxSize - MaxInventorySize; i++)
+	{
+		ItemArr.Add(-1);
+	}
+
+	return true;
 }

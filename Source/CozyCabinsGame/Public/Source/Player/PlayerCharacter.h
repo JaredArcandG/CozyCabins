@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UInteractableComponent> InteractionComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	TObjectPtr<class UInventoryComponent> InventoryComp;
+
 	// Whether the character is allowed to move or not
 	bool bCanMove;
 
@@ -81,6 +84,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Allow Player Look", ToolTip = "Enables or disables the player's ability to look."))
 	void AllowPlayerInteract(const bool& bCanInteractState);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Inventory Component", ToolTip = "Gets the player's inventory."))
+	class UInventoryComponent* GetInventoryComponent();
 
 protected:
 

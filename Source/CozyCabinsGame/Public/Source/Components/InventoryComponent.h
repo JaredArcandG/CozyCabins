@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory Settings")
 	int MaxItemStackSize = 99;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
+	bool bCanUseInventory = true;
+
 protected:
 
 	// Represents an item stack with the arr idx as the slot number, and the quantity of the item
@@ -67,5 +70,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid."))
 	bool TryGetItem(const FGuid& ItemId, FItemData ResultData);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Changes the size of the inventory. True if resize was successful, false otherwise. Note: Can only increase the size."))
+	bool Resize(const int& NewMaxSize);
 
 };
