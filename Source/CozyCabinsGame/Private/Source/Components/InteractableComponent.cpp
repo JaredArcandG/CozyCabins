@@ -21,6 +21,8 @@ UInteractableComponent::UInteractableComponent()
 	
 	CHECK(CollisionSphere);
 	CollisionSphere->SetSphereRadius(ActorFindRadius);
+
+	bEnableDebugMode = false;
 }
 
 
@@ -46,12 +48,15 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CHECK(CollisionSphere);
-	FVector SphereLocation = CollisionSphere->GetComponentLocation(); // Get the current location of the sphere 
+	if (bEnableDebugMode)
+	{
+		CHECK(CollisionSphere);
+		FVector SphereLocation = CollisionSphere->GetComponentLocation(); // Get the current location of the sphere 
 
 #ifdef UE_BUILD_DEBUG
-	DrawDebugSphere(GetWorld(), SphereLocation, ActorFindRadius, 12, FColor::Green, false, -1, 0, 2);
+		DrawDebugSphere(GetWorld(), SphereLocation, ActorFindRadius, 12, FColor::Green, false, -1, 0, 2);
 #endif
+	}
 }
 
 /// <summary>
@@ -156,9 +161,12 @@ void UInteractableComponent::ApplyRaycast()
 
 	GetWorld()->LineTraceMultiByChannel(hitResults, vRayStart, vRayEnd, interactableChannel, CollisionParams);
 
+	if (bEnableDebugMode)
+	{
 #ifdef UE_BUILD_DEBUG
-	DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, RaycastFreqSecs, 0, 1.0f);
+		DrawDebugLine(GetWorld(), vRayStart, vRayEnd, FColor::Blue, false, RaycastFreqSecs, 0, 1.0f);
 #endif
+	}
 
 	bool bFoundActor = false;
 

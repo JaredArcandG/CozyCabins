@@ -10,6 +10,7 @@
 #include <EnhancedInputComponent.h>
 #include "Source/Components/InteractableComponent.h"
 #include "Source/Components/InventoryComponent.h"
+#include "Source/Components/StatsComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -55,6 +56,8 @@ APlayerCharacter::APlayerCharacter()
 
 	InventoryComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 
+	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("StatsComponent"));
+
 }
 
 /// <summary>
@@ -89,6 +92,11 @@ void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
 UInventoryComponent* APlayerCharacter::GetInventoryComponent()
 {
 	return InventoryComp;
+}
+
+UStatsComponent* APlayerCharacter::GetStatsComponent()
+{
+	return StatsComp;
 }
 
 // Called when the game starts or when spawned

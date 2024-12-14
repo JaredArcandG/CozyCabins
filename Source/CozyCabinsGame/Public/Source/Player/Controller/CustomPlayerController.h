@@ -13,5 +13,18 @@ UCLASS()
 class COZYCABINSGAME_API ACustomPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+
+	ACustomPlayerController();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widgets")
+	TSubclassOf<class UStatsHUD> PlayerHUDWidgetClass;
+
+	TObjectPtr<class UStatsHUD> PlayerHUD;
+
+protected:
+
+	virtual void BeginPlay() override;
 	
 };

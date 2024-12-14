@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Raycast Settings", meta = (ToolTip = "Actor classes to ignore for the raycast"))
 	TArray<TSubclassOf<AActor>> IgnoredActorClasses;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug Settings", meta = (ToolTip = "Enable debug mode to see interaction/collision debug lines"))
+	bool bEnableDebugMode;
+
 protected:
 
 	FTimerHandle RaycastHandle;

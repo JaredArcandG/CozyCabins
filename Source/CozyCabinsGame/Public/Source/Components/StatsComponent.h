@@ -23,12 +23,16 @@ struct COZYCABINSGAME_API FActorStats
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int CurrentHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int CurrentStamina;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalStamina;
 };
 
@@ -52,6 +56,7 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FActorStats ActorStats;
 
 protected:

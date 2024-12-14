@@ -2,4 +2,27 @@
 
 
 #include "Source/Player/Controller/CustomPlayerController.h"
+#include "Source/UI/StatsHUD.h"
+#include <Source/Utils/CheckUtils.h>
+#include <Source/Player/PlayerCharacter.h>
 
+ACustomPlayerController::ACustomPlayerController()
+{
+}
+
+void ACustomPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CHECK(PlayerHUDWidgetClass);
+	PlayerHUD = CreateWidget<UStatsHUD>(this, PlayerHUDWidgetClass);
+	CHECK(PlayerHUD);
+
+	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(GetPawn());
+	CHECK(pPlayer);
+
+	PlayerHUD->InitializeWidget(*pPlayer);
+	CHECK(PlayerHUD);
+
+	PlayerHUD->AddToViewport();
+}
