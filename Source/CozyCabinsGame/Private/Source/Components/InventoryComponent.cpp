@@ -3,6 +3,8 @@
 
 #include "Source/Components/InventoryComponent.h"
 #include "Engine/DataTable.h"
+#include <Source/Utils/CheckUtils.h>
+#include "Source/UI/ItemSlotContainer.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -13,6 +15,8 @@ UInventoryComponent::UInventoryComponent()
 
 	CurrentSize = 0;
 	bCanUseInventory = true;
+	bIsInventoryOpen = false;
+	ItemSlotContainer = nullptr;
 
 	// -1 represents empty space
 	for (int i = 0; i < MaxInventorySize; i++)
@@ -27,7 +31,15 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	CHECK(ItemSlotContainerClass);
+
+	TObjectPtr<APlayerController> pPlayerController = GetWorld()->GetFirstPlayerController();
+	CHECK(pPlayerController);
+
+	ItemSlotContainer = CreateWidget<UItemSlotContainer>(pPlayerController, ItemSlotContainerClass);
+	CHECK(ItemSlotContainer);
+
+	ItemSlotContainer->SetVisibility(ESlateVisibility::Hidden);
 }
 
 int UInventoryComponent::FindEmptyIdxInItemArr()
@@ -255,4 +267,15 @@ bool UInventoryComponent::Resize(const int& NewMaxSize)
 	}
 
 	return true;
+}
+
+void UInventoryComponent::ToggleInventory()
+{
+	if (bCanUseInventory)
+	{
+		CHECK(ItemSlotContainer);
+
+		bIsInventoryOpen = !bIsInventoryOpen;
+		ItemSlotContainer->SetVisibility(bIsInventoryOpen ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	}
 }

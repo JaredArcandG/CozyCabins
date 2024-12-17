@@ -136,6 +136,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	pInputComponent->BindAction(InputActions->InputJournal, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerJournal);
 	pInputComponent->BindAction(InputActions->InputFlashlight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerFlashlight);
 	pInputComponent->BindAction(InputActions->InputConfirm, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
+	pInputComponent->BindAction(InputActions->InputInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerInventory);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -242,4 +243,15 @@ void APlayerCharacter::TriggerJournal(const FInputActionValue& InputValue)
 void APlayerCharacter::TriggerFlashlight(const FInputActionValue& InputValue)
 {
 	OnFlashlightPress();
+}
+
+/// <summary>
+/// Triggered when character opens/closes the inventory via the 'i' key
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::TriggerInventory(const FInputActionValue& InputValue)
+{
+	CHECK(InventoryComp);
+
+	InventoryComp->ToggleInventory();
 }

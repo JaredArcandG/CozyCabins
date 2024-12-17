@@ -41,4 +41,7 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TObjectPtr<UInputAction> InputJournal;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TObjectPtr<UInputAction> InputInventory;
+
 };

@@ -117,4 +117,7 @@ protected:
 	// Handle start/turn off flashlight
 	void TriggerFlashlight(const FInputActionValue& InputValue);
 
+	// Handle show/hide inventory
+	void TriggerInventory(const FInputActionValue& InputValue);
+
 };

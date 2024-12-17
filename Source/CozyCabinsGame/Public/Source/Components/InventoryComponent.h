@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
 	bool bCanUseInventory = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
+	TSubclassOf<class UItemSlotContainer> ItemSlotContainerClass;
+
 protected:
 
 	// Represents an item stack with the arr idx as the slot number, and the quantity of the item
@@ -43,6 +46,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<class UDataTable> DataTable;
+
+	bool bIsInventoryOpen;
+
+	UPROPERTY()
+	TObjectPtr<class UItemSlotContainer> ItemSlotContainer;
 
 protected:
 
@@ -73,5 +81,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Changes the size of the inventory. True if resize was successful, false otherwise. Note: Can only increase the size."))
 	bool Resize(const int& NewMaxSize);
+
+	void ToggleInventory();
 
 };
