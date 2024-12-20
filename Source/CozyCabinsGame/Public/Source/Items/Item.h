@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemDataRowName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Quantity;
+
 protected:
 
 	FItemData CachedItemData;

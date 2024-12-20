@@ -15,9 +15,10 @@ void UItemSlot::ClearSlot()
 	ItemImage->SetBrushFromTexture(nullptr);
 	Quantity->SetText(FText::GetEmpty());
 	Name->SetText(FText::GetEmpty());
+	InventoryIdx = -1;
 }
 
-void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount)
+void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory)
 {
 	CHECK(ItemImage);
 	CHECK(Quantity);
@@ -26,4 +27,6 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount)
 	ItemImage->SetBrushFromTexture(ItemData.Icon);
 	Quantity->SetText(FText::AsNumber(Amount));
 	Name->SetText(FText::FromString(ItemData.Name));
+
+	InventoryIdx = IdxInInventory;
 }

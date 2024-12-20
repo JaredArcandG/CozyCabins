@@ -21,7 +21,8 @@ UInventoryComponent::UInventoryComponent()
 	// -1 represents empty space
 	for (int i = 0; i < MaxInventorySize; i++)
 	{
-		ItemArr.Add(-1);
+		ItemQuantityArr.Add(-1);
+		ItemIdArr.Add(FGuid::NewGuid());
 	}
 }
 
@@ -40,13 +41,19 @@ void UInventoryComponent::BeginPlay()
 	CHECK(ItemSlotContainer);
 
 	ItemSlotContainer->SetVisibility(ESlateVisibility::Hidden);
+	ItemSlotContainer->AddToViewport();
+	ItemSlotContainer->Setup(*this);
 }
 
+/// <summary>
+/// Finds an empty index in the inventory
+/// </summary>
+/// <returns></returns>
 int UInventoryComponent::FindEmptyIdxInItemArr()
 {
 	for (int i = 0; i < MaxInventorySize; i++)
 	{
-		if (ItemArr[i] == -1)
+		if (ItemQuantityArr[i] == -1)
 		{
 			return i;
 		}
@@ -63,6 +70,12 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
+/// <summary>
+/// Tries to add an item to the inventory, if possible
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="Quantity"></param>
+/// <returns>False if failed to add</returns>
 bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 {
 	if (Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
@@ -71,9 +84,9 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 	}
 
 	// Case: Item exists, needs to be added
-	if (ItemCacheMap.Contains(ItemId))
+	if (ItemIdArr.Contains(ItemId))
 	{
-		TArray<int> arrValidIndexes = ItemCacheMap[ItemId];
+		TArray<int> arrValidIndexes = GetIndexesWithItem(ItemId);
 
 		for (int candidateIdx : arrValidIndexes)
 		{
@@ -104,7 +117,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 	}
 
 	// Case: Item does not exist, No more space in the inventory
-	if (!ItemCacheMap.Contains(ItemId) && CurrentSize == MaxInventorySize)
+	if (!ItemIdArr.Contains(ItemId) && CurrentSize == MaxInventorySize)
 	{
 		return false;
 	}
@@ -117,66 +130,71 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 		return false;
 	}
 
-	ItemArr[candidateIndex] = 1;
-	TTuple<FGuid, TArray<int>> kvp = MakeTuple(ItemId, TArray<int>{ candidateIndex });
-	ItemCacheMap.Add(kvp);
+	ItemQuantityArr[candidateIndex] = Quantity;
+	ItemIdArr[candidateIndex] = ItemId;
 	CurrentSize++;
 	return true;
 
 }
 
+/// <summary>
+/// Tries to remove an item based on the ItemId.
+/// Removes the first item it can find in the inventory that matches, if one exists
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="Quantity"></param>
+/// <returns></returns>
 bool UInventoryComponent::TryRemove(const FGuid& ItemId, const int& Quantity)
 {
 	// Case Item does not exist, quantity is invalid
-	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
+	if (!ItemIdArr.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
 	
-	int arrIdx = ItemCacheMap[ItemId].Num() - 1;
-
-	if (arrIdx == -1)
-	{
-		return false;
-	}
-
-	int candidateIdx = ItemCacheMap[ItemId][arrIdx];
+	int candidateIdx = GetIndexesWithItem(ItemId)[0];
 
 	return TryRemoveAtIndex(ItemId, candidateIdx, Quantity);
 
 }
 
+/// <summary>
+/// Tries to add an item at a particular index
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="ArrIdx"></param>
+/// <param name="Quantity"></param>
+/// <returns></returns>
 bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
 	// Case Invalid Index, Large quantity
-	if (!ItemArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
+	if (!ItemIdArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
 	
 	// Case adding new item 
-	if (!ItemCacheMap.Contains(ItemId))
+	if (!ItemIdArr.Contains(ItemId))
 	{
 		// Different item exists in that index
-		if (ItemArr[ArrIdx] != -1)
+		if (ItemQuantityArr[ArrIdx] != -1)
 		{
 			return false;
 		}
 
-		ItemArr[ArrIdx] = Quantity;
-		TTuple<FGuid, TArray<int>> kvp = MakeTuple(ItemId, TArray<int>{ ArrIdx });
-		ItemCacheMap.Add(kvp);
+		ItemQuantityArr[ArrIdx] = Quantity;
+		ItemIdArr[ArrIdx] = ItemId;
 		CurrentSize++;
 		return true;
 	}
 
 	// Case addint to existing idx
-	if (ItemArr[ArrIdx] + Quantity > MaxItemStackSize)
+	if (ItemQuantityArr[ArrIdx] + Quantity > MaxItemStackSize)
 	{
 		return false;
 	}
 
-	ItemArr[ArrIdx] = Quantity;
+	ItemQuantityArr[ArrIdx] = Quantity;
 	return true;
 }
 
@@ -190,36 +208,28 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
 {
 	// Item does not exist, quantity too large/small, invalid arr index
-	if (!ItemCacheMap.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemArr.IsValidIndex(ArrIdx) || Quantity <= 0 || !bCanUseInventory)
+	if (!ItemIdArr.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemQuantityArr.IsValidIndex(ArrIdx) || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
 
 	// Removing index from wrong item, quantity too large
-	if (!ItemCacheMap[ItemId].Contains(ArrIdx) || ItemArr[ArrIdx] - Quantity < 0)
+	if (ItemIdArr[ArrIdx] != ItemId || ItemQuantityArr[ArrIdx] - Quantity < 0)
 	{
 		return false;
 	}
 
 	// Remove item from slot scenario
-	if (ItemArr[ArrIdx] - Quantity == 0)
+	if (ItemQuantityArr[ArrIdx] - Quantity == 0)
 	{
-		ItemArr[ArrIdx] = -1;
-		ItemCacheMap[ItemId].Remove(ArrIdx);
-
-		// Remove key if no more slots with this item left
-		if (ItemCacheMap[ItemId].Num() == 0)
-		{
-			ItemCacheMap.Remove(ItemId);
-			CurrentSize--;
-			return true;
-		}
+		ItemQuantityArr[ArrIdx] = -1;
+		ItemIdArr[ArrIdx] = FGuid::NewGuid();
 
 		return true;	
 	}
 
 	// Remove, item stacks still remain
-	ItemArr[ArrIdx] -= Quantity;
+	ItemQuantityArr[ArrIdx] -= Quantity;
 	return true;
 }
 
@@ -229,9 +239,9 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 /// <param name="ItemId"></param>
 /// <param name="ResultData"></param>
 /// <returns></returns>
-bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData ResultData)
+bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData)
 {
-	if (!DataTable || !ItemCacheMap.Contains(ItemId) || !bCanUseInventory)
+	if (!DataTable || !ItemIdArr.Contains(ItemId) || !bCanUseInventory)
 	{
 		return false;
 	}
@@ -249,6 +259,29 @@ bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData ResultData)
 }
 
 /// <summary>
+/// Tries to get the item data based on a specific index in the array. 
+/// </summary>
+/// <param name="ItemArrIdx"></param>
+/// <param name="ResultData"></param>
+/// <returns>False if the target index is invalid or a valid item is not present in that index</returns>
+bool UInventoryComponent::TryGetItemAtIndex(int ItemArrIdx, FItemData& ResultData, int& Quantity)
+{
+	if (!ItemQuantityArr.IsValidIndex(ItemArrIdx))
+	{
+		return false;
+	}
+
+	Quantity = ItemQuantityArr[ItemArrIdx];
+
+	if (Quantity == -1)
+	{
+		return false;
+	}
+
+	return TryGetItem(ItemIdArr[ItemArrIdx], ResultData);
+}
+
+/// <summary>
 /// Increases the size of the inventory
 /// Note: Can only increase the inventory size for now
 /// </summary>
@@ -263,12 +296,16 @@ bool UInventoryComponent::Resize(const int& NewMaxSize)
 
 	for (int i = 0; i < NewMaxSize - MaxInventorySize; i++)
 	{
-		ItemArr.Add(-1);
+		ItemQuantityArr.Add(-1);
+		ItemIdArr.Add(FGuid::NewGuid());
 	}
 
 	return true;
 }
 
+/// <summary>
+/// Toggles the inventory UI
+/// </summary>
 void UInventoryComponent::ToggleInventory()
 {
 	if (bCanUseInventory)
@@ -276,6 +313,27 @@ void UInventoryComponent::ToggleInventory()
 		CHECK(ItemSlotContainer);
 
 		bIsInventoryOpen = !bIsInventoryOpen;
-		ItemSlotContainer->SetVisibility(bIsInventoryOpen ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+		ESlateVisibility targetVisibility = bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
+		ItemSlotContainer->SetVisibility(targetVisibility);
 	}
+}
+
+/// <summary>
+/// Gets all indexes that contain the item based on item id (guid)
+/// </summary>
+/// <param name="TargetGuid"></param>
+/// <returns></returns>
+TArray<int> UInventoryComponent::GetIndexesWithItem(const FGuid& TargetGuid)
+{
+	TArray<int> arrValidIndexes;
+
+	for (int i = 0; i < ItemIdArr.Num(); i++)
+	{
+		if (ItemIdArr[i] == TargetGuid)
+		{
+			arrValidIndexes.Add(i);
+		}
+	}
+
+	return arrValidIndexes;
 }

@@ -35,11 +35,11 @@ public:
 
 protected:
 
-	// Represents an item stack with the arr idx as the slot number, and the quantity of the item
-	TArray<int> ItemArr;
+	// Represents an item stack with the arr idx as the slot number, and value as the quantity of the item
+	TArray<int> ItemQuantityArr;
 
-	// Map for quick lookup. Key is the item id, value is the index in the array where the item was stored
-	TMap<FGuid, TArray<int>> ItemCacheMap;
+	// Array for item id lookup with the arr idx as the slot number
+	TArray<FGuid> ItemIdArr;
 
 	// Keep track of the current array size
 	int CurrentSize;
@@ -77,11 +77,18 @@ public:
 	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid."))
-	bool TryGetItem(const FGuid& ItemId, FItemData ResultData);
+	bool TryGetItem(const FGuid& ItemId, FItemData& ResultData);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item at a specific index in the item table if it exists in the inventory. ResultData is null if item not found or invalid, Quantity is -1."))
+	bool TryGetItemAtIndex(int ItemArrIdx, FItemData& ResultData, int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Changes the size of the inventory. True if resize was successful, false otherwise. Note: Can only increase the size."))
 	bool Resize(const int& NewMaxSize);
 
 	void ToggleInventory();
+
+protected:
+
+	TArray<int> GetIndexesWithItem(const FGuid& TargetGuid);
 
 };

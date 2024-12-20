@@ -23,6 +23,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UCanvasPanel> ItemCanvas;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTileView> ContainerView;
+
 protected:
 
 	TArray<TObjectPtr<class UItemSlot>> ItemSlots;
@@ -45,9 +48,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
 	TSubclassOf<class UItemSlot> ItemSlotClass;
 
-protected:
+	UPROPERTY()
+	TObjectPtr<class UInventoryComponent> InventoryCompRef;
 
-	void SetupSlots();
+public:
+
+	void Setup(class UInventoryComponent& Inventory);
+
+protected:
 
 	void GetClosestSlotBasedOnLocation(const FVector2f& ItemLocation, TObjectPtr<class UItemSlot>& OutItemSlot);
 

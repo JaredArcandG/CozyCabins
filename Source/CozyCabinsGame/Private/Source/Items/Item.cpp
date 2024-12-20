@@ -20,6 +20,9 @@ AItem::AItem()
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Mesh->SetCollisionResponseToChannel(ECC_InteractableChannel, ECollisionResponse::ECR_Block);
 
+	// Assume only one dropped by default
+	Quantity = 1;
+
 	SetRootComponent(Mesh);
 }
 

@@ -4,21 +4,27 @@
 #include "Source/UI/ItemSlotContainer.h"
 #include "Source/UI/ItemSlot.h"
 #include <Source/Utils/CheckUtils.h>
-#include "Components/CanvasPanel.h"
+#include "Source/Components/InventoryComponent.h"
+#include "Components/TileView.h"
+
 
 void UItemSlotContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
-	SetupSlots();
 
 	MaxDistanceAllowSlots = 50;
 	SlotPaddingX = 10;
 	SlotPaddingY = 10;
+	
 }
 
-void UItemSlotContainer::SetupSlots()
+void UItemSlotContainer::Setup(UInventoryComponent& Inventory)
 {
 	CHECK(ItemSlotClass);
+	CHECK(ContainerView);
+
+	InventoryCompRef = &Inventory;
+	ContainerView->ClearListItems();
 
 	int maxRows = FMath::CeilToInt((float)TotalSlots / SlotsPerRow);
 
@@ -31,17 +37,20 @@ void UItemSlotContainer::SetupSlots()
 		TObjectPtr<UItemSlot> pItemSlot = CreateWidget<UItemSlot>(this, ItemSlotClass);
 		CHECK(pItemSlot);
 
+		FItemData resultData;
+		int quantity;
+
+		// Set slot data if valid quantity
+		if (InventoryCompRef->TryGetItemAtIndex(i, resultData, quantity))
+		{
+			pItemSlot->SetSlotData(resultData, quantity, i);
+		}
+
 		// Calculate the widget location relative to the top left corner of the slot container widget
 		int xLoc = SlotPaddingX * rowX;
 		int yLoc = SlotPaddingY * rowY;
 
-		FWidgetTransform transform;
-		transform.Translation = FVector2D(xLoc, yLoc);
-
-		pItemSlot->SetRenderTransform(transform);
-
-		CHECK(ItemCanvas);
-		ItemCanvas->AddChildToCanvas(pItemSlot);
+		ContainerView->AddItem(pItemSlot);
 
 		ItemSlots.Add(pItemSlot);
 	}
