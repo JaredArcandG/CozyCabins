@@ -19,14 +19,13 @@ public:
 
 	FVector2f OriginalLocation;
 
-
 public:
 
 	virtual void NativeConstruct() override;
 
-	void OnDragStart(const FGeometry& Geometry, const FPointerEvent& PointerEvent, UDragDropOperation*& OutOperation);
-	
-	bool OnDrop(const FGeometry& Geometry, const FDragDropEvent& DragDropEvent, UDragDropOperation* Operation);
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
-	void OnDragOver(const FGeometry& Geometry, const FDragDropEvent& DragDropEvent, UDragDropOperation* Operation);
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };

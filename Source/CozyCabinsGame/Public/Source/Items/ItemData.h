@@ -17,16 +17,16 @@ struct COZYCABINSGAME_API FItemData : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Unique Item Id - Generated Automatically"))
-	FGuid Id;
+	FGuid Id = FGuid::NewGuid();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Name"))
-	FString Name;
+	FString Name = FString();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Description of Item"))
-	FString Description;
+	FString Description = FString();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Icon to show in Widgets"))
-	TObjectPtr<UTexture2D> Icon;
+	TObjectPtr<UTexture2D> Icon = nullptr;
 
 	FItemData() 
 		: Id(FGuid::NewGuid()),

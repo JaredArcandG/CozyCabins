@@ -5,34 +5,27 @@
 #include "Source/UI/ItemSlot.h"
 #include <Source/Utils/CheckUtils.h>
 #include "Source/Components/InventoryComponent.h"
-#include "Components/TileView.h"
+#include "Components/WrapBox.h"
 
 
 void UItemSlotContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	MaxDistanceAllowSlots = 50;
-	SlotPaddingX = 10;
-	SlotPaddingY = 10;
+	TotalSlots = 36;
 	
 }
 
 void UItemSlotContainer::Setup(UInventoryComponent& Inventory)
 {
 	CHECK(ItemSlotClass);
-	CHECK(ContainerView);
+	CHECK(GridBox);
 
 	InventoryCompRef = &Inventory;
-	ContainerView->ClearListItems();
-
-	int maxRows = FMath::CeilToInt((float)TotalSlots / SlotsPerRow);
+	GridBox->ClearChildren();
 
 	for (int i = 0; i < TotalSlots; i++)
 	{
-		int rowY = i / SlotsPerRow;
-		int rowX = i % SlotsPerRow;
-
 		// Create the object
 		TObjectPtr<UItemSlot> pItemSlot = CreateWidget<UItemSlot>(this, ItemSlotClass);
 		CHECK(pItemSlot);
@@ -46,43 +39,8 @@ void UItemSlotContainer::Setup(UInventoryComponent& Inventory)
 			pItemSlot->SetSlotData(resultData, quantity, i);
 		}
 
-		// Calculate the widget location relative to the top left corner of the slot container widget
-		int xLoc = SlotPaddingX * rowX;
-		int yLoc = SlotPaddingY * rowY;
-
-		ContainerView->AddItem(pItemSlot);
+		GridBox->AddChildToWrapBox(pItemSlot);
 
 		ItemSlots.Add(pItemSlot);
 	}
-}
-
-void UItemSlotContainer::GetClosestSlotBasedOnLocation(const FVector2f& ItemLocation, TObjectPtr<UItemSlot>& OutItemSlot)
-{
-	OutItemSlot = nullptr;
-
-	int targetIndex = -1;
-	float targetDist = MaxDistanceAllowSlots;
-
-	for (int i = 0; i < TotalSlots; i++)
-	{
-		int rowY = i / SlotsPerRow;
-		int rowX = i % SlotsPerRow;
-
-		int xLoc = SlotPaddingX * rowX;
-		int yLoc = SlotPaddingY * rowY;
-
-		float slotDist = FMath::Sqrt(FMath::Square(yLoc - ItemLocation.Y) + FMath::Square(xLoc - ItemLocation.X));
-
-		if (slotDist <= targetDist)
-		{
-			targetIndex = i;
-			targetDist = slotDist;
-		}
-	}
-
-	if (ItemSlots.IsValidIndex(targetIndex))
-	{
-		OutItemSlot = ItemSlots[targetIndex];
-	}
-
 }

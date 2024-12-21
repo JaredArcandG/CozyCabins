@@ -21,10 +21,7 @@ public:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UCanvasPanel> ItemCanvas;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTileView> ContainerView;
+	TObjectPtr<class UWrapBox> GridBox;
 
 protected:
 
@@ -32,18 +29,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
 	int TotalSlots;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
-	int SlotsPerRow;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
-	int MaxDistanceAllowSlots;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
-	int SlotPaddingX;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
-	int SlotPaddingY;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
 	TSubclassOf<class UItemSlot> ItemSlotClass;
@@ -54,10 +39,5 @@ protected:
 public:
 
 	void Setup(class UInventoryComponent& Inventory);
-
-protected:
-
-	void GetClosestSlotBasedOnLocation(const FVector2f& ItemLocation, TObjectPtr<class UItemSlot>& OutItemSlot);
-
 
 };

@@ -14,7 +14,7 @@
  * 
  */
 UCLASS(Blueprintable, BlueprintType)
-class COZYCABINSGAME_API UItemSlot : public UDraggableWidget, public IUserObjectListEntry
+class COZYCABINSGAME_API UItemSlot : public UDraggableWidget
 {
 	GENERATED_BODY()
 
@@ -28,9 +28,6 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> Name;
-
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UImage> SlotBackgroundimage;
 
 	// Reference to where in the inventory the slot is located
 	int InventoryIdx;
