@@ -78,13 +78,13 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory for a specific index. Returns true if successful, false otherwise"))
 	bool TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add the item to the inventory for a specific index. Returns true if successful, false otherwise"))
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to remove the item to the inventory for a specific index with a specific quantity for that index only. Returns true if successful, false otherwise"))
 	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid."))
-	bool TryGetItem(const FGuid& ItemId, FItemData& ResultData);
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid. Index agnostic, quantity is the total over all indexes."))
+	bool TryGetItem(const FGuid& ItemId, FItemData& ResultData, int& Quantity);
 
-	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item at a specific index in the item table if it exists in the inventory. ResultData is null if item not found or invalid, Quantity is -1."))
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item at a specific index in the item table if it exists in the inventory. ResultData is null if item not found or invalid, Quantity is -1 if invalid."))
 	bool TryGetItemAtIndex(int ItemArrIdx, FItemData& ResultData, int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Changes the size of the inventory. True if resize was successful, false otherwise. Note: Can only increase the size."))
@@ -95,5 +95,7 @@ public:
 protected:
 
 	TArray<int> GetIndexesWithItem(const FGuid& TargetGuid);
+
+	bool TryGetQuantityAtIndex(const int& Idx, int& Quantity);
 
 };

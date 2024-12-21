@@ -72,68 +72,90 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 /// <summary>
 /// Tries to add an item to the inventory, if possible
+/// If quantity exceeds a single index, it will try to add it to any empty indexes found
 /// </summary>
 /// <param name="ItemId"></param>
 /// <param name="Quantity"></param>
 /// <returns>False if failed to add</returns>
 bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 {
-	if (Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
+	if (Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
 
-	// Case: Item exists, needs to be added
+	// First check if it's possible to add
+	int addSpaceAvailable = 0;
+
+	if (ItemIdArr.Contains(ItemId))
+	{
+		for (int idx : GetIndexesWithItem(ItemId))
+		{
+			int currQuantity = 0;
+			if (TryGetQuantityAtIndex(idx, currQuantity))
+			{
+				addSpaceAvailable += (MaxItemStackSize - currQuantity);
+			}
+		}
+	}
+
+	for (int idx = 0; idx < MaxInventorySize; idx++)
+	{
+		if (ItemQuantityArr[idx] == -1)
+		{
+			addSpaceAvailable += 99;
+		}
+	}
+
+	if (addSpaceAvailable < Quantity)
+	{
+		return false;
+	}
+
+	// Case: Item exists, fill those slots first
+	int quantityLeftToAdd = Quantity;
 	if (ItemIdArr.Contains(ItemId))
 	{
 		TArray<int> arrValidIndexes = GetIndexesWithItem(ItemId);
 
 		for (int candidateIdx : arrValidIndexes)
 		{
-			if (TryAddAtIndex(ItemId, candidateIdx, Quantity))
+			if (quantityLeftToAdd == 0)
 			{
-				OnInventoryChange.Broadcast();  
+				OnInventoryChange.Broadcast();
 				return true;
-			}  
+			}
+
+			int currQty = ItemQuantityArr[candidateIdx];
+			int amtCanAdd = MaxItemStackSize - currQty;
+
+			TryAddAtIndex(ItemId, candidateIdx, amtCanAdd);
+			quantityLeftToAdd -= amtCanAdd;
 		}
-
-		// Item needs to be added in a new index
-
-		// No space, can't add
-		if (CurrentSize == MaxInventorySize || Quantity > MaxItemStackSize)
-		{
-			return false;
-		}
-		
-		// Should be able to add
-		int candidateIdx = FindEmptyIdxInItemArr();
-
-		// For some reason, item arr does not match up and we couldn't find a valid index
-		if (candidateIdx == -1)
-		{
-			return false;
-		}
-
-		return TryAddAtIndex(ItemId, candidateIdx, Quantity);
 	}
 
-	// Case: Item does not exist, No more space in the inventory
-	if (!ItemIdArr.Contains(ItemId) && CurrentSize == MaxInventorySize)
+	// Fill in empty spaces if necessary
+	while (quantityLeftToAdd != 0)
 	{
-		return false;
+		// Case Item does not exist, should be able to add anywhere
+		int candidateIndex = FindEmptyIdxInItemArr();
+
+		if (quantityLeftToAdd <= MaxItemStackSize) // We have enough, can end here
+		{
+			ItemQuantityArr[candidateIndex] = quantityLeftToAdd;
+			ItemIdArr[candidateIndex] = ItemId;
+			quantityLeftToAdd = 0;
+		}
+		else
+		{
+			ItemQuantityArr[candidateIndex] = MaxItemStackSize;
+			ItemIdArr[candidateIndex] = ItemId;
+			quantityLeftToAdd -= MaxItemStackSize;
+		}
+
+		CurrentSize++;
 	}
 
-	// Case Item does not exist, should be able to add
-	int candidateIndex = FindEmptyIdxInItemArr();
-
-	if (candidateIndex == -1)
-	{
-		return false;
-	}
-
-	ItemQuantityArr[candidateIndex] = Quantity;
-	ItemIdArr[candidateIndex] = ItemId;
-	CurrentSize++;
 	OnInventoryChange.Broadcast();
 	return true;
 
@@ -141,7 +163,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 
 /// <summary>
 /// Tries to remove an item based on the ItemId.
-/// Removes the first item it can find in the inventory that matches, if one exists
+/// Removes the item from multiple indexes in order if quantity overflows
 /// </summary>
 /// <param name="ItemId"></param>
 /// <param name="Quantity"></param>
@@ -149,14 +171,66 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 bool UInventoryComponent::TryRemove(const FGuid& ItemId, const int& Quantity)
 {
 	// Case Item does not exist, quantity is invalid
-	if (!ItemIdArr.Contains(ItemId) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
+	if (!ItemIdArr.Contains(ItemId) || Quantity <= 0 || !bCanUseInventory)
 	{
 		return false;
 	}
 	
-	int candidateIdx = GetIndexesWithItem(ItemId)[0];
+	TArray<int> candidateIndexes = GetIndexesWithItem(ItemId);
 
-	return TryRemoveAtIndex(ItemId, candidateIdx, Quantity);
+	// first ensure that quantity to remove <= total quantity
+
+	int totalQuantity = 0;
+
+	for (int candidateIdx : candidateIndexes)
+	{
+		int quantity = 0;
+
+		if (TryGetQuantityAtIndex(candidateIdx, quantity))
+		{
+			totalQuantity += quantity;
+		}
+	}
+
+	if (totalQuantity < Quantity)
+	{
+		// All the item quanitities are still not sufficient, can't remove this item
+		return false;
+	}
+
+	// Removal is possible
+	int leftToRemove = Quantity;
+
+	for (int candidateIdx : candidateIndexes)
+	{
+		// Finished removal
+		if (leftToRemove == 0)
+		{
+			break;
+		}
+
+		int maxRemovedForIdx = 0;
+
+		if (TryGetQuantityAtIndex(candidateIdx, maxRemovedForIdx))
+		{
+			if (maxRemovedForIdx < leftToRemove)
+			{
+				// Remove everything at this index
+				leftToRemove -= maxRemovedForIdx;
+				TryRemoveAtIndex(ItemId, candidateIdx, maxRemovedForIdx);
+			}
+			else
+			{
+				// Remove whatever is left, then break out
+				TryRemoveAtIndex(ItemId, candidateIdx, leftToRemove);
+				leftToRemove = 0;
+				break;
+			}
+		}
+	}
+
+	OnInventoryChange.Broadcast();
+	return true;
 
 }
 
@@ -243,11 +317,13 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 /// </summary>
 /// <param name="ItemId"></param>
 /// <param name="ResultData"></param>
+/// <param name="Quantity"> The total quantity of the item including other indexes</param>
 /// <returns></returns>
-bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData)
+bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData, int& Quantity)
 {
 	if (!DataTable || !ItemIdArr.Contains(ItemId) || !bCanUseInventory)
 	{
+		Quantity = -1;
 		return false;
 	}
 
@@ -258,6 +334,24 @@ bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData)
 	if (pItemData && pItemData->Id == ItemId)
 	{
 		ResultData = *pItemData;
+
+		int totalQuantity = 0;
+
+		// Get the total quantity across all indexes
+		TArray<int> validIndexes = GetIndexesWithItem(ItemId);
+
+		for (int& idx : validIndexes)
+		{
+			int idxQuantity = 0;
+
+			if (TryGetQuantityAtIndex(idx, idxQuantity))
+			{
+				totalQuantity += idxQuantity;
+			}
+		}
+
+		Quantity = totalQuantity;
+
 		return true;
 	}
 	
@@ -269,22 +363,35 @@ bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData)
 /// </summary>
 /// <param name="ItemArrIdx"></param>
 /// <param name="ResultData"></param>
+/// <param name="Quantity">The quantity of the item AT THAT INDEX ONLY</param>
 /// <returns>False if the target index is invalid or a valid item is not present in that index</returns>
 bool UInventoryComponent::TryGetItemAtIndex(int ItemArrIdx, FItemData& ResultData, int& Quantity)
 {
-	if (!ItemQuantityArr.IsValidIndex(ItemArrIdx))
+	if (!ItemQuantityArr.IsValidIndex(ItemArrIdx) || !ItemIdArr.IsValidIndex(ItemArrIdx))
 	{
 		return false;
 	}
 
 	Quantity = ItemQuantityArr[ItemArrIdx];
+	FGuid itemId = ItemIdArr[ItemArrIdx];
 
 	if (Quantity == -1)
 	{
 		return false;
 	}
 
-	return TryGetItem(ItemIdArr[ItemArrIdx], ResultData);
+	FString sContextString;
+	FName rowName = FName(itemId.ToString(EGuidFormats::DigitsWithHyphens));
+	auto pItemData = DataTable->FindRow<FItemData>(rowName, sContextString);
+
+	if (!pItemData)
+	{
+		return false;
+	}
+
+	ResultData = *pItemData;
+
+	return true;
 }
 
 /// <summary>
@@ -343,4 +450,22 @@ TArray<int> UInventoryComponent::GetIndexesWithItem(const FGuid& TargetGuid)
 	}
 
 	return arrValidIndexes;
+}
+
+/// <summary>
+/// Gets the quantity of an item at the index
+/// </summary>
+/// <param name="idx"></param>
+/// <returns></returns>
+bool UInventoryComponent::TryGetQuantityAtIndex(const int& Idx, int& Quantity)
+{
+	if (!ItemQuantityArr.IsValidIndex(Idx))
+	{
+		Quantity = -1;
+		return false;
+	}
+
+	Quantity = ItemQuantityArr[Idx];
+
+	return Quantity == -1;
 }
