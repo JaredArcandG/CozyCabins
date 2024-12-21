@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Source/Crafting/CraftingData.h"
 #include "WorkStationUIBase.generated.h"
 
 /**
@@ -33,7 +34,7 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	TObjectPtr<class UInventoryComponent> InventoryComponent;
 
 	UPROPERTY()
-	TObjectPtr<struct FCraftingRecipe> CurrentRecipe;
+	struct FCraftingRecipe CurrentRecipe;
 
 public:
 

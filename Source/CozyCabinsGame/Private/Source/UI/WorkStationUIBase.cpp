@@ -46,7 +46,7 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 
 void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 {
-	CurrentRecipe = ActiveRecipe;
+	CurrentRecipe = *ActiveRecipe;
 
 	FItemData* CraftingResultData = ActiveRecipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(ActiveRecipe->CraftingResult.ItemReference.RowName, "");
 	TArray<FCraftingItem> IngredientsData = ActiveRecipe->CraftingIngredients;
@@ -66,9 +66,9 @@ void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 
 void UWorkStationUIBase::AttemptCraft()
 {
-	TArray<FCraftingItem> IngredientsData = CurrentRecipe->CraftingIngredients;
+	TArray<FCraftingItem> IngredientsData = CurrentRecipe.CraftingIngredients;
 
-	if (InventoryComponent && CurrentRecipe)
+	if (InventoryComponent)
 	{
 		for (FCraftingItem Ingredient : IngredientsData) 
 		{

@@ -92,9 +92,9 @@ public:
 
 	void ToggleInventory();
 
-protected:
-
 	TArray<int> GetIndexesWithItem(const FGuid& TargetGuid);
+
+protected:
 
 	bool TryGetQuantityAtIndex(const int& Idx, int& Quantity);
 
