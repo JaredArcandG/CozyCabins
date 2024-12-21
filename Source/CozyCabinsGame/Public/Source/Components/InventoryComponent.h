@@ -18,6 +18,11 @@ class COZYCABINSGAME_API UInventoryComponent : public UActorComponent
 
 public:
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChange);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnInventoryChange OnInventoryChange;
+
 	// Sets default values for this component's properties
 	UInventoryComponent();
 

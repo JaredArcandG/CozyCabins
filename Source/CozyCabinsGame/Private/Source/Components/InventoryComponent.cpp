@@ -92,6 +92,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 		{
 			if (TryAddAtIndex(ItemId, candidateIdx, Quantity))
 			{
+				OnInventoryChange.Broadcast();  
 				return true;
 			}  
 		}
@@ -133,6 +134,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 	ItemQuantityArr[candidateIndex] = Quantity;
 	ItemIdArr[candidateIndex] = ItemId;
 	CurrentSize++;
+	OnInventoryChange.Broadcast();
 	return true;
 
 }
@@ -185,6 +187,7 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 		ItemQuantityArr[ArrIdx] = Quantity;
 		ItemIdArr[ArrIdx] = ItemId;
 		CurrentSize++;
+		OnInventoryChange.Broadcast();
 		return true;
 	}
 
@@ -195,6 +198,7 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 	}
 
 	ItemQuantityArr[ArrIdx] = Quantity;
+	OnInventoryChange.Broadcast();
 	return true;
 }
 
@@ -224,12 +228,13 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 	{
 		ItemQuantityArr[ArrIdx] = -1;
 		ItemIdArr[ArrIdx] = FGuid::NewGuid();
-
+		OnInventoryChange.Broadcast();
 		return true;	
 	}
 
 	// Remove, item stacks still remain
 	ItemQuantityArr[ArrIdx] -= Quantity;
+	OnInventoryChange.Broadcast();
 	return true;
 }
 
@@ -247,7 +252,8 @@ bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData)
 	}
 
 	FString sContextString;
-	auto pItemData = DataTable->FindRow<FItemData>(FName(ItemId.ToString()), sContextString);
+	FName rowName = FName(ItemId.ToString(EGuidFormats::DigitsWithHyphens));
+	auto pItemData = DataTable->FindRow<FItemData>(rowName, sContextString);
 
 	if (pItemData && pItemData->Id == ItemId)
 	{
@@ -300,6 +306,7 @@ bool UInventoryComponent::Resize(const int& NewMaxSize)
 		ItemIdArr.Add(FGuid::NewGuid());
 	}
 
+	OnInventoryChange.Broadcast();
 	return true;
 }
 

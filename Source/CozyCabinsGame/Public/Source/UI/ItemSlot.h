@@ -37,5 +37,7 @@ public:
 	void ClearSlot();
 
 	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory);
+
+	void SetEmptySlot(const int& IdxInInventory);
 	
 };

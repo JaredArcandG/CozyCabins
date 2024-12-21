@@ -40,4 +40,11 @@ public:
 
 	void Setup(class UInventoryComponent& Inventory);
 
+	UFUNCTION()
+	void UpdateAllSlots();
+
+protected:
+
+	void CreateNewItemSlotAddToGrid(const int& ItemIdx);
+
 };

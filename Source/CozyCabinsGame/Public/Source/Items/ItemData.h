@@ -17,7 +17,7 @@ struct COZYCABINSGAME_API FItemData : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Unique Item Id - Generated Automatically"))
-	FGuid Id = FGuid::NewGuid();
+	FGuid Id;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Name"))
 	FString Name = FString();

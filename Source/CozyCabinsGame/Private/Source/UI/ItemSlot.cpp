@@ -28,5 +28,26 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	Quantity->SetText(FText::AsNumber(Amount));
 	Name->SetText(FText::FromString(ItemData.Name));
 
+	ItemImage->SetVisibility(ESlateVisibility::Visible);
+	Quantity->SetVisibility(ESlateVisibility::Visible);
+	Name->SetVisibility(ESlateVisibility::Visible);
+
+	InventoryIdx = IdxInInventory;
+}
+
+void UItemSlot::SetEmptySlot(const int& IdxInInventory)
+{
+	CHECK(ItemImage);
+	CHECK(Quantity);
+	CHECK(Name);
+
+	ItemImage->SetBrushFromTexture(nullptr);
+	Quantity->SetText(FText::GetEmpty());
+	Name->SetText(FText::GetEmpty());
+
+	ItemImage->SetVisibility(ESlateVisibility::Hidden);
+	Quantity->SetVisibility(ESlateVisibility::Hidden);
+	Name->SetVisibility(ESlateVisibility::Hidden);
+
 	InventoryIdx = IdxInInventory;
 }
