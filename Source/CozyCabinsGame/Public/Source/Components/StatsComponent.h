@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "StatsComponent.generated.h"
 
-#define MIN_TOTAL_STAT_VALUE 1
-#define MAX_TOTAL_STAT_VALUE 999
+#define MIN_TOTAL_STAT_VALUE 0
+#define MAX_TOTAL_STAT_VALUE 100
 
 UENUM(BlueprintType, Blueprintable)
 enum class EActorStatType : uint8
