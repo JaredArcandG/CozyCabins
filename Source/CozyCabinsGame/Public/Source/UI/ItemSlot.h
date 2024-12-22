@@ -29,6 +29,13 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> Name;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class UItemSlotDragPreview> DragPreviewClass;
+
+	FGuid ItemId;
+
+	int ItemQty;
+
 	// Reference to where in the inventory the slot is located
 	int InventoryIdx;
 

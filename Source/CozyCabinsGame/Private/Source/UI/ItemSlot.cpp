@@ -7,6 +7,8 @@
 #include "Components/Image.h"
 #include <Source/UI/CustomDragDropOperation.h>
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/UserWidget.h"
+#include "Source/UI/ItemSlotDragPreview.h"
 
 void UItemSlot::ClearSlot()
 {
@@ -19,6 +21,8 @@ void UItemSlot::ClearSlot()
 	Name->SetText(FText::GetEmpty());
 	InventoryIdx = -1;
 	bIsOccupied = false;
+	ItemId = FGuid();
+	ItemQty = -1;
 }
 
 void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory)
@@ -27,8 +31,10 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	CHECK(Quantity);
 	CHECK(Name);
 
+	ItemQty = Amount;
+
 	ItemImage->SetBrushFromTexture(ItemData.Icon);
-	Quantity->SetText(FText::AsNumber(Amount));
+	Quantity->SetText(FText::AsNumber(ItemQty));
 	Name->SetText(FText::FromString(ItemData.Name));
 
 	ItemImage->SetVisibility(ESlateVisibility::Visible);
@@ -37,6 +43,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 
 	InventoryIdx = IdxInInventory;
 	bIsOccupied = true;
+	ItemId = ItemData.Id;
 }
 
 void UItemSlot::SetEmptySlot(const int& IdxInInventory)
@@ -55,28 +62,31 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory)
 
 	InventoryIdx = IdxInInventory;
 	bIsOccupied = false;
+	ItemId = FGuid();
+	ItemQty = -1;
 }
 
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
+	CHECK(DragPreviewClass);
+
+	//Create the drag/drop operation
 	TObjectPtr<UCustomDragDropOperation> pOperation = NewObject<UCustomDragDropOperation>();
 	CHECK(pOperation);
 
-	TObjectPtr<UItemSlot> pSlotCopy = CreateWidget<UItemSlot>(this, UItemSlot::StaticClass());
-	CHECK(pSlotCopy);
+	// Create the preview widget
+	TObjectPtr<APlayerController> pPlayer = GetWorld()->GetFirstPlayerController();
+	CHECK(pPlayer);
 
-	pSlotCopy->ItemImage = this->ItemImage;
-	pSlotCopy->Quantity = this->Quantity;
-	pSlotCopy->Name = this->Name;
-	pSlotCopy->InventoryIdx = this->InventoryIdx;
-	pOperation->ItemSlotRef = pSlotCopy;
+	TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = CreateWidget<UItemSlotDragPreview>(pPlayer, DragPreviewClass);
+	CHECK(pDragPreviewWidget);
 
-	pOperation->DefaultDragVisual = pSlotCopy;
+	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, this->ItemQty, InventoryIdx, *this->ItemImage);
+
+	pOperation->DefaultDragVisual = pDragPreviewWidget;
+	pOperation->ItemSlotPreviewRef = pDragPreviewWidget;
 
 	OutOperation = pOperation;
-
-	pSlotCopy->AddToViewport();
-
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	UE_LOG(LogTemp, Warning, TEXT("On Drag Detected."));

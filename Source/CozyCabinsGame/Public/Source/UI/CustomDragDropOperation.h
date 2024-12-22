@@ -19,7 +19,7 @@ public:
 	UCustomDragDropOperation();
 
 	UPROPERTY()
-	TObjectPtr<class UItemSlot> ItemSlotRef;
+	TObjectPtr<class UItemSlotDragPreview> ItemSlotPreviewRef;
 
 	FVector2D DragOffset;
 
