@@ -84,6 +84,7 @@ bool UWorkStationUIBase::AttemptCraft()
 				//Attempt to add Crafting result
 				if (AttemptAdd(CurrentRecipe->CraftingResult)) 
 				{
+					UpdateIngredients();
 					return true;
 				}
 			}
@@ -143,4 +144,15 @@ bool UWorkStationUIBase::AttemptAdd(FCraftingItem ResultData)
 	}
 
 	return true;
+}
+
+void UWorkStationUIBase::UpdateIngredients()
+{
+	TArray<UWidget*> Childs = SelectedItemIngredients->GetAllChildren();
+
+	for (UWidget* Ingredient : Childs)
+	{
+		TObjectPtr<UCraftingIngredientSlot> IngredientSlot = Cast<UCraftingIngredientSlot>(Ingredient);
+		IngredientSlot->UpdateSlot(InventoryComponent);
+	}
 }

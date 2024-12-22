@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Source/Crafting/CraftingData.h"
 #include "CraftingIngredientSlot.generated.h"
 
 /**
@@ -26,9 +27,12 @@ class COZYCABINSGAME_API UCraftingIngredientSlot : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TXT_ItemQuantity;
 
+	struct FItemData* ItemDataStruct;
+	struct FCraftingItem CraftingItemData;
 
 public:
 
 	void SetupSlot(struct FCraftingItem ItemData, class UInventoryComponent* InventoryComponent);
+	void UpdateSlot(class UInventoryComponent* InventoryComponent);
 
 };

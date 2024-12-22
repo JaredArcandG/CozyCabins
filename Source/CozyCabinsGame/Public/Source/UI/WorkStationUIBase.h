@@ -41,6 +41,7 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	bool CheckQuantity(TArray<struct FCraftingItem> IngredientsData);
 	bool AttemptRemove(TArray<struct FCraftingItem> IngredientsData);
 	bool AttemptAdd(struct FCraftingItem ResultData);
+	void UpdateIngredients();
 
 public:
 
