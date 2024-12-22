@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "Source/Crafting/CraftingData.h"
+#include "Blueprint/UserWidget.h"
 #include "WorkStationUIBase.generated.h"
 
 /**
@@ -15,6 +15,8 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	virtual void NativeConstruct() override;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UWrapBox> WrapBox;
 
@@ -33,8 +35,12 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	UPROPERTY()
 	TObjectPtr<class UInventoryComponent> InventoryComponent;
 
-	UPROPERTY()
-	struct FCraftingRecipe CurrentRecipe;
+	FCraftingRecipe* CurrentRecipe;
+
+	// Functions used during the crafting process
+	bool CheckQuantity(TArray<struct FCraftingItem> IngredientsData);
+	bool AttemptRemove(TArray<struct FCraftingItem> IngredientsData);
+	bool AttemptAdd(struct FCraftingItem ResultData);
 
 public:
 
@@ -44,10 +50,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UCraftingIngredientSlot> IngredientSlotWidget;
 
+	// Called when Interacting with the Station
 	void InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter);
 
-	void ChangeSelection(struct FCraftingRecipe* ActiveRecipe);
+	// Called when a new Recipe is being clicked
+	void ChangeSelection(FCraftingRecipe* ActiveRecipe);
 
-	void AttemptCraft();
+	// Called from Blueprint when attempting to Craft the selected Recipe
+	UFUNCTION(BlueprintCallable)
+	bool AttemptCraft();
 
 };

@@ -19,9 +19,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UStaticMeshComponent> StationMesh;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//TObjectPtr<class UBoxComponent> CollisionMesh = nullptr;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UWorkStationUIBase> StationWidgetClass;
 
@@ -30,9 +27,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayWidget(UWorld* World, ACharacter* SourceCharacter);
-
-	//UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	//void OnInteract(UWorld* World, ACharacter* SourceCharacter);
 
 
 protected:

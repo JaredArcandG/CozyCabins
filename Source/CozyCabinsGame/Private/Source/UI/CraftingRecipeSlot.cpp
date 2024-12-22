@@ -2,18 +2,43 @@
 
 
 #include "Source/UI/CraftingRecipeSlot.h"
+#include "Source/UI/WorkStationUIBase.h"
 #include "Source/Items/ItemData.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
 
-void UCraftingRecipeSlot::InitializeSlot(FCraftingRecipe* Recipe)
+void UCraftingRecipeSlot::NativeConstruct()
 {
-	FItemData* ItemData = Recipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(Recipe->CraftingResult.ItemReference.RowName, "");
-	if (ItemData) 
+	ButtonSelect->OnPressed.AddDynamic(this, &UCraftingRecipeSlot::ChangeSlot);
+}
+
+void UCraftingRecipeSlot::InitializeSlot(FCraftingRecipe* Recipe, TObjectPtr<UUserWidget> ParentReference)
+{
+	CraftingRecipe = Recipe;
+	ParentWidget = ParentReference;
+
+	if (CraftingRecipe) 
 	{
-		if (ItemData->Icon) 
+		FItemData* ItemData = CraftingRecipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(CraftingRecipe->CraftingResult.ItemReference.RowName, "");
+		if (ItemData) 
 		{
-			ItemIcon->SetBrushFromTexture(ItemData->Icon);
+			if (ItemData->Icon) 
+			{
+				ItemIcon->SetBrushFromTexture(ItemData->Icon);
+			}
+		}
+	}
+}
+
+void UCraftingRecipeSlot::ChangeSlot()
+{
+	if (ParentWidget) 
+	{
+		TObjectPtr<UWorkStationUIBase> WorkstationUI = Cast<UWorkStationUIBase>(ParentWidget);
+
+		if (WorkstationUI) 
+		{
+			WorkstationUI->ChangeSelection(CraftingRecipe);
 		}
 	}
 }

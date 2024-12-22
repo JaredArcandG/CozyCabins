@@ -28,10 +28,16 @@ struct COZYCABINSGAME_API FCraftingRecipe : public FTableRowBase
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Unique Recipe Id - Generated Automatically"))
+	FGuid Id;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "All Items needed to create the Crafting Result"))
 	TArray<FCraftingItem> CraftingIngredients;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Crafting Result"))
 	FCraftingItem CraftingResult;
+
+	FCraftingRecipe()
+		: Id(FGuid::NewGuid()) { }
 
 };

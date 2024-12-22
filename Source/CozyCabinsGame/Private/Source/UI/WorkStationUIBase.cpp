@@ -2,7 +2,6 @@
 
 
 #include "Source/UI/WorkStationUIBase.h"
-#include "Source/Crafting/CraftingData.h"
 #include "Source/UI/CraftingRecipeSlot.h"
 #include "Source/UI/CraftingIngredientSlot.h"
 #include "Source/Components/InventoryComponent.h"
@@ -15,6 +14,10 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 
+void UWorkStationUIBase::NativeConstruct()
+{
+
+}
 
 void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter)
 {
@@ -23,6 +26,7 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 		if (InventoryComponent = SourceCharacter->FindComponentByClass<UInventoryComponent>()) 
 		{
 			TArray<FName> DataTableRowNames = DataTable->GetRowNames();
+			WrapBox->ClearChildren();
 
 			for (FName CurrentRow : DataTableRowNames)
 			{
@@ -30,7 +34,7 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 				TObjectPtr<UCraftingRecipeSlot> NewRecipeSlot = CreateWidget<UCraftingRecipeSlot>(GetWorld(), RecipeSlotWidget);
 				if (NewRecipe && NewRecipeSlot) 
 				{
-					NewRecipeSlot->InitializeSlot(NewRecipe);
+					NewRecipeSlot->InitializeSlot(NewRecipe, this);
 					WrapBox->AddChildToWrapBox(NewRecipeSlot);
 				}
 			}
@@ -46,7 +50,7 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 
 void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 {
-	CurrentRecipe = *ActiveRecipe;
+	CurrentRecipe = ActiveRecipe;
 
 	FItemData* CraftingResultData = ActiveRecipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(ActiveRecipe->CraftingResult.ItemReference.RowName, "");
 	TArray<FCraftingItem> IngredientsData = ActiveRecipe->CraftingIngredients;
@@ -61,19 +65,82 @@ void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 	{
 		UCraftingIngredientSlot* IngredientSlot = CreateWidget<UCraftingIngredientSlot>(GetWorld(), IngredientSlotWidget);
 		SelectedItemIngredients->AddChildToVerticalBox(IngredientSlot);
+		IngredientSlot->SetupSlot(Ingredient, InventoryComponent);
 	}
 }
 
-void UWorkStationUIBase::AttemptCraft()
+bool UWorkStationUIBase::AttemptCraft()
 {
-	TArray<FCraftingItem> IngredientsData = CurrentRecipe.CraftingIngredients;
+	TArray<FCraftingItem> IngredientsData = CurrentRecipe->CraftingIngredients;
 
 	if (InventoryComponent)
 	{
-		for (FCraftingItem Ingredient : IngredientsData) 
+		// Check if Quantity to craft matches
+		if (CheckQuantity(IngredientsData)) 
 		{
-			TArray<int> Indicies = InventoryComponent->GetIndexesWithItem(Ingredient.ItemReference.DataTable->FindRow<FItemData>(Ingredient.ItemReference.RowName, "")->Id);
-			Ingredient.ItemReference.RowName;
+			// Attempt to remove all Ingrdients
+			if (AttemptRemove(IngredientsData)) 
+			{
+				//Attempt to add Crafting result
+				if (AttemptAdd(CurrentRecipe->CraftingResult)) 
+				{
+					return true;
+				}
+			}
 		}
 	}
+
+	return false;
+}
+
+
+
+bool UWorkStationUIBase::CheckQuantity(TArray<struct FCraftingItem> IngredientsData)
+{
+	for (FCraftingItem Ingredient : IngredientsData)
+	{
+		int tempQuantity = 0;
+		FItemData* itemData = Ingredient.ItemReference.DataTable->FindRow<FItemData>(Ingredient.ItemReference.RowName, "");
+		FItemData tempData;
+
+		if (InventoryComponent->TryGetItem(itemData->Id, tempData, tempQuantity))
+		{
+			if (tempQuantity < Ingredient.Quantity)
+			{
+				return false;
+			}
+		}
+		else 
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool UWorkStationUIBase::AttemptRemove(TArray<struct FCraftingItem> IngredientsData)
+{
+	for (FCraftingItem Ingredient : IngredientsData)
+	{
+		FItemData* itemData = Ingredient.ItemReference.DataTable->FindRow<FItemData>(Ingredient.ItemReference.RowName, "");
+
+		if (!InventoryComponent->TryRemove(itemData->Id, Ingredient.Quantity))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool UWorkStationUIBase::AttemptAdd(FCraftingItem ResultData)
+{
+	FItemData* itemData = ResultData.ItemReference.DataTable->FindRow<FItemData>(ResultData.ItemReference.RowName, "");
+
+	if (!InventoryComponent->TryAdd(itemData->Id, ResultData.Quantity)) 
+	{
+		return false;
+	}
+
+	return true;
 }

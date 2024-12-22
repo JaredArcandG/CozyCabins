@@ -13,14 +13,25 @@ class COZYCABINSGAME_API UCraftingRecipeSlot : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	virtual void NativeConstruct() override;
+
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> ItemIcon;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> ButtonSelect;
 
+	FCraftingRecipe* CraftingRecipe;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> ParentWidget;
+
+	// Called through Button press, attempting to change the WorkStationUIBase active Recipe
+	UFUNCTION()
+	void ChangeSlot();
 
 public:
 
-	void InitializeSlot(FCraftingRecipe* Recipe);
+	// Called when Workstation is Interacted with at first
+	void InitializeSlot(FCraftingRecipe* Recipe, TObjectPtr<UUserWidget> ParentReference);
 };
