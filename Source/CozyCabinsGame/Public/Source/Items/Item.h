@@ -28,7 +28,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemDataRowName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	int Quantity;
 
 protected:

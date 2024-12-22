@@ -5,6 +5,6 @@
 
 UCustomDragDropOperation::UCustomDragDropOperation()
 {
-	WidgetRef = nullptr;
+	ItemSlotRef = nullptr;
 	DragOffset = FVector2D::Zero();
 }

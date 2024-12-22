@@ -103,7 +103,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 	{
 		if (ItemQuantityArr[idx] == -1)
 		{
-			addSpaceAvailable += 99;
+			addSpaceAvailable += MaxItemStackSize;
 		}
 	}
 
@@ -129,8 +129,23 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 			int currQty = ItemQuantityArr[candidateIdx];
 			int amtCanAdd = MaxItemStackSize - currQty;
 
-			TryAddAtIndex(ItemId, candidateIdx, amtCanAdd);
-			quantityLeftToAdd -= amtCanAdd;
+			// Slot is filled, can't add any more items
+			if (amtCanAdd == 0)
+			{
+				continue;
+			}
+
+			// Slot is not filled, try adding as much as we can
+			if (quantityLeftToAdd <= amtCanAdd)
+			{
+				TryAddAtIndex(ItemId, candidateIdx, quantityLeftToAdd);
+				quantityLeftToAdd = 0;
+			}
+			else
+			{
+				TryAddAtIndex(ItemId, candidateIdx, amtCanAdd);
+				quantityLeftToAdd -= amtCanAdd;
+			}
 		}
 	}
 
@@ -142,18 +157,14 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 
 		if (quantityLeftToAdd <= MaxItemStackSize) // We have enough, can end here
 		{
-			ItemQuantityArr[candidateIndex] = quantityLeftToAdd;
-			ItemIdArr[candidateIndex] = ItemId;
+			TryAddAtIndex(ItemId, candidateIndex, quantityLeftToAdd);
 			quantityLeftToAdd = 0;
 		}
 		else
 		{
-			ItemQuantityArr[candidateIndex] = MaxItemStackSize;
-			ItemIdArr[candidateIndex] = ItemId;
+			TryAddAtIndex(ItemId, candidateIndex, MaxItemStackSize);
 			quantityLeftToAdd -= MaxItemStackSize;
 		}
-
-		CurrentSize++;
 	}
 
 	OnInventoryChange.Broadcast();
@@ -248,29 +259,30 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 	{
 		return false;
 	}
-	
-	// Case adding new item 
-	if (!ItemIdArr.Contains(ItemId))
+
+	// Invalid Case trying to add to an existing item slot, but the item is different
+	if (ItemIdArr[ArrIdx] != ItemId && ItemQuantityArr[ArrIdx] != -1)
 	{
-		// Different item exists in that index
-		if (ItemQuantityArr[ArrIdx] != -1)
+		return false;
+	}
+	
+	// Case adding to an existing item slot, item is same
+	if (ItemIdArr[ArrIdx] == ItemId)
+	{
+		// Invalid Case Quantity exceeds index space
+		if (ItemQuantityArr[ArrIdx] + Quantity > MaxItemStackSize)
 		{
 			return false;
 		}
 
-		ItemQuantityArr[ArrIdx] = Quantity;
-		ItemIdArr[ArrIdx] = ItemId;
-		CurrentSize++;
+		ItemQuantityArr[ArrIdx] += Quantity;
 		OnInventoryChange.Broadcast();
 		return true;
 	}
 
-	// Case addint to existing idx
-	if (ItemQuantityArr[ArrIdx] + Quantity > MaxItemStackSize)
-	{
-		return false;
-	}
-
+	// Case adding to a new index
+	CurrentSize++;
+	ItemIdArr[ArrIdx] = ItemId;
 	ItemQuantityArr[ArrIdx] = Quantity;
 	OnInventoryChange.Broadcast();
 	return true;
@@ -429,6 +441,20 @@ void UInventoryComponent::ToggleInventory()
 		bIsInventoryOpen = !bIsInventoryOpen;
 		ESlateVisibility targetVisibility = bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 		ItemSlotContainer->SetVisibility(targetVisibility);
+
+		if (targetVisibility == ESlateVisibility::Visible)
+		{
+			FInputModeGameAndUI inputMode;
+			inputMode.SetWidgetToFocus(ItemSlotContainer->TakeWidget());
+			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
+			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+		} 
+		else if (targetVisibility == ESlateVisibility::Hidden)
+		{
+			FInputModeGameOnly inputMode;
+			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
+			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+		}
 	}
 }
 
@@ -467,5 +493,5 @@ bool UInventoryComponent::TryGetQuantityAtIndex(const int& Idx, int& Quantity)
 
 	Quantity = ItemQuantityArr[Idx];
 
-	return Quantity == -1;
+	return Quantity != -1;
 }

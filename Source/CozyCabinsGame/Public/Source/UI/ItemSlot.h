@@ -32,6 +32,8 @@ protected:
 	// Reference to where in the inventory the slot is located
 	int InventoryIdx;
 
+	bool bIsOccupied;
+
 public:
 
 	void ClearSlot();
@@ -39,5 +41,13 @@ public:
 	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory);
 
 	void SetEmptySlot(const int& IdxInInventory);
+
+protected:
+
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	virtual FReply NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 	
 };

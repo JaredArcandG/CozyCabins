@@ -13,6 +13,7 @@ void UItemSlotContainer::NativeConstruct()
 	Super::NativeConstruct();
 
 	TotalSlots = 36;
+	bIsFocusable = true;
 	
 }
 
