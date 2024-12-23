@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemSlotDragPreview> DragPreviewClass;
 
+	UPROPERTY()
+	TObjectPtr<class UInventoryComponent> InventoryCompRef;
+
 	FGuid ItemId;
 
 	int ItemQty;
@@ -43,11 +46,11 @@ protected:
 
 public:
 
-	void ClearSlot();
+	void ClearSlot(class UInventoryComponent& InventoryComp);
 
-	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory);
+	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, class UInventoryComponent& InventoryComp);
 
-	void SetEmptySlot(const int& IdxInInventory);
+	void SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp);
 
 protected:
 

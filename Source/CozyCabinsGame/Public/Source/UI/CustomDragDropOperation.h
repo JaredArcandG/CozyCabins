@@ -21,6 +21,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UItemSlotDragPreview> ItemSlotPreviewRef;
 
-	FVector2D DragOffset;
+	UPROPERTY()
+	TObjectPtr<class UInventoryComponent> InventoryCompRef;
 
 };

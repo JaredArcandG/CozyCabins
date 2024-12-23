@@ -14,6 +14,4 @@ void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount
 	Quantity = Amount;
 	ItemImage->SetBrush(Image.GetBrush());
 	InventoryIdx = IdxInInventory;
-
-	UE_LOG(LogTemp, Warning, TEXT("Border size set to 80x80."));
 }

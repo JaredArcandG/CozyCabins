@@ -7,6 +7,9 @@
 #include <Source/Items/ItemData.h>
 #include "InventoryComponent.generated.h"
 
+#define EMPTY_GUID FGuid()
+#define EMPTY_SLOT_VALUE -1
+
 /// <summary>
 /// Class to handle logic related to the Inventory
 /// Can be attached to multiple characters
@@ -89,6 +92,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Changes the size of the inventory. True if resize was successful, false otherwise. Note: Can only increase the size."))
 	bool Resize(const int& NewMaxSize);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Swaps the slot between the same or different inventories. Useful for drop functionality calls"))
+	bool TryTransferSlots(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& TargetSlotIdx);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Checks if it is possible to remove the item to the inventory for a specific index with a specific quantity for that index only. Returns true if successful, false otherwise"))
+	bool CanRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory for a specific index. Returns true if successful, false otherwise"))
+	bool CanAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	void ToggleInventory();
 

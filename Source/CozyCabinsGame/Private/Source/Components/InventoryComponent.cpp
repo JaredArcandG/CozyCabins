@@ -18,11 +18,10 @@ UInventoryComponent::UInventoryComponent()
 	bIsInventoryOpen = false;
 	ItemSlotContainer = nullptr;
 
-	// -1 represents empty space
 	for (int i = 0; i < MaxInventorySize; i++)
 	{
-		ItemQuantityArr.Add(-1);
-		ItemIdArr.Add(FGuid::NewGuid());
+		ItemQuantityArr.Add(EMPTY_SLOT_VALUE);
+		ItemIdArr.Add(EMPTY_GUID);
 	}
 }
 
@@ -53,13 +52,13 @@ int UInventoryComponent::FindEmptyIdxInItemArr()
 {
 	for (int i = 0; i < MaxInventorySize; i++)
 	{
-		if (ItemQuantityArr[i] == -1)
+		if (ItemQuantityArr[i] == EMPTY_SLOT_VALUE)
 		{
 			return i;
 		}
 	}
 
-	return -1;
+	return EMPTY_SLOT_VALUE;
 }
 
 // Called every frame
@@ -101,7 +100,7 @@ bool UInventoryComponent::TryAdd(const FGuid& ItemId, const int& Quantity)
 
 	for (int idx = 0; idx < MaxInventorySize; idx++)
 	{
-		if (ItemQuantityArr[idx] == -1)
+		if (ItemQuantityArr[idx] == EMPTY_SLOT_VALUE)
 		{
 			addSpaceAvailable += MaxItemStackSize;
 		}
@@ -261,7 +260,7 @@ bool UInventoryComponent::TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 	}
 
 	// Invalid Case trying to add to an existing item slot, but the item is different
-	if (ItemIdArr[ArrIdx] != ItemId && ItemQuantityArr[ArrIdx] != -1)
+	if (ItemIdArr[ArrIdx] != ItemId && ItemQuantityArr[ArrIdx] != EMPTY_SLOT_VALUE)
 	{
 		return false;
 	}
@@ -312,8 +311,8 @@ bool UInventoryComponent::TryRemoveAtIndex(const FGuid& ItemId, const int& ArrId
 	// Remove item from slot scenario
 	if (ItemQuantityArr[ArrIdx] - Quantity == 0)
 	{
-		ItemQuantityArr[ArrIdx] = -1;
-		ItemIdArr[ArrIdx] = FGuid::NewGuid();
+		ItemQuantityArr[ArrIdx] = EMPTY_SLOT_VALUE;
+		ItemIdArr[ArrIdx] = EMPTY_GUID;
 		OnInventoryChange.Broadcast();
 		return true;	
 	}
@@ -335,7 +334,7 @@ bool UInventoryComponent::TryGetItem(const FGuid& ItemId, FItemData& ResultData,
 {
 	if (!DataTable || !ItemIdArr.Contains(ItemId) || !bCanUseInventory)
 	{
-		Quantity = -1;
+		Quantity = EMPTY_SLOT_VALUE;
 		return false;
 	}
 
@@ -387,7 +386,7 @@ bool UInventoryComponent::TryGetItemAtIndex(int ItemArrIdx, FItemData& ResultDat
 	Quantity = ItemQuantityArr[ItemArrIdx];
 	FGuid itemId = ItemIdArr[ItemArrIdx];
 
-	if (Quantity == -1)
+	if (Quantity == EMPTY_SLOT_VALUE)
 	{
 		return false;
 	}
@@ -421,11 +420,108 @@ bool UInventoryComponent::Resize(const int& NewMaxSize)
 
 	for (int i = 0; i < NewMaxSize - MaxInventorySize; i++)
 	{
-		ItemQuantityArr.Add(-1);
+		ItemQuantityArr.Add(EMPTY_SLOT_VALUE);
 		ItemIdArr.Add(FGuid::NewGuid());
 	}
 
 	OnInventoryChange.Broadcast();
+	return true;
+}
+
+/// <summary>
+/// Attempts to transfer slot values between the same or two different inventories
+/// </summary>
+/// <param name="TargetInventory"></param>
+/// <param name="SourceSlotIdx"></param>
+/// <param name="TargetSlotIdx"></param>
+/// <returns>True if operation successful, ofalse otherwise</returns>
+bool UInventoryComponent::TryTransferSlots(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& TargetSlotIdx)
+{
+	if (!TargetInventory || !ItemIdArr.IsValidIndex(SourceSlotIdx) || !ItemQuantityArr.IsValidIndex(SourceSlotIdx))
+	{
+		return false;
+	}
+
+	FGuid itemIdToTransfer = ItemIdArr[SourceSlotIdx];
+	int itemQty = ItemQuantityArr[SourceSlotIdx];
+
+	// invalid slot
+	if (itemQty == EMPTY_SLOT_VALUE && itemIdToTransfer == EMPTY_GUID)
+	{
+		return false;
+	}
+
+	if (!CanRemoveAtIndex(itemIdToTransfer, SourceSlotIdx, itemQty) ||
+		!TargetInventory->CanAddAtIndex(itemIdToTransfer, TargetSlotIdx, itemQty))
+	{
+		return false;
+	}
+
+	TryRemoveAtIndex(itemIdToTransfer, SourceSlotIdx, itemQty);
+	TargetInventory->TryAddAtIndex(itemIdToTransfer, TargetSlotIdx, itemQty);
+
+	return true;
+}
+
+/// <summary>
+/// Verifies if it's possible to remove a particular item & quantity from the index
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="ArrIdx"></param>
+/// <param name="Quantity"></param>
+/// <returns>True if possible, false otherwise</returns>
+bool UInventoryComponent::CanRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
+{
+	// Item does not exist, quantity too large/small, invalid arr index
+	if (!ItemIdArr.Contains(ItemId) || Quantity > MaxItemStackSize || !ItemQuantityArr.IsValidIndex(ArrIdx) || Quantity <= 0 || !bCanUseInventory)
+	{
+		return false;
+	}
+
+	// Removing index from wrong item, quantity too large
+	if (ItemIdArr[ArrIdx] != ItemId || ItemQuantityArr[ArrIdx] - Quantity < 0)
+	{
+		return false;
+	}
+
+	// Can remove
+	return true;
+}
+
+/// <summary>
+/// Verifies if it's possible to add a particular item & quantity to the index
+/// </summary>
+/// <param name="ItemId"></param>
+/// <param name="ArrIdx"></param>
+/// <param name="Quantity"></param>
+/// <returns>True if possible, false otherwise</returns>
+bool UInventoryComponent::CanAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity)
+{
+	// Case Invalid Index, Large quantity
+	if (!ItemIdArr.IsValidIndex(ArrIdx) || Quantity > MaxItemStackSize || Quantity <= 0 || !bCanUseInventory)
+	{
+		return false;
+	}
+
+	// Invalid Case trying to add to an existing item slot, but the item is different
+	if (ItemIdArr[ArrIdx] != ItemId && ItemQuantityArr[ArrIdx] != EMPTY_SLOT_VALUE)
+	{
+		return false;
+	}
+
+	// Case adding to an existing item slot, item is same
+	if (ItemIdArr[ArrIdx] == ItemId)
+	{
+		// Invalid Case Quantity exceeds index space
+		if (ItemQuantityArr[ArrIdx] + Quantity > MaxItemStackSize)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	// Case adding to a new index
 	return true;
 }
 
@@ -487,11 +583,11 @@ bool UInventoryComponent::TryGetQuantityAtIndex(const int& Idx, int& Quantity)
 {
 	if (!ItemQuantityArr.IsValidIndex(Idx))
 	{
-		Quantity = -1;
+		Quantity = EMPTY_SLOT_VALUE;
 		return false;
 	}
 
 	Quantity = ItemQuantityArr[Idx];
 
-	return Quantity != -1;
+	return Quantity != EMPTY_SLOT_VALUE;
 }

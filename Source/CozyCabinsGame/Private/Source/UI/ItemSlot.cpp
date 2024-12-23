@@ -9,8 +9,9 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Source/UI/ItemSlotDragPreview.h"
+#include <Source/Components/InventoryComponent.h>
 
-void UItemSlot::ClearSlot()
+void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
 	CHECK(Quantity);
@@ -21,11 +22,12 @@ void UItemSlot::ClearSlot()
 	Name->SetText(FText::GetEmpty());
 	InventoryIdx = -1;
 	bIsOccupied = false;
-	ItemId = FGuid();
+	ItemId = EMPTY_GUID;
 	ItemQty = -1;
+	InventoryCompRef = &InventoryComp;
 }
 
-void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory)
+void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
 	CHECK(Quantity);
@@ -44,9 +46,10 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	InventoryIdx = IdxInInventory;
 	bIsOccupied = true;
 	ItemId = ItemData.Id;
+	InventoryCompRef = &InventoryComp;
 }
 
-void UItemSlot::SetEmptySlot(const int& IdxInInventory)
+void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
 	CHECK(Quantity);
@@ -62,8 +65,9 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory)
 
 	InventoryIdx = IdxInInventory;
 	bIsOccupied = false;
-	ItemId = FGuid();
+	ItemId = EMPTY_GUID;
 	ItemQty = -1;
+	InventoryCompRef = &InventoryComp;
 }
 
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -85,6 +89,7 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 
 	pOperation->DefaultDragVisual = pDragPreviewWidget;
 	pOperation->ItemSlotPreviewRef = pDragPreviewWidget;
+	pOperation->InventoryCompRef = InventoryCompRef;
 
 	OutOperation = pOperation;
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
@@ -94,7 +99,26 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	return false;
+	TObjectPtr<UCustomDragDropOperation> pOperation = Cast<UCustomDragDropOperation>(InOperation);
+
+	// Operation should be a valid CustomDragDropOperation
+	if (!pOperation || !pOperation->InventoryCompRef || !pOperation->ItemSlotPreviewRef)
+	{
+		return false;
+	}
+
+	// Target Slot should have a valid Inventory component reference
+	if (!InventoryCompRef)
+	{
+		return false;
+	}
+
+	TObjectPtr<UInventoryComponent> pInventoryComp = pOperation->InventoryCompRef;
+	int srcIdx = pOperation->ItemSlotPreviewRef->InventoryIdx;
+	int targetIdx = InventoryIdx;
+
+	return pInventoryComp->TryTransferSlots(InventoryCompRef, srcIdx, targetIdx);
+
 }
 
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)

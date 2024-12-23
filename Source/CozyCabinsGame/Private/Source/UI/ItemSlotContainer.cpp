@@ -60,12 +60,12 @@ void UItemSlotContainer::UpdateAllSlots()
 			// Set slot data if valid quantity
 			if (!InventoryCompRef->TryGetItemAtIndex(i, resultData, quantity))
 			{
-				pItemSlot->SetEmptySlot(i);
+				pItemSlot->SetEmptySlot(i, *InventoryCompRef);
 				ItemSlots.Add(pItemSlot);
 				continue;
 			}
 			
-			pItemSlot->SetSlotData(resultData, quantity, i);
+			pItemSlot->SetSlotData(resultData, quantity, i, *InventoryCompRef);
 			ItemSlots.Add(pItemSlot);
 			continue;
 		}
@@ -83,6 +83,7 @@ void UItemSlotContainer::UpdateAllSlots()
 void UItemSlotContainer::CreateNewItemSlotAddToGrid(const int& ItemIdx)
 {
 	CHECK(GridBox);
+	CHECK(InventoryCompRef);
 
 	// Create the object
 	TObjectPtr<UItemSlot> pItemSlot = CreateWidget<UItemSlot>(this, ItemSlotClass);
@@ -94,11 +95,11 @@ void UItemSlotContainer::CreateNewItemSlotAddToGrid(const int& ItemIdx)
 	// Set slot data if valid quantity
 	if (InventoryCompRef->TryGetItemAtIndex(ItemIdx, resultData, quantity))
 	{
-		pItemSlot->SetSlotData(resultData, quantity, ItemIdx);
+		pItemSlot->SetSlotData(resultData, quantity, ItemIdx, *InventoryCompRef);
 	}
 	else
 	{
-		pItemSlot->SetEmptySlot(ItemIdx);
+		pItemSlot->SetEmptySlot(ItemIdx, *InventoryCompRef);
 	}
 
 	GridBox->AddChildToWrapBox(pItemSlot);

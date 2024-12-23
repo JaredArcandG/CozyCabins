@@ -6,5 +6,5 @@
 UCustomDragDropOperation::UCustomDragDropOperation()
 {
 	ItemSlotPreviewRef = nullptr;
-	DragOffset = FVector2D::Zero();
+	InventoryCompRef = nullptr;
 }
