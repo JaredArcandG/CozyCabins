@@ -13,7 +13,7 @@ void UGameTimeManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	float fRealtimeSecs = 60 * RealTimeMinutesPerGameHour;
+	float fRealtimeSecs = RealTimeMinutesPerGameHour; // multiply by 60 to get real time seconds, divide by 60 to get real time seconds per game minute, they cancel out
 
 	// Broadcast event for game time passed every fRealtime seconds
 	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, FTimerDelegate::CreateUObject(this, &UGameTimeManager::BroadCastGameTimePassed), fRealtimeSecs, true);
