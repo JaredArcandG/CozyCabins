@@ -23,7 +23,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> StaminaBar;
 
-	UPROPERTY()
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> HungerBar;
+
 	TObjectPtr<class UStatsComponent> ActorStatsRef;
 
 public:
@@ -38,5 +40,7 @@ protected:
 	void UpdateHealthBar(float HealthPercent);
 
 	void UpdateStaminaBar(float StaminaPercent);
+
+	void UpdateHungerBar(float HungerPercent);
 	
 };

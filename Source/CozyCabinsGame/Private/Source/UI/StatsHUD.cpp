@@ -20,6 +20,9 @@ void UStatsHUD::InitializeWidget(APlayerCharacter& PlayerCharacter)
 
 	CHECK(StaminaBar);
 	StaminaBar->SetPercent(ActorStatsRef->GetStaminaRatio());
+
+	CHECK(HungerBar);
+	HungerBar->SetPercent(ActorStatsRef->GetHungerRatio());
 }
 
 void UStatsHUD::HandleStatsUpdate(EActorStatType UpdatedStat)
@@ -33,6 +36,9 @@ void UStatsHUD::HandleStatsUpdate(EActorStatType UpdatedStat)
 			break;
 		case EActorStatType::Health:
 			UpdateHealthBar(ActorStatsRef->GetHealthRatio());
+			break;
+		case EActorStatType::Hunger:
+			UpdateHungerBar(ActorStatsRef->GetHungerRatio());
 			break;
 		default:
 			UE_LOG(LogTemp, Error, TEXT("Updated Stat is not supported by the UStatsHUD widget."));
@@ -48,5 +54,14 @@ void UStatsHUD::UpdateHealthBar(float HealthPercent)
 
 void UStatsHUD::UpdateStaminaBar(float StaminaPercent)
 {
+	CHECK(StaminaBar);
+
 	StaminaBar->SetPercent(StaminaPercent);
+}
+
+void UStatsHUD::UpdateHungerBar(float HungerPercent)
+{
+	CHECK(HungerBar);
+
+	HungerBar->SetPercent(HungerPercent);
 }

@@ -13,7 +13,8 @@ UENUM(BlueprintType, Blueprintable)
 enum class EActorStatType : uint8
 {
 	Health,
-	Stamina
+	Stamina,
+	Hunger
 };
 
 USTRUCT(BlueprintType, Blueprintable)
@@ -27,13 +28,20 @@ public:
 	int CurrentHealth = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int CurrentStamina = 0;
+	int CurrentStamina = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int TotalHealth = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int TotalStamina = 0;
+	int TotalStamina = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int CurrentHunger = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int TotalHunger = 100;
+
 };
 
 /// <summary>
@@ -58,6 +66,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	FActorStats ActorStats;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int HungerDecayRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HungerDecayGametimeMins;
+
+	float MinsPassedSinceLastHungerDecay;
+
 
 protected:
 
@@ -93,8 +110,21 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Set the total stamina of the actor"))
 	void SetTotalStamina(const int& NewStamina);
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Set the current hunger of the actor"))
+	void SetCurrentHunger(const int& NewHunger);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Set the total hunger of the actor"))
+	void SetTotalHunger(const int& NewHunger);
+
 	float GetHealthRatio();
 
 	float GetStaminaRatio();
+
+	float GetHungerRatio();
+
+protected:
+
+	UFUNCTION()
+	void DecayHunger();
 		
 };
