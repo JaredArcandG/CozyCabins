@@ -2,6 +2,7 @@
 
 
 #include "Source/Items/ItemData.h"
+#include "Source/Items/Item.h"
 
 FItemData::FItemData(const FItemData& Other)
 {
@@ -19,6 +20,10 @@ FItemData& FItemData::operator=(FItemData const& Other)
 	Name = Other.Name;
 	Description = Other.Description;
 	Icon = Other.Icon;
+	Mesh = Other.Mesh;
+	IsConsumable = Other.IsConsumable;
+	IsDroppable = Other.IsDroppable;
+	ItemClass = Other.ItemClass;
 	return *this;
 }
 

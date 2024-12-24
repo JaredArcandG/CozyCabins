@@ -10,6 +10,10 @@
 #include "Blueprint/UserWidget.h"
 #include "Source/UI/ItemSlotDragPreview.h"
 #include <Source/Components/InventoryComponent.h>
+#include "Components/Button.h"
+#include <Source/Items/Item.h>
+#include <Source/Player/PlayerCharacter.h>
+#include <Kismet/GameplayStatics.h>
 
 void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 {
@@ -32,6 +36,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	CHECK(ItemImage);
 	CHECK(Quantity);
 	CHECK(Name);
+	CHECK(ItemButton);
 
 	ItemQty = Amount;
 
@@ -125,10 +130,56 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, co
 {
 	if (!bIsOccupied || !MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Preview Mouse Down Failed."));
+		UE_LOG(LogTemp, Warning, TEXT("Preview Left Mouse Down Failed."));
 		return FEventReply(false).NativeReply;
 	}
 
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 
+}
+
+FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// 1. Slot should have an item
+	// 2. Right mouse button should be pressed
+	if (!bIsOccupied || !InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Right Mouse Down Failed."));
+		return FEventReply(false).NativeReply;
+	}
+
+	OnConsumeItem();
+	return FEventReply(true).NativeReply;
+}
+
+void UItemSlot::OnConsumeItem()
+{
+	CHECK(InventoryCompRef);
+
+	FItemData itemData;
+	int itemQty;
+	if (InventoryCompRef->TryGetItemAtIndex(InventoryIdx, itemData, itemQty))
+	{
+		if (itemData.IsConsumable && itemData.ItemClass)
+		{
+			// Defer spawn the actor, call consume, then delete the actor instead of fully spawning it
+			TObjectPtr<AItem> pItem = GetWorld()->SpawnActorDeferred<AItem>(itemData.ItemClass, FTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			CHECK(pItem);
+			pItem->SetHidden(true);
+
+			// Use the item
+			TObjectPtr<APlayerController> pController = GetWorld()->GetFirstPlayerController();
+			CHECK(pController);
+
+			if (pItem->Execute_OnUse(pItem, GetWorld(), Cast<APlayerCharacter>(pController->GetOwner())))
+			{
+				UGameplayStatics::FinishSpawningActor(pItem, FTransform());
+				// Now remove the item from the inventory, only 1 item in the stack
+				InventoryCompRef->TryRemoveAtIndex(itemData.Id, InventoryIdx, 1);
+
+				// remove the item after on use
+				pItem->Destroy();
+			}
+		}
+	}
 }

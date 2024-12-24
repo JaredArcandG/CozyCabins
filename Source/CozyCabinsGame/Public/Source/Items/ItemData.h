@@ -28,11 +28,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Icon to show in Widgets"))
 	TObjectPtr<UTexture2D> Icon = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Mesh reference"))
+	TObjectPtr<UStaticMesh> Mesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Whether the item is consumable or not"))
+	bool IsConsumable = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Whether the item can be dropped or not"))
+	bool IsDroppable = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item BP class reference"))
+	TSubclassOf<class AItem> ItemClass;
+
 	FItemData() 
 		: Id(FGuid::NewGuid()),
 		Name(FString()),
 		Description(FString()),
-		Icon(nullptr) { }
+		Icon(nullptr),
+		Mesh (nullptr),
+		IsConsumable(false),
+		IsDroppable(false),
+		ItemClass(nullptr) { }
 
 	FItemData(const FItemData& Other);
 	FItemData& operator=(FItemData const& Other);

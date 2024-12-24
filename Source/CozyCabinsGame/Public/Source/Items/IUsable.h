@@ -23,14 +23,8 @@ class COZYCABINSGAME_API IUsable
 
 public:
 	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnUse(UWorld* World, ACharacter* SourceCharacter);
-	void OnUse_Implementation(UWorld* World, ACharacter* SourceCharacter) { }
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnUnequip(UWorld* World, ACharacter* SourceCharacter);
-	void OnUnequip_Implementation(UWorld* World, ACharacter* SourceCharacter) { }
-
-	FORCEINLINE void OnDrop(UWorld* World, ACharacter* SourceCharacter) { }
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, meta = (Text = "Called to consume/use the item. Returns true if operation was successful, false otherwise"))
+	bool OnUse(UWorld* World, ACharacter* SourceCharacter);
+	bool OnUse_Implementation(UWorld* World, ACharacter* SourceCharacter) { return true; }
 
 };
