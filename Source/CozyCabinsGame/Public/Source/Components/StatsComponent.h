@@ -73,6 +73,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HungerDecayGametimeMins;
 
+	// In game minutes
 	float MinsPassedSinceLastHungerDecay;
 
 

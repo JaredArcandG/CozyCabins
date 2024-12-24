@@ -149,6 +149,13 @@ float UStatsComponent::GetHungerRatio()
 
 void UStatsComponent::DecayHunger()
 {
-	SetCurrentHunger(ActorStats.CurrentHunger - HungerDecayRate);
+	if (MinsPassedSinceLastHungerDecay >= HungerDecayGametimeMins)
+	{
+		SetCurrentHunger(ActorStats.CurrentHunger - HungerDecayRate);
+		return;
+	}
+
+	MinsPassedSinceLastHungerDecay += 1;
+
 }
 
