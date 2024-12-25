@@ -3,6 +3,9 @@
 
 #include "Source/UI/CustomDragDropOperation.h"
 
+/// <summary>
+/// ctor
+/// </summary>
 UCustomDragDropOperation::UCustomDragDropOperation()
 {
 	ItemSlotPreviewRef = nullptr;

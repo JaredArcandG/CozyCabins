@@ -46,26 +46,46 @@ void UStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
+/// <summary>
+/// Gets the current health of the actor
+/// </summary>
+/// <returns></returns>
 int UStatsComponent::GetCurrentHealth()
 {
 	return ActorStats.CurrentHealth;
 }
 
+/// <summary>
+/// Gets the total/base health of the actor
+/// </summary>
+/// <returns></returns>
 int UStatsComponent::GetTotalHealth()
 {
 	return ActorStats.TotalHealth;
 }
 
+/// <summary>
+/// Gets the current stamina of the actor
+/// </summary>
+/// <returns></returns>
 int UStatsComponent::GetCurrentStamina()
 {
 	return ActorStats.CurrentStamina;
 }
 
+/// <summary>
+/// Gets the total/base stamina of the actor
+/// </summary>
+/// <returns></returns>
 int UStatsComponent::GetTotalStamina()
 {
 	return ActorStats.TotalStamina;
 }
 
+/// <summary>
+/// Sets the current health of the actor
+/// </summary>
+/// <param name="NewHealth"></param>
 void UStatsComponent::SetCurrentHealth(const int& NewHealth)
 {
 	ActorStats.CurrentHealth = FMath::Clamp(NewHealth, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -73,6 +93,10 @@ void UStatsComponent::SetCurrentHealth(const int& NewHealth)
 	OnStatChanged.Broadcast(EActorStatType::Health);
 }
 
+/// <summary>
+/// Sets the base health of the actor
+/// </summary>
+/// <param name="NewHealth"></param>
 void UStatsComponent::SetTotalHealth(const int& NewHealth)
 {
 	ActorStats.TotalHealth = FMath::Clamp(NewHealth, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -83,6 +107,10 @@ void UStatsComponent::SetTotalHealth(const int& NewHealth)
 	OnStatChanged.Broadcast(EActorStatType::Health);
 }
 
+/// <summary>
+/// Sets the current stamina of the actor
+/// </summary>
+/// <param name="NewStamina"></param>
 void UStatsComponent::SetCurrentStamina(const int& NewStamina)
 {
 	ActorStats.CurrentStamina = FMath::Clamp(NewStamina, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -90,6 +118,10 @@ void UStatsComponent::SetCurrentStamina(const int& NewStamina)
 	OnStatChanged.Broadcast(EActorStatType::Stamina);
 }
 
+/// <summary>
+/// Sets the total stamina of the actor
+/// </summary>
+/// <param name="NewStamina"></param>
 void UStatsComponent::SetTotalStamina(const int& NewStamina)
 {
 	ActorStats.TotalStamina = FMath::Clamp(NewStamina, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -100,6 +132,10 @@ void UStatsComponent::SetTotalStamina(const int& NewStamina)
 	OnStatChanged.Broadcast(EActorStatType::Stamina);
 }
 
+/// <summary>
+/// Sets the current hunger of the actor
+/// </summary>
+/// <param name="NewHunger"></param>
 void UStatsComponent::SetCurrentHunger(const int& NewHunger)
 {
 	ActorStats.CurrentHunger = FMath::Clamp(NewHunger, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -107,6 +143,10 @@ void UStatsComponent::SetCurrentHunger(const int& NewHunger)
 	OnStatChanged.Broadcast(EActorStatType::Hunger);
 }
 
+/// <summary>
+/// Sets the total/base hunger of the actor
+/// </summary>
+/// <param name="NewHunger"></param>
 void UStatsComponent::SetTotalHunger(const int& NewHunger)
 {
 	ActorStats.TotalHunger = FMath::Clamp(NewHunger, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
@@ -117,6 +157,11 @@ void UStatsComponent::SetTotalHunger(const int& NewHunger)
 	OnStatChanged.Broadcast(EActorStatType::Hunger);
 }
 
+/// <summary>
+/// Gets the health percentage
+/// Useful for UI display
+/// </summary>
+/// <returns></returns>
 float UStatsComponent::GetHealthRatio()
 {
 	if (FMath::IsNearlyZero(static_cast<float>(ActorStats.TotalHealth)))
@@ -127,6 +172,11 @@ float UStatsComponent::GetHealthRatio()
 	return static_cast<float>(ActorStats.CurrentHealth) / ActorStats.TotalHealth;
 }
 
+/// <summary>
+/// Gets the stamina percentage
+/// Useful for UI display
+/// </summary>
+/// <returns></returns>
 float UStatsComponent::GetStaminaRatio()
 {
 	if (FMath::IsNearlyZero(static_cast<float>(ActorStats.TotalStamina)))
@@ -137,6 +187,11 @@ float UStatsComponent::GetStaminaRatio()
 	return static_cast<float>(ActorStats.CurrentStamina) / ActorStats.TotalStamina;
 }
 
+/// <summary>
+/// Gets the hunger percentage
+/// Useful for UI Display
+/// </summary>
+/// <returns></returns>
 float UStatsComponent::GetHungerRatio()
 {
 	if (FMath::IsNearlyZero(static_cast<float>(ActorStats.TotalHunger)))
@@ -147,6 +202,9 @@ float UStatsComponent::GetHungerRatio()
 	return static_cast<float>(ActorStats.CurrentHunger) / ActorStats.TotalHunger;
 }
 
+/// <summary>
+/// Decays hunger based on the specified decay class params
+/// </summary>
 void UStatsComponent::DecayHunger()
 {
 	if (MinsPassedSinceLastHungerDecay >= HungerDecayGametimeMins)

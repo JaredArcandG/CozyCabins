@@ -7,6 +7,9 @@
 #include <Source/Player/PlayerCharacter.h>
 #include <Source/UI/GlobalUIManager.h>
 
+/// <summary>
+/// ctor
+/// </summary>
 ACustomPlayerController::ACustomPlayerController()
 {
 	GlobalUIManager = CreateDefaultSubobject<UGlobalUIManager>(TEXT("GlobalUIManager"));

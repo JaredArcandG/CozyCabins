@@ -21,7 +21,7 @@ class COZYCABINSGAME_API IInteractable
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, meta = (Text = "Called when an interaction is detected"))
 	void OnInteract(UWorld* World, ACharacter* SourceCharacter);
 	void OnInteract_Implementation(UWorld* World, ACharacter* SourceCharacter) {}
 };

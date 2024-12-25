@@ -20,6 +20,9 @@
 #include <Source/Player/Controller/CustomPlayerController.h>
 #include <Source/UI/GlobalUIManager.h>
 
+/// <summary>
+/// Ctor
+/// </summary>
 void UItemSlot::NativeConstruct()
 {
 	InventoryIdx = -1;
@@ -37,6 +40,10 @@ void UItemSlot::NativeConstruct()
 
 }
 
+/// <summary>
+/// Removes previously set slot values
+/// </summary>
+/// <param name="InventoryComp"></param>
 void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
@@ -54,6 +61,13 @@ void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 	PreviewQtyToTransfer = 0;
 }
 
+/// <summary>
+/// Sets the slot data to the given parameters
+/// </summary>
+/// <param name="ItemData"></param>
+/// <param name="Amount"></param>
+/// <param name="IdxInInventory"></param>
+/// <param name="InventoryComp"></param>
 void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
@@ -78,6 +92,11 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	PreviewQtyToTransfer = 0;
 }
 
+/// <summary>
+/// Empties a slot
+/// </summary>
+/// <param name="IdxInInventory"></param>
+/// <param name="InventoryComp"></param>
 void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp)
 {
 	CHECK(ItemImage);
@@ -100,6 +119,12 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 	PreviewQtyToTransfer = 0;
 }
 
+/// <summary>
+/// Called when a slot drag is detected
+/// </summary>
+/// <param name="InGeometry"></param>
+/// <param name="InMouseEvent"></param>
+/// <param name="OutOperation"></param>
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	CHECK(DragPreviewClass);
@@ -129,6 +154,13 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 	UE_LOG(LogTemp, Warning, TEXT("On Drag Detected."));
 }
 
+/// <summary>
+/// Called when a slot is dropped
+/// </summary>
+/// <param name="InGeometry"></param>
+/// <param name="InDragDropEvent"></param>
+/// <param name="InOperation"></param>
+/// <returns></returns>
 bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	TObjectPtr<UCustomDragDropOperation> pOperation = Cast<UCustomDragDropOperation>(InOperation);
@@ -158,6 +190,13 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 
 }
 
+/// <summary>
+/// Called when the mouse button is down
+/// Starts the drag process
+/// </summary>
+/// <param name="MyGeometry"></param>
+/// <param name="MouseEvent"></param>
+/// <returns></returns>
 FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (!bIsOccupied || !MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
@@ -173,6 +212,13 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, co
 
 }
 
+/// <summary>
+/// Called when the right mouse button is down
+/// Starts the item consumption process
+/// </summary>
+/// <param name="InGeometry"></param>
+/// <param name="InMouseEvent"></param>
+/// <returns></returns>
 FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	// 1. Slot should have an item
@@ -188,6 +234,10 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 	return FEventReply(true).NativeReply;
 }
 
+/// <summary>
+/// Called when an item is consumed
+/// TODO: Move core consumption logic to InventoryComponent
+/// </summary>
 void UItemSlot::OnConsumeItem()
 {
 	CHECK(InventoryCompRef);
@@ -220,6 +270,12 @@ void UItemSlot::OnConsumeItem()
 	}
 }
 
+/// <summary>
+/// Called when the mouse wheel is moved over a slot
+/// </summary>
+/// <param name="MyGeometry"></param>
+/// <param name="MouseEvent"></param>
+/// <returns></returns>
 FReply UItemSlot::NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (!bIsOccupied || !GlobalUIManager)
@@ -279,6 +335,10 @@ FReply UItemSlot::NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointer
 	}
 }
 
+/// <summary>
+/// Shows the preview widget before a drag operation is perfomed
+/// This is needed for the mouse wheel scenario
+/// </summary>
 void UItemSlot::ShowPreviewWidgetPreDrag()
 {
 	// Create the preview widget
@@ -305,6 +365,10 @@ void UItemSlot::ShowPreviewWidgetPreDrag()
 	DragPreviewWidget->SetPositionInViewport(vFinalPos, false);
 }
 
+/// <summary>
+/// Updates the preview widget before a drag operation is perfomed
+/// This is needed for the mouse wheel scenario
+/// </summary>
 void UItemSlot::UpdatePreviewWidgetPreDrag()
 {
 	CHECK(DragPreviewWidget);
@@ -312,6 +376,10 @@ void UItemSlot::UpdatePreviewWidgetPreDrag()
 	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
 }
 
+/// <summary>
+/// Removes the preview slot widget when a drag operation is perfomed
+/// This is needed for the mouse wheel scenario
+/// </summary>
 void UItemSlot::RemovePreviewWidgetPreDrag()
 {
 	CHECK(DragPreviewWidget);

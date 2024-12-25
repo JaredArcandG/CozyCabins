@@ -7,6 +7,10 @@
 #include "Components/ProgressBar.h"
 #include <Source/Utils/CheckUtils.h>
 
+/// <summary>
+/// Called to setup the widget after ctor
+/// </summary>
+/// <param name="PlayerCharacter"></param>
 void UStatsHUD::InitializeWidget(APlayerCharacter& PlayerCharacter)
 {
 	ActorStatsRef = PlayerCharacter.GetStatsComponent();
@@ -25,6 +29,10 @@ void UStatsHUD::InitializeWidget(APlayerCharacter& PlayerCharacter)
 	HungerBar->SetPercent(ActorStatsRef->GetHungerRatio());
 }
 
+/// <summary>
+/// Dynamic function linked to the on stat changed variable
+/// </summary>
+/// <param name="UpdatedStat"></param>
 void UStatsHUD::HandleStatsUpdate(EActorStatType UpdatedStat)
 {
 	CHECK(ActorStatsRef);
@@ -45,6 +53,10 @@ void UStatsHUD::HandleStatsUpdate(EActorStatType UpdatedStat)
 	}
 }
 
+/// <summary>
+/// Updates the health bar to the new percentage
+/// </summary>
+/// <param name="HealthPercent"></param>
 void UStatsHUD::UpdateHealthBar(float HealthPercent)
 {
 	CHECK(HealthBar);
@@ -52,6 +64,10 @@ void UStatsHUD::UpdateHealthBar(float HealthPercent)
 	HealthBar->SetPercent(HealthPercent);
 }
 
+/// <summary>
+/// Updates the stamina bar to the new percentage
+/// </summary>
+/// <param name="HealthPercent"></param>
 void UStatsHUD::UpdateStaminaBar(float StaminaPercent)
 {
 	CHECK(StaminaBar);
@@ -59,6 +75,10 @@ void UStatsHUD::UpdateStaminaBar(float StaminaPercent)
 	StaminaBar->SetPercent(StaminaPercent);
 }
 
+/// <summary>
+/// Updates the hunger bar to the new percentage
+/// </summary>
+/// <param name="HealthPercent"></param>
 void UStatsHUD::UpdateHungerBar(float HungerPercent)
 {
 	CHECK(HungerBar);

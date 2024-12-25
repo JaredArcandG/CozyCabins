@@ -89,11 +89,19 @@ void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
 	bCanInteract = bCanInteractState;
 }
 
+/// <summary>
+/// Gets the inventory component
+/// </summary>
+/// <returns></returns>
 UInventoryComponent* APlayerCharacter::GetInventoryComponent()
 {
 	return InventoryComp;
 }
 
+/// <summary>
+/// Gets the player stats component
+/// </summary>
+/// <returns></returns>
 UStatsComponent* APlayerCharacter::GetStatsComponent()
 {
 	return StatsComp;

@@ -3,6 +3,9 @@
 
 #include "Source/Time/GameTimeManager.h"
 
+/// <summary>
+/// ctor
+/// </summary>
 UGameTimeManager::UGameTimeManager()
 {
 	RealTimeMinutesPerGameHour = 2.5f;
@@ -19,6 +22,10 @@ void UGameTimeManager::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, FTimerDelegate::CreateUObject(this, &UGameTimeManager::BroadCastGameTimePassed), fRealtimeSecs, true);
 }
 
+/// <summary>
+/// Broadcasts when one game minute has passed
+/// Can be hooked via the OnGameMinutePassed event to allow various time related functionality
+/// </summary>
 void UGameTimeManager::BroadCastGameTimePassed()
 {
 	OnGameMinutePassed.Broadcast();

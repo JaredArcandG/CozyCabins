@@ -7,7 +7,9 @@
 #include "Source/Components/InventoryComponent.h"
 #include "Components/WrapBox.h"
 
-
+/// <summary>
+/// Ctor
+/// </summary>
 void UItemSlotContainer::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -17,6 +19,11 @@ void UItemSlotContainer::NativeConstruct()
 	
 }
 
+/// <summary>
+/// Sets up the container
+/// Should be called after construction
+/// </summary>
+/// <param name="Inventory"></param>
 void UItemSlotContainer::Setup(UInventoryComponent& Inventory)
 {
 	CHECK(ItemSlotClass);

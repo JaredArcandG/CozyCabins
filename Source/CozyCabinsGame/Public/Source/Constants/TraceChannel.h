@@ -2,5 +2,6 @@
 
 #pragma once
 
+// Custom trace channel for the game, if needed
 constexpr ECollisionChannel ECC_InteractableChannel = ECC_GameTraceChannel1;
 

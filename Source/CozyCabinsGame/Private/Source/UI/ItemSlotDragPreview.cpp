@@ -8,6 +8,13 @@
 #include "Components/Sizebox.h"
 #include "Components/TextBlock.h"
 
+/// <summary>
+/// Sets the preview widget's data
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Amount"></param>
+/// <param name="IdxInInventory"></param>
+/// <param name="Image"></param>
 void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInInventory, TObjectPtr<UImage> Image)
 {
 	CHECK(ItemImage);
