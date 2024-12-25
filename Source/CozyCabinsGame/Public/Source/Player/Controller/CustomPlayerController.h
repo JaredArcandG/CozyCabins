@@ -21,7 +21,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widgets")
 	TSubclassOf<class UStatsHUD> PlayerHUDWidgetClass;
 
+	UPROPERTY()
 	TObjectPtr<class UStatsHUD> PlayerHUD;
+
+	UPROPERTY();
+	TObjectPtr<class UGlobalUIManager> GlobalUIManager;
 
 protected:
 

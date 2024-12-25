@@ -5,13 +5,18 @@
 #include "Components/Image.h"
 #include "Components/Border.h"
 #include <Source/Utils/CheckUtils.h>
+#include "Components/Sizebox.h"
+#include "Components/TextBlock.h"
 
-void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInInventory, UImage& Image)
+void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInInventory, TObjectPtr<UImage> Image)
 {
 	CHECK(ItemImage);
+	CHECK(ItemText);
+	CHECK(Image);
 
 	ItemId = Id;
 	Quantity = Amount;
-	ItemImage->SetBrush(Image.GetBrush());
+	ItemImage->SetBrush(Image->GetBrush());
 	InventoryIdx = IdxInInventory;
+	ItemText->SetText(FText::AsNumber(Amount));
 }

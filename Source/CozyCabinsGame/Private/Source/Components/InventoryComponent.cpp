@@ -430,6 +430,7 @@ bool UInventoryComponent::Resize(const int& NewMaxSize)
 
 /// <summary>
 /// Attempts to transfer slot values between the same or two different inventories
+/// Transfers the entire contents of a slot (all quantity)
 /// </summary>
 /// <param name="TargetInventory"></param>
 /// <param name="SourceSlotIdx"></param>
@@ -461,6 +462,35 @@ bool UInventoryComponent::TryTransferSlots(UInventoryComponent* TargetInventory,
 	TargetInventory->TryAddAtIndex(itemIdToTransfer, TargetSlotIdx, itemQty);
 
 	return true;
+}
+
+bool UInventoryComponent::TryTransferSlotsWithQuantity(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& SourceQtyToTransfer, const int& TargetSlotIdx)
+{
+	if (!TargetInventory || !ItemIdArr.IsValidIndex(SourceSlotIdx) || !ItemQuantityArr.IsValidIndex(SourceSlotIdx))
+	{
+		return false;
+	}
+
+	FGuid itemIdToTransfer = ItemIdArr[SourceSlotIdx];
+
+	// invalid quantity
+	if (SourceQtyToTransfer <= 0)
+	{
+		return false;
+	}
+
+	// Verify if possible to remove from src and add to target
+	if (!CanRemoveAtIndex(itemIdToTransfer, SourceSlotIdx, SourceQtyToTransfer) ||
+		!TargetInventory->CanAddAtIndex(itemIdToTransfer, TargetSlotIdx, SourceQtyToTransfer))
+	{
+		return false;
+	}
+
+	TryRemoveAtIndex(itemIdToTransfer, SourceSlotIdx, SourceQtyToTransfer);
+	TargetInventory->TryAddAtIndex(itemIdToTransfer, TargetSlotIdx, SourceQtyToTransfer);
+
+	return true;
+
 }
 
 /// <summary>

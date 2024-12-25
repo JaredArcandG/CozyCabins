@@ -25,11 +25,17 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> ItemImage;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> ItemText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class USizeBox> ItemSizeBox;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int InventoryIdx;
 
 public:
 
-	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, class UImage& Image);
+	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, TObjectPtr<class UImage> Image);
 	
 };

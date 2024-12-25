@@ -47,6 +47,17 @@ protected:
 
 	bool bIsOccupied;
 
+	int PreviewQtyToTransfer;
+
+	UPROPERTY()
+	TObjectPtr<class UItemSlotDragPreview> DragPreviewWidget;
+
+	UPROPERTY()
+	TObjectPtr<class ACustomPlayerController> PlayerController;
+
+	UPROPERTY()
+	TObjectPtr<class UGlobalUIManager> GlobalUIManager;
+
 public:
 
 	void ClearSlot(class UInventoryComponent& InventoryComp);
@@ -56,6 +67,8 @@ public:
 	void SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp);
 
 protected:
+	
+	virtual void NativeConstruct() override;
 
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
@@ -66,5 +79,13 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	void OnConsumeItem();
-	
+
+	virtual FReply NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+
+	void ShowPreviewWidgetPreDrag();
+
+	void UpdatePreviewWidgetPreDrag();
+
+	void RemovePreviewWidgetPreDrag();
+
 };

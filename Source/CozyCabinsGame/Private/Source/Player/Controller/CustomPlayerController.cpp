@@ -5,9 +5,11 @@
 #include "Source/UI/StatsHUD.h"
 #include <Source/Utils/CheckUtils.h>
 #include <Source/Player/PlayerCharacter.h>
+#include <Source/UI/GlobalUIManager.h>
 
 ACustomPlayerController::ACustomPlayerController()
 {
+	GlobalUIManager = CreateDefaultSubobject<UGlobalUIManager>(TEXT("GlobalUIManager"));
 }
 
 void ACustomPlayerController::BeginPlay()

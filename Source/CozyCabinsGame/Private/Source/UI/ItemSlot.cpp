@@ -14,6 +14,28 @@
 #include <Source/Items/Item.h>
 #include <Source/Player/PlayerCharacter.h>
 #include <Kismet/GameplayStatics.h>
+#include <Components/ScaleBoxSlot.h>
+#include "Components/Sizebox.h"
+#include <Blueprint/WidgetLayoutLibrary.h>
+#include <Source/Player/Controller/CustomPlayerController.h>
+#include <Source/UI/GlobalUIManager.h>
+
+void UItemSlot::NativeConstruct()
+{
+	InventoryIdx = -1;
+	bIsOccupied = false;
+	ItemId = EMPTY_GUID;
+	ItemQty = -1;
+	InventoryCompRef = nullptr;
+	PreviewQtyToTransfer = 0;
+	DragPreviewWidget = nullptr;
+
+	PlayerController = Cast<ACustomPlayerController>(GetWorld()->GetFirstPlayerController());
+	CHECK(PlayerController);
+
+	GlobalUIManager = PlayerController->GlobalUIManager;
+
+}
 
 void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 {
@@ -29,6 +51,7 @@ void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 	ItemId = EMPTY_GUID;
 	ItemQty = -1;
 	InventoryCompRef = &InventoryComp;
+	PreviewQtyToTransfer = 0;
 }
 
 void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, UInventoryComponent& InventoryComp)
@@ -52,6 +75,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	bIsOccupied = true;
 	ItemId = ItemData.Id;
 	InventoryCompRef = &InventoryComp;
+	PreviewQtyToTransfer = 0;
 }
 
 void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp)
@@ -73,31 +97,34 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 	ItemId = EMPTY_GUID;
 	ItemQty = -1;
 	InventoryCompRef = &InventoryComp;
+	PreviewQtyToTransfer = 0;
 }
 
 void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	CHECK(DragPreviewClass);
 
+	// Remove the drag preview widget since the drop operation was invoked, as well as the operation reference
+	RemovePreviewWidgetPreDrag();
+
 	//Create the drag/drop operation
 	TObjectPtr<UCustomDragDropOperation> pOperation = NewObject<UCustomDragDropOperation>();
 	CHECK(pOperation);
 
-	// Create the preview widget
-	TObjectPtr<APlayerController> pPlayer = GetWorld()->GetFirstPlayerController();
-	CHECK(pPlayer);
-
-	TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = CreateWidget<UItemSlotDragPreview>(pPlayer, DragPreviewClass);
+	// Create the new preview widget
+	TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
 	CHECK(pDragPreviewWidget);
-
-	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, this->ItemQty, InventoryIdx, *this->ItemImage);
+	
+	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
 
 	pOperation->DefaultDragVisual = pDragPreviewWidget;
 	pOperation->ItemSlotPreviewRef = pDragPreviewWidget;
 	pOperation->InventoryCompRef = InventoryCompRef;
 
-	OutOperation = pOperation;
+	OutOperation = pOperation; 
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	GlobalUIManager->SetIsActiveDragState(true, this, pDragPreviewWidget);
 
 	UE_LOG(LogTemp, Warning, TEXT("On Drag Detected."));
 }
@@ -120,9 +147,14 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 
 	TObjectPtr<UInventoryComponent> pInventoryComp = pOperation->InventoryCompRef;
 	int srcIdx = pOperation->ItemSlotPreviewRef->InventoryIdx;
+	int srcQty = pOperation->ItemSlotPreviewRef->Quantity;
 	int targetIdx = InventoryIdx;
 
-	return pInventoryComp->TryTransferSlots(InventoryCompRef, srcIdx, targetIdx);
+	// Drop operation will occur - set preview quantity back to zero, no active drag
+	PreviewQtyToTransfer = 0;
+	GlobalUIManager->SetIsActiveDragState(false, nullptr, nullptr);
+
+	return pInventoryComp->TryTransferSlotsWithQuantity(InventoryCompRef, srcIdx, srcQty, targetIdx);
 
 }
 
@@ -134,6 +166,9 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, co
 		return FEventReply(false).NativeReply;
 	}
 
+	// Full slot drag, preview quantity is the entire slot's quantity
+	PreviewQtyToTransfer = this->ItemQty;
+
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(MouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 
 }
@@ -142,7 +177,8 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 {
 	// 1. Slot should have an item
 	// 2. Right mouse button should be pressed
-	if (!bIsOccupied || !InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	// 3. Can't consume an item while actively dragging something n 
+	if (!bIsOccupied || !InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton) || GlobalUIManager->IsActiveDragState())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Right Mouse Down Failed."));
 		return FEventReply(false).NativeReply;
@@ -182,4 +218,110 @@ void UItemSlot::OnConsumeItem()
 			}
 		}
 	}
+}
+
+FReply UItemSlot::NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	if (!bIsOccupied || !GlobalUIManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("On Mouse Wheel Failed - empty slot or no global manager."));
+		return FEventReply(false).NativeReply;
+	}
+
+	// Make sure we are wheeling on a valid slot
+	if (GlobalUIManager->IsActiveDragState() && !(GlobalUIManager->DragWidgetRef == this))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("On Mouse Wheel Failed - wheeling on invalid slot."));
+		return FEventReply(false).NativeReply;
+	}
+
+	int deltaQty = FMath::RoundToInt(MouseEvent.GetWheelDelta());
+	PreviewQtyToTransfer = FMath::Clamp(PreviewQtyToTransfer + deltaQty, 1, this->ItemQty);
+
+	UE_LOG(LogTemp, Warning, TEXT("Mouse Wheel Success - ActiveDragState: %hs"), GlobalUIManager->IsActiveDragState() ? "True" : "False");
+
+	FEventReply targetReply = FEventReply(true);
+
+	if (GlobalUIManager->IsActiveDragState())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PostDrag Scenario"));
+
+		TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = Cast<UItemSlotDragPreview>(GlobalUIManager->DragSlotRef);
+
+		// Update the slot
+		if (pDragPreviewWidget)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Drag preview slot reference updated."));
+			pDragPreviewWidget->SetPreviewSlotData(pDragPreviewWidget->ItemId, PreviewQtyToTransfer, pDragPreviewWidget->InventoryIdx, pDragPreviewWidget->ItemImage);
+		}
+		
+		return targetReply.NativeReply;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PreDrag Scenario"));
+
+		// DragPreview Scenario on mouse wheel scroll
+		// Create it if it doesn't exist, otherwise update it
+		if (!DragPreviewWidget)
+		{
+			ShowPreviewWidgetPreDrag();
+
+			UE_LOG(LogTemp, Warning, TEXT("On Mouse Wheel Start. Preview Created."));
+		}
+		else
+		{
+			UpdatePreviewWidgetPreDrag();
+			UE_LOG(LogTemp, Warning, TEXT("On Mouse Wheel Update Preview. New Qty: %d"), PreviewQtyToTransfer);
+		}
+
+		return UWidgetBlueprintLibrary::DetectDrag(targetReply, this, EKeys::Mouse2D).NativeReply;
+	}
+}
+
+void UItemSlot::ShowPreviewWidgetPreDrag()
+{
+	// Create the preview widget
+
+	DragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
+	CHECK(DragPreviewWidget);
+
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
+
+	CHECK(DragPreviewWidget->ItemSizeBox);
+
+	FVector2D vDesiredSize = DragPreviewWidget->ItemSizeBox->GetDesiredSize();
+
+	DragPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
+
+	DragPreviewWidget->AddToViewport();
+
+	// Get the current mouse position to ensure it's spawned where the mouse is
+	FVector2D vMousePosition;
+	UWidgetLayoutLibrary::GetMousePositionScaledByDPI(PlayerController, vMousePosition.X, vMousePosition.Y);
+
+	FVector2D vFinalPos = vMousePosition - (vDesiredSize * 0.5);
+
+	DragPreviewWidget->SetPositionInViewport(vFinalPos, false);
+}
+
+void UItemSlot::UpdatePreviewWidgetPreDrag()
+{
+	CHECK(DragPreviewWidget);
+
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
+}
+
+void UItemSlot::RemovePreviewWidgetPreDrag()
+{
+	CHECK(DragPreviewWidget);
+	CHECK(GlobalUIManager);
+
+	// Remove the global drag state since we are destroying or pre drag widget
+	GlobalUIManager->SetIsActiveDragState(false, nullptr, nullptr);
+
+	DragPreviewWidget->RemoveFromParent();
+	DragPreviewWidget->ConditionalBeginDestroy();
+
+	DragPreviewWidget = nullptr;
 }

@@ -142,7 +142,10 @@ void UInteractableComponent::ApplyRaycast()
 	FVector vForward = pCharacter->FollowCamera->GetForwardVector();
 	FVector vRayEnd = vRayStart + (vForward * ActorInteractRadius);
 
-	UE_LOG(LogTemp, Warning, TEXT("Ray Start: %s, Ray End: %s"), *vRayStart.ToString(), *vRayEnd.ToString());
+	if (bEnableDebugMode)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ray Start: %s, Ray End: %s"), *vRayStart.ToString(), *vRayEnd.ToString());
+	}
 
 	TArray<FHitResult> hitResults; 
 	FCollisionQueryParams CollisionParams; 
@@ -154,7 +157,11 @@ void UInteractableComponent::ApplyRaycast()
 		{
 			TObjectPtr<AActor> pIgnoredActor = *It;
 			CollisionParams.AddIgnoredActor(pIgnoredActor);
-			UE_LOG(LogTemp, Warning, TEXT("Ignoring Actor: %s"), *pIgnoredActor->GetName());
+			
+			if (bEnableDebugMode)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Ignoring Actor: %s"), *pIgnoredActor->GetName());
+			}
 		} 
 	}
 	
@@ -176,7 +183,10 @@ void UInteractableComponent::ApplyRaycast()
 
 		if (pHitActor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s, Class: %s, Location: %s, Component: %s"), *pHitActor->GetName(), *pHitActor->GetClass()->GetName(), *hitResult.ImpactPoint.ToString(), *hitResult.Component->GetName());
+			if (bEnableDebugMode)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s, Class: %s, Location: %s, Component: %s"), *pHitActor->GetName(), *pHitActor->GetClass()->GetName(), *hitResult.ImpactPoint.ToString(), *hitResult.Component->GetName());
+			}
 
 			// Log collision response for each component 
 			for (TObjectPtr<UActorComponent> Component : pHitActor->GetComponents()) 
@@ -186,7 +196,11 @@ void UInteractableComponent::ApplyRaycast()
 				if (PrimitiveComponent)
 				{ 
 					ECollisionResponse Response = PrimitiveComponent->GetCollisionResponseToChannel(ECC_InteractableChannel);
-					UE_LOG(LogTemp, Warning, TEXT("Component: %s, CollisionResponse to Interactable: %d"), *PrimitiveComponent->GetName(), Response);
+
+					if (bEnableDebugMode)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Component: %s, CollisionResponse to Interactable: %d"), *PrimitiveComponent->GetName(), Response);
+					}
 				} 
 			}
 		}
