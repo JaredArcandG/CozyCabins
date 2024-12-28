@@ -19,6 +19,8 @@
 #include <Blueprint/WidgetLayoutLibrary.h>
 #include <Source/Player/Controller/CustomPlayerController.h>
 #include <Source/UI/GlobalUIManager.h>
+#include <Source/Components/InteractableComponent.h>
+#include <Source/Items/Item.h>
 
 /// <summary>
 /// Ctor
@@ -32,11 +34,17 @@ void UItemSlot::NativeConstruct()
 	InventoryCompRef = nullptr;
 	PreviewQtyToTransfer = 0;
 	DragPreviewWidget = nullptr;
+	ItemClass = nullptr;
 
 	PlayerController = Cast<ACustomPlayerController>(GetWorld()->GetFirstPlayerController());
 	CHECK(PlayerController);
 
 	GlobalUIManager = PlayerController->GlobalUIManager;
+
+	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(PlayerController->GetPawn());
+	CHECK(pPlayer);
+
+	InteractableComp = pPlayer->GetInteractionComponent();
 
 }
 
@@ -59,6 +67,7 @@ void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 	ItemQty = -1;
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
+	ItemClass = nullptr;
 }
 
 /// <summary>
@@ -90,6 +99,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	ItemId = ItemData.Id;
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
+	ItemClass = ItemData.ItemClass;
 }
 
 /// <summary>
@@ -140,7 +150,7 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 	TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
 	CHECK(pDragPreviewWidget);
 	
-	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
+	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
 
 	pOperation->DefaultDragVisual = pDragPreviewWidget;
 	pOperation->ItemSlotPreviewRef = pDragPreviewWidget;
@@ -167,12 +177,6 @@ bool UItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& 
 
 	// Operation should be a valid CustomDragDropOperation
 	if (!pOperation || !pOperation->InventoryCompRef || !pOperation->ItemSlotPreviewRef)
-	{
-		return false;
-	}
-
-	// Target Slot should have a valid Inventory component reference
-	if (!InventoryCompRef)
 	{
 		return false;
 	}
@@ -308,7 +312,7 @@ FReply UItemSlot::NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointer
 		if (pDragPreviewWidget)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Drag preview slot reference updated."));
-			pDragPreviewWidget->SetPreviewSlotData(pDragPreviewWidget->ItemId, PreviewQtyToTransfer, pDragPreviewWidget->InventoryIdx, pDragPreviewWidget->ItemImage);
+			pDragPreviewWidget->SetPreviewSlotData(pDragPreviewWidget->ItemId, PreviewQtyToTransfer, pDragPreviewWidget->InventoryIdx, pDragPreviewWidget->ItemImage, pDragPreviewWidget->ItemClass);
 		}
 		
 		return targetReply.NativeReply;
@@ -346,7 +350,7 @@ void UItemSlot::ShowPreviewWidgetPreDrag()
 	DragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
 	CHECK(DragPreviewWidget);
 
-	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
 
 	CHECK(DragPreviewWidget->ItemSizeBox);
 
@@ -373,7 +377,7 @@ void UItemSlot::UpdatePreviewWidgetPreDrag()
 {
 	CHECK(DragPreviewWidget);
 
-	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage);
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
 }
 
 /// <summary>

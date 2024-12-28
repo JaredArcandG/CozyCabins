@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Source/Constants/TraceChannel.h"
 #include "Engine/DataTable.h"
+#include <Kismet/GameplayStatics.h>
+#include "Source/GameMode/CustomGameModeBase.h"
 
 // Sets default values
 AItem::AItem()
@@ -21,6 +23,7 @@ AItem::AItem()
 	Mesh->SetCollisionResponseToChannel(ECC_InteractableChannel, ECollisionResponse::ECR_Block);
 
 	// Assume only one dropped by default
+	ItemDataRowName = FName();
 	Quantity = 1;
 
 	SetRootComponent(Mesh);
@@ -31,23 +34,7 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CHECK(DataTable);
-
-	FString ContextString;
-	auto pData = DataTable->FindRow<FItemData>(ItemDataRowName, ContextString);
-
-    if (pData)
-    {
-		CachedItemData = *pData;
-
-        // Log the item data for debugging
-        UE_LOG(LogTemp, Warning, TEXT("Item Initialized: %s, Name: %s, Description: %s"),
-            *ItemDataRowName.ToString(), *CachedItemData.Name, *CachedItemData.Description);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Failed to find item data for row: %s"), *ItemDataRowName.ToString());
-    }
+	CacheItemData();
 }
 
 // Called every frame
@@ -65,4 +52,50 @@ void AItem::Tick(float DeltaTime)
 FItemData AItem::GetData()
 {
 	return CachedItemData;
+}
+
+/// <summary>
+/// Sets the item data
+/// </summary>
+/// <param name="InMesh"></param>
+/// <param name="InDataTableRef"></param>
+/// <param name="InItemDataRowName"></param>
+/// <param name="InQuantity"></param>
+void AItem::SetData(FName InItemDataRowName, int InQuantity)
+{
+	Quantity = InQuantity;
+	ItemDataRowName = InItemDataRowName;
+
+	CacheItemData();
+}
+
+/// <summary>
+/// Caches data from the table so it can be easily retrieved from the actor itself
+/// </summary>
+void AItem::CacheItemData()
+{
+	// Get the table pointer from the game mode
+	TObjectPtr<ACustomGameModeBase> pGameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	CHECK(pGameMode);
+
+	DataTable = pGameMode->ItemsDataTable;
+
+	CHECK(DataTable);
+
+	// Update the cached data
+	FString ContextString;
+	auto pData = DataTable->FindRow<FItemData>(ItemDataRowName, ContextString);
+
+	if (pData)
+	{
+		CachedItemData = *pData;
+
+		// Log the item data for debugging
+		UE_LOG(LogTemp, Warning, TEXT("Item Initialized: %s, Name: %s, Description: %s"),
+			*ItemDataRowName.ToString(), *CachedItemData.Name, *CachedItemData.Description);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find item data for row: %s"), *ItemDataRowName.ToString());
+	}
 }

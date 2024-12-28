@@ -23,9 +23,6 @@ public:
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TObjectPtr<class UDataTable> DataTable;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemDataRowName;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
@@ -34,6 +31,9 @@ public:
 protected:
 
 	FItemData CachedItemData;
+
+	UPROPERTY()
+	TObjectPtr<class UDataTable> DataTable;
 
 protected:
 
@@ -47,5 +47,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Get the item specific data like name, description, etc."))
 	FItemData GetData();
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Set the item specific data mesh, data table, row name, etc."))
+	void SetData(FName InItemDataRowName, int InQuantity);
+
+private:
+
+	void CacheItemData();
 
 };

@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> ItemButton;
 
+	UPROPERTY()
+	TSubclassOf<class AItem> ItemClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemSlotDragPreview> DragPreviewClass;
 
@@ -57,6 +60,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UGlobalUIManager> GlobalUIManager;
+
+	UPROPERTY()
+	TObjectPtr<class UInteractableComponent> InteractableComp;
 
 public:
 

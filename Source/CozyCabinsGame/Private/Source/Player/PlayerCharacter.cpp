@@ -107,6 +107,15 @@ UStatsComponent* APlayerCharacter::GetStatsComponent()
 	return StatsComp;
 }
 
+/// <summary>
+/// Gets the player's interactable component
+/// </summary>
+/// <returns></returns>
+UInteractableComponent* APlayerCharacter::GetInteractionComponent()
+{
+	return InteractionComp;
+}
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {

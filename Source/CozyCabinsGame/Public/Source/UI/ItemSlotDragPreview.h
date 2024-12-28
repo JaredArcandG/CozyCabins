@@ -34,8 +34,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int InventoryIdx;
 
+	UPROPERTY()
+	TSubclassOf<class AItem> ItemClass;
+
 public:
 
-	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, TObjectPtr<class UImage> Image);
+	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, TObjectPtr<class UImage> Image, TSubclassOf<class AItem> InItemClass);
 	
 };
