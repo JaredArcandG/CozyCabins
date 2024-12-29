@@ -27,6 +27,8 @@
 /// </summary>
 void UItemSlot::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	InventoryIdx = -1;
 	bIsOccupied = false;
 	ItemId = EMPTY_GUID;
@@ -35,6 +37,7 @@ void UItemSlot::NativeConstruct()
 	PreviewQtyToTransfer = 0;
 	DragPreviewWidget = nullptr;
 	ItemClass = nullptr;
+	bIsDroppable = false;
 
 	PlayerController = Cast<ACustomPlayerController>(GetWorld()->GetFirstPlayerController());
 	CHECK(PlayerController);
@@ -68,6 +71,7 @@ void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
 	ItemClass = nullptr;
+	bIsDroppable = false;
 }
 
 /// <summary>
@@ -100,6 +104,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
 	ItemClass = ItemData.ItemClass;
+	bIsDroppable = ItemData.IsDroppable;
 }
 
 /// <summary>
@@ -130,6 +135,18 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 }
 
 /// <summary>
+/// Handle scenario when inventory is closed while a slot is being dragged
+/// </summary>
+void UItemSlot::HandleOnClose()
+{
+	// Remove any ongoing operations
+	RemovePreviewWidgetPreDrag();
+	
+	GlobalUIManager->SetIsActiveDragState(false, nullptr, nullptr);
+	UWidgetBlueprintLibrary::CancelDragDrop();
+}
+
+/// <summary>
 /// Called when a slot drag is detected
 /// </summary>
 /// <param name="InGeometry"></param>
@@ -150,7 +167,7 @@ void UItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointer
 	TObjectPtr<UItemSlotDragPreview> pDragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
 	CHECK(pDragPreviewWidget);
 	
-	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
+	pDragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass, this->bIsDroppable);
 
 	pOperation->DefaultDragVisual = pDragPreviewWidget;
 	pOperation->ItemSlotPreviewRef = pDragPreviewWidget;
@@ -312,7 +329,7 @@ FReply UItemSlot::NativeOnMouseWheel(const FGeometry& MyGeometry, const FPointer
 		if (pDragPreviewWidget)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Drag preview slot reference updated."));
-			pDragPreviewWidget->SetPreviewSlotData(pDragPreviewWidget->ItemId, PreviewQtyToTransfer, pDragPreviewWidget->InventoryIdx, pDragPreviewWidget->ItemImage, pDragPreviewWidget->ItemClass);
+			pDragPreviewWidget->SetPreviewSlotData(pDragPreviewWidget->ItemId, PreviewQtyToTransfer, pDragPreviewWidget->InventoryIdx, pDragPreviewWidget->ItemImage, pDragPreviewWidget->ItemClass, pDragPreviewWidget->bIsDroppable);
 		}
 		
 		return targetReply.NativeReply;
@@ -350,7 +367,7 @@ void UItemSlot::ShowPreviewWidgetPreDrag()
 	DragPreviewWidget = CreateWidget<UItemSlotDragPreview>(PlayerController, DragPreviewClass);
 	CHECK(DragPreviewWidget);
 
-	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass, this->bIsDroppable);
 
 	CHECK(DragPreviewWidget->ItemSizeBox);
 
@@ -377,7 +394,7 @@ void UItemSlot::UpdatePreviewWidgetPreDrag()
 {
 	CHECK(DragPreviewWidget);
 
-	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass);
+	DragPreviewWidget->SetPreviewSlotData(this->ItemId, PreviewQtyToTransfer, InventoryIdx, this->ItemImage, this->ItemClass, this->bIsDroppable);
 }
 
 /// <summary>

@@ -83,6 +83,21 @@ void UItemSlotContainer::UpdateAllSlots()
 }
 
 /// <summary>
+/// Make sure item slots are properly closed
+/// Dragged previews should disapper
+/// </summary>
+void UItemSlotContainer::HandleOnCloseSlotContainer()
+{
+	for (auto pItemSlot : ItemSlots)
+	{
+		if (pItemSlot)
+		{
+			pItemSlot->HandleOnClose();
+		}
+	}
+}
+
+/// <summary>
 /// Creates a new item slot widget and adds it to the grid
 /// Can be used on initial setup to create the widget, or during an upgrade if the inventory size changed
 /// </summary>

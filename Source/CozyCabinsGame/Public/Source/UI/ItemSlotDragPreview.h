@@ -37,8 +37,10 @@ public:
 	UPROPERTY()
 	TSubclassOf<class AItem> ItemClass;
 
+	bool bIsDroppable;
+
 public:
 
-	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, TObjectPtr<class UImage> Image, TSubclassOf<class AItem> InItemClass);
+	void SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInIvnentory, TObjectPtr<class UImage> Image, TSubclassOf<class AItem> InItemClass, const bool& IsDroppable);
 	
 };

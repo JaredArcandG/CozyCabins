@@ -1,0 +1,37 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Source/Factory/ItemFactory.h"
+#include "Source/Items/Item.h"
+#include "Source/Items/ItemData.h"
+#include "Engine/DataTable.h"
+#include "GameFramework/GameMode.h"
+#include <Source/GameMode/CustomGameModeBase.h>
+#include <Kismet/GameplayStatics.h>
+#include <Source/Utils/CheckUtils.h>
+
+/// <summary>
+/// Spawns an item in the world with the given parameters
+/// </summary>
+/// <param name="World"></param>
+/// <param name="Transform"></param>
+/// <param name="ItemClass"></param>
+/// <returns></returns>
+TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<AItem> ItemClass, const FGuid& ItemId, const int& Quantity)
+{
+	CHECK_NULLPTR(ItemClass);
+
+	TObjectPtr<ACustomGameModeBase> pGameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(&World));
+	CHECK_NULLPTR(pGameMode);
+
+	TObjectPtr<UDataTable> pItemDataTable = pGameMode->ItemsDataTable;
+	CHECK_NULLPTR(pItemDataTable);
+
+	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	CHECK_NULLPTR(pItem);
+
+	FName rowName = FName(ItemId.ToString(EGuidFormats::DigitsWithHyphens));
+	pItem->SetData(rowName, Quantity);
+
+	return Cast<AItem>(UGameplayStatics::FinishSpawningActor(pItem, Transform));
+}

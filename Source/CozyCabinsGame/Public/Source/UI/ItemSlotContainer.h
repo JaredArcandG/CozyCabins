@@ -43,6 +43,8 @@ public:
 	UFUNCTION()
 	void UpdateAllSlots();
 
+	void HandleOnCloseSlotContainer();
+
 protected:
 
 	void CreateNewItemSlotAddToGrid(const int& ItemIdx);

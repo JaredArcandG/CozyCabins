@@ -52,6 +52,10 @@ protected:
 
 	int PreviewQtyToTransfer;
 
+	// Refers to whether the item can be dropped in the world
+	// Shouldn't be droppable for key items
+	bool bIsDroppable;
+
 	UPROPERTY()
 	TObjectPtr<class UItemSlotDragPreview> DragPreviewWidget;
 
@@ -71,6 +75,8 @@ public:
 	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, class UInventoryComponent& InventoryComp);
 
 	void SetEmptySlot(const int& IdxInInventory, UInventoryComponent& InventoryComp);
+
+	void HandleOnClose();
 
 protected:
 	

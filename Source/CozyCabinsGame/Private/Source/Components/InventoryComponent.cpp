@@ -40,7 +40,7 @@ void UInventoryComponent::BeginPlay()
 	CHECK(ItemSlotContainer);
 
 	ItemSlotContainer->SetVisibility(ESlateVisibility::Hidden);
-	ItemSlotContainer->AddToViewport();
+	ItemSlotContainer->AddToViewport(3);
 	ItemSlotContainer->Setup(*this);
 }
 
@@ -580,6 +580,7 @@ void UInventoryComponent::ToggleInventory()
 			FInputModeGameOnly inputMode;
 			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
 			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+			ItemSlotContainer->HandleOnCloseSlotContainer();
 		}
 	}
 }

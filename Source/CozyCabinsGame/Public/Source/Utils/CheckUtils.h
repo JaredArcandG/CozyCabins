@@ -17,4 +17,12 @@ struct CheckUtils
                 return; \
             } \
         } while (false)
+
+#define CHECK_NULLPTR(pObj) \
+        do { \
+            if (!pObj) { \
+                UE_LOG(LogTemp, Error, TEXT("Null pointer detected in file %s | line %d"), ANSI_TO_TCHAR(__FILE__), __LINE__); \
+                return nullptr; \
+            } \
+        } while (false)
 };

@@ -16,7 +16,7 @@
 /// <param name="Amount"></param>
 /// <param name="IdxInInventory"></param>
 /// <param name="Image"></param>
-void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInInventory, TObjectPtr<UImage> Image, TSubclassOf<AItem> InItemClass)
+void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount, const int& IdxInInventory, TObjectPtr<UImage> Image, TSubclassOf<AItem> InItemClass, const bool& IsDroppable)
 {
 	CHECK(ItemImage);
 	CHECK(ItemText);
@@ -29,4 +29,5 @@ void UItemSlotDragPreview::SetPreviewSlotData(const FGuid& Id, const int& Amount
 	InventoryIdx = IdxInInventory;
 	ItemText->SetText(FText::AsNumber(Amount));
 	ItemClass = InItemClass;
+	bIsDroppable = IsDroppable;
 }
