@@ -51,22 +51,47 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 {
 	CurrentRecipe = ActiveRecipe;
-
-	FItemData* CraftingResultData = ActiveRecipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(ActiveRecipe->CraftingResult.ItemReference.RowName, "");
-	TArray<FCraftingItem> IngredientsData = ActiveRecipe->CraftingIngredients;
-
-
-	SelectedItemImage->SetBrushFromTexture(CraftingResultData->Icon);
-	SelectedItemName->SetText(FText::AsCultureInvariant(CraftingResultData->Name));
-
-	SelectedItemIngredients->ClearChildren();
-
-	for (FCraftingItem Ingredient : IngredientsData) 
+	if (CurrentRecipe) 
 	{
-		UCraftingIngredientSlot* IngredientSlot = CreateWidget<UCraftingIngredientSlot>(GetWorld(), IngredientSlotWidget);
-		SelectedItemIngredients->AddChildToVerticalBox(IngredientSlot);
-		IngredientSlot->SetupSlot(Ingredient, InventoryComponent);
+		VBOX_CraftingRecipe->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+		FItemData* CraftingResultData = ActiveRecipe->CraftingResult.ItemReference.DataTable->FindRow<FItemData>(ActiveRecipe->CraftingResult.ItemReference.RowName, "");
+		TArray<FCraftingItem> IngredientsData = ActiveRecipe->CraftingIngredients;
+
+
+		SelectedItemImage->SetBrushFromTexture(CraftingResultData->Icon);
+		SelectedItemName->SetText(FText::AsCultureInvariant(CraftingResultData->Name));
+
+		SelectedItemIngredients->ClearChildren();
+
+		for (FCraftingItem Ingredient : IngredientsData) 
+		{
+			UCraftingIngredientSlot* IngredientSlot = CreateWidget<UCraftingIngredientSlot>(GetWorld(), IngredientSlotWidget);
+			SelectedItemIngredients->AddChildToVerticalBox(IngredientSlot);
+			IngredientSlot->SetupSlot(Ingredient, InventoryComponent, CraftingMultiplier);
+		}
 	}
+	else 
+	{
+		VBOX_CraftingRecipe->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UWorkStationUIBase::ChangeCraftingMultiplier(int Value)
+{
+	int tempQuantity = CraftingMultiplier + Value;
+	CraftingMultiplier = FMath::Clamp(tempQuantity, 1, 99);
+	UpdateIngredients();
+}
+
+void UWorkStationUIBase::IncreaseCraftingMultiplier()
+{
+	ChangeCraftingMultiplier(1);
+}
+
+void UWorkStationUIBase::DecreaseCraftingMultiplier()
+{
+	ChangeCraftingMultiplier(-1);
 }
 
 bool UWorkStationUIBase::AttemptCraft()
@@ -106,7 +131,7 @@ bool UWorkStationUIBase::CheckQuantity(TArray<struct FCraftingItem> IngredientsD
 
 		if (InventoryComponent->TryGetItem(itemData->Id, tempData, tempQuantity))
 		{
-			if (tempQuantity < Ingredient.Quantity)
+			if (tempQuantity < Ingredient.Quantity * CraftingMultiplier)
 			{
 				return false;
 			}
@@ -125,7 +150,7 @@ bool UWorkStationUIBase::AttemptRemove(TArray<struct FCraftingItem> IngredientsD
 	{
 		FItemData* itemData = Ingredient.ItemReference.DataTable->FindRow<FItemData>(Ingredient.ItemReference.RowName, "");
 
-		if (!InventoryComponent->TryRemove(itemData->Id, Ingredient.Quantity))
+		if (!InventoryComponent->TryRemove(itemData->Id, Ingredient.Quantity * CraftingMultiplier))
 		{
 			return false;
 		}
@@ -138,7 +163,7 @@ bool UWorkStationUIBase::AttemptAdd(FCraftingItem ResultData)
 {
 	FItemData* itemData = ResultData.ItemReference.DataTable->FindRow<FItemData>(ResultData.ItemReference.RowName, "");
 
-	if (!InventoryComponent->TryAdd(itemData->Id, ResultData.Quantity)) 
+	if (!InventoryComponent->TryAdd(itemData->Id, ResultData.Quantity * CraftingMultiplier))
 	{
 		return false;
 	}
@@ -153,6 +178,6 @@ void UWorkStationUIBase::UpdateIngredients()
 	for (UWidget* Ingredient : Childs)
 	{
 		TObjectPtr<UCraftingIngredientSlot> IngredientSlot = Cast<UCraftingIngredientSlot>(Ingredient);
-		IngredientSlot->UpdateSlot(InventoryComponent);
+		IngredientSlot->UpdateSlot(InventoryComponent, CraftingMultiplier);
 	}
 }

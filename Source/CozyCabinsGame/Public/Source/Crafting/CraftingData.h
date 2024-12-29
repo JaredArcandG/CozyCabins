@@ -13,7 +13,7 @@ struct COZYCABINSGAME_API FCraftingItem
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Quantity of Item"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Quantity of Item", ClampMin = 1))
 	int Quantity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "DataTable reference of Item"))

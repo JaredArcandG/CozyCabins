@@ -30,6 +30,15 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	TObjectPtr<class UVerticalBox> SelectedItemIngredients;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVerticalBox> VBOX_CraftingRecipe;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> IncreaseCraftingAmount;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> DecreaseCraftingAmount;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> SelectedItemCraft;
 
 	UPROPERTY()
@@ -42,6 +51,13 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	bool AttemptRemove(TArray<struct FCraftingItem> IngredientsData);
 	bool AttemptAdd(struct FCraftingItem ResultData);
 	void UpdateIngredients();
+
+	// Crafting Multiplier
+	UPROPERTY()
+	int CraftingMultiplier = 1;
+
+	// Called when amount of crafting multiplier is adjusted
+	void ChangeCraftingMultiplier(int Value);
 
 public:
 
@@ -56,6 +72,14 @@ public:
 
 	// Called when a new Recipe is being clicked
 	void ChangeSelection(FCraftingRecipe* ActiveRecipe);
+
+	// Called when amount of crafting multiplier is adjusted
+	UFUNCTION(BlueprintCallable)
+	void IncreaseCraftingMultiplier();
+
+	// Called when amount of crafting multiplier is adjusted
+	UFUNCTION(BlueprintCallable)
+	void DecreaseCraftingMultiplier();
 
 	// Called from Blueprint when attempting to Craft the selected Recipe
 	UFUNCTION(BlueprintCallable)

@@ -32,7 +32,7 @@ class COZYCABINSGAME_API UCraftingIngredientSlot : public UUserWidget
 
 public:
 
-	void SetupSlot(struct FCraftingItem ItemData, class UInventoryComponent* InventoryComponent);
-	void UpdateSlot(class UInventoryComponent* InventoryComponent);
+	void SetupSlot(struct FCraftingItem ItemData, class UInventoryComponent* InventoryComponent, int QuantityMultiplier);
+	void UpdateSlot(class UInventoryComponent* InventoryComponent, int QuantityMultiplier);
 
 };

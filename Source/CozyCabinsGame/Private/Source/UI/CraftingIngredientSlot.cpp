@@ -8,7 +8,7 @@
 #include "Components/Image.h"
 #include "Components/HorizontalBox.h"
 
-void UCraftingIngredientSlot::SetupSlot(FCraftingItem ItemData, UInventoryComponent* InventoryComponent)
+void UCraftingIngredientSlot::SetupSlot(FCraftingItem ItemData, UInventoryComponent* InventoryComponent, int QuantityMultiplier)
 {
 	CraftingItemData = ItemData;
 	ItemDataStruct = CraftingItemData.ItemReference.DataTable->FindRow<FItemData>(CraftingItemData.ItemReference.RowName, "");
@@ -21,14 +21,14 @@ void UCraftingIngredientSlot::SetupSlot(FCraftingItem ItemData, UInventoryCompon
 
 	if (InventoryComponent->TryGetItem(ItemDataStruct->Id, tempData, tempQuantity))
 	{
-		QuantityText = FString::FromInt(tempQuantity) + " / " + FString::FromInt(CraftingItemData.Quantity);
+		QuantityText = FString::FromInt(tempQuantity) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
 
 	}
 
 	TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 }
 
-void UCraftingIngredientSlot::UpdateSlot(UInventoryComponent* InventoryComponent)
+void UCraftingIngredientSlot::UpdateSlot(UInventoryComponent* InventoryComponent, int QuantityMultiplier)
 {
 	int tempQuantity = 0;
 	FString QuantityText;
@@ -36,12 +36,12 @@ void UCraftingIngredientSlot::UpdateSlot(UInventoryComponent* InventoryComponent
 
 	if (InventoryComponent->TryGetItem(ItemDataStruct->Id, tempData, tempQuantity))
 	{
-		QuantityText = FString::FromInt(tempQuantity) + " / " + FString::FromInt(CraftingItemData.Quantity);
+		QuantityText = FString::FromInt(tempQuantity) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
 		TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 	}
 	else 
 	{
-		QuantityText = FString::FromInt(0) + " / " + FString::FromInt(CraftingItemData.Quantity);
+		QuantityText = FString::FromInt(0) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
 		TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 	}
 }
