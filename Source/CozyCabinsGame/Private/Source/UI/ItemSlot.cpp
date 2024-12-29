@@ -375,7 +375,7 @@ void UItemSlot::ShowPreviewWidgetPreDrag()
 
 	DragPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
 
-	DragPreviewWidget->AddToViewport();
+	DragPreviewWidget->AddToViewport(2);
 
 	// Get the current mouse position to ensure it's spawned where the mouse is
 	FVector2D vMousePosition;
