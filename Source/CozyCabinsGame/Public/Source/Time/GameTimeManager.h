@@ -17,10 +17,18 @@ class COZYCABINSGAME_API UGameTimeManager : public UActorComponent
 	
 public:
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameMinutePassed); 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameMinutePassed);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameHourPassed);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameDayPassed);
 
 	UPROPERTY(BlueprintAssignable, Category = "Events", meta = (Text = "Event that is broadcasted when one minute has passed in game time"))
 	FOnGameMinutePassed OnGameMinutePassed;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events", meta = (Text = "Event that is broadcasted when one hour has passed in game time"))
+	FOnGameHourPassed OnGameHourPassed;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events", meta = (Text = "Event that is broadcasted when one day has passed in game time"))
+	FOnGameDayPassed OnGameDayPassed;
 
 	UGameTimeManager();
 
@@ -38,5 +46,9 @@ public:
 
 protected:
 
-	void BroadCastGameTimePassed();
+	void BroadCastGameTimeMinutePassed();
+
+	void BroadCastGameTimeHourPassed();
+
+	void BroadCastGameTimeDayPassed();
 };
