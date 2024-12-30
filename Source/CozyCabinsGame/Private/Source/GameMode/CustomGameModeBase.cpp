@@ -3,8 +3,10 @@
 
 #include "Source/GameMode/CustomGameModeBase.h"
 #include "Engine/DataTable.h"
+#include "Source/Time/GameTimeManager.h"
 
 ACustomGameModeBase::ACustomGameModeBase()
 {
 	ItemsDataTable = CreateDefaultSubobject<UDataTable>(TEXT("ItemsDataTable"));
+	GameTimeManager = CreateDefaultSubobject<UGameTimeManager>(TEXT("GameTimeManager"));
 }

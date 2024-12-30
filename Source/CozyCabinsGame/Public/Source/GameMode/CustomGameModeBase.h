@@ -20,5 +20,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<class UDataTable> ItemsDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<class UGameTimeManager> GameTimeManager;
 	
 };
