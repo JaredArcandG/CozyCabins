@@ -112,6 +112,9 @@ protected:
 	// Handle interact input
 	void Interact(const FInputActionValue& InputValue);
 
+	// Handle consume input
+	void Consume(const FInputActionValue& InputValue);
+
 	// Handle show/hide map
 	void TriggerMap(const FInputActionValue& InputValue);
 

@@ -154,6 +154,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	pInputComponent->BindAction(InputActions->InputFlashlight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerFlashlight);
 	pInputComponent->BindAction(InputActions->InputConfirm, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
 	pInputComponent->BindAction(InputActions->InputInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerInventory);
+	pInputComponent->BindAction(InputActions->InputConsume, ETriggerEvent::Triggered, this, &APlayerCharacter::Consume);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -233,6 +234,20 @@ void APlayerCharacter::Interact(const FInputActionValue& InputValue)
 		InteractionComp->OnInteractTriggered();
 	}
 
+}
+
+/// <summary>
+/// Triggered when character attempts to consume an object on the ground
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::Consume(const FInputActionValue& InputValue)
+{
+	CHECK(InteractionComp);
+
+	if (bCanInteract)
+	{
+		InteractionComp->OnConsumeTriggered();
+	}
 }
 
 /// <summary>

@@ -41,6 +41,8 @@ protected:
 
 	TArray<TObjectPtr<AActor>> OverlappedInteractableActors;
 
+	TObjectPtr<ACharacter> OwningCharacter;
+
 	// Should only have one actor at a time
 	UPROPERTY()
 	TObjectPtr<AActor> TargetActor;
@@ -64,4 +66,6 @@ public:
 	virtual void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	void OnInteractTriggered();
+
+	void OnConsumeTriggered();
 };

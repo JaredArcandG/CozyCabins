@@ -9,6 +9,8 @@
 #include "Camera/CameraComponent.h"
 #include "Source/Constants/TraceChannel.h"
 #include "EngineUtils.h"
+#include <Source/Items/IUsable.h>
+#include <Source/Items/Item.h>
 
 // Sets default values for this component's properties
 UInteractableComponent::UInteractableComponent()
@@ -23,6 +25,7 @@ UInteractableComponent::UInteractableComponent()
 	CollisionSphere->SetSphereRadius(ActorFindRadius);
 
 	bEnableDebugMode = false;
+	OwningCharacter = nullptr;
 }
 
 
@@ -39,6 +42,8 @@ void UInteractableComponent::BeginPlay()
 	CollisionSphere->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	GetWorld()->GetTimerManager().SetTimer(RaycastHandle, this, &UInteractableComponent::ApplyRaycast, RaycastFreqSecs, true, 0.0f);
+
+	OwningCharacter = Cast<ACharacter>(GetOwner());
 	
 }
 
@@ -108,10 +113,41 @@ void UInteractableComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedCompone
 void UInteractableComponent::OnInteractTriggered()
 {
 	CHECK(TargetActor);
+	CHECK(OwningCharacter);
 
 	if (TargetActor->Implements<UInteractable>())
 	{ 
-		IInteractable::Execute_OnInteract(TargetActor, GetWorld(), Cast<ACharacter>(GetOwner()));
+		IInteractable::Execute_OnInteract(TargetActor, GetWorld(), OwningCharacter);
+	}
+}
+
+/// <summary>
+/// OnConsume
+/// Consume one quantity of the item
+/// </summary>
+void UInteractableComponent::OnConsumeTriggered()
+{
+	CHECK(TargetActor);
+	CHECK(OwningCharacter);
+
+	if (TargetActor->Implements<UUsable>())
+	{
+		bool bSuccess = IUsable::Execute_OnUse(TargetActor, GetWorld(), OwningCharacter);
+
+		if (bSuccess)
+		{
+			TObjectPtr<AItem> pItemActor = Cast<AItem>(TargetActor);
+			CHECK(pItemActor);
+			
+			if (pItemActor->Quantity == 1)
+			{
+				pItemActor->Destroy();
+			}
+			else
+			{
+				pItemActor->Quantity--;
+			}
+		}
 	}
 }
 
