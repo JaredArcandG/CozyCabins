@@ -62,6 +62,19 @@ bool UWorldDroppableItemWidget::NativeOnDrop(const FGeometry& InGeometry, const 
 	FVector vLocationToSpawn = PlayerRef->GetActorLocation() + (vForwardVector * fDistanceToSpawn);
 	FRotator vRotationToSpawn = PlayerRef->GetActorRotation();
 
+	// Raycast so item is dropped on the ground
+	FHitResult hitResult; 
+	FVector vTraceStart = vLocationToSpawn;
+	FVector vTraceEnd = vLocationToSpawn - FVector(0, 0, 10000);
+	FCollisionQueryParams queryParams; 
+	queryParams.AddIgnoredActor(PlayerRef); 
+	bool bHitGround = pWorld->LineTraceSingleByChannel(hitResult, vTraceStart, vTraceEnd, ECC_Visibility, queryParams);
+	
+	if (bHitGround) 
+	{ 
+		vLocationToSpawn.Z = hitResult.Location.Z;
+	}
+
 	FTransform itemTransform = FTransform();
 	itemTransform.SetLocation(vLocationToSpawn);
 	itemTransform.SetRotation(vRotationToSpawn.Quaternion());
