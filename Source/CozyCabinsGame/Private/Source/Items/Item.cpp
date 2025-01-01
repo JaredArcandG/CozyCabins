@@ -8,6 +8,7 @@
 #include "Engine/DataTable.h"
 #include <Kismet/GameplayStatics.h>
 #include "Source/GameMode/CustomGameModeBase.h"
+#include "TimerManager.h"
 
 // Sets default values
 AItem::AItem()
@@ -26,6 +27,9 @@ AItem::AItem()
 	ItemDataRowName = FName();
 	Quantity = 1;
 
+	// By default, if TTL is -1, the item does not disappear
+	TimeToLiveSeconds = -1;
+
 	SetRootComponent(Mesh);
 }
 
@@ -35,6 +39,12 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 
 	CacheItemData();
+
+	// If an explicit TTL was specified in the BP spawn params, then the item should be destroyed by the end of the TTL
+	if (TimeToLiveSeconds != -1)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ItemTimerHandle, this, &AItem::OnDestroy, TimeToLiveSeconds, false, -1.f);
+	}
 }
 
 // Called every frame
@@ -65,8 +75,22 @@ void AItem::SetData(FName InItemDataRowName, int InQuantity)
 {
 	Quantity = InQuantity;
 	ItemDataRowName = InItemDataRowName;
+	TimeToLiveSeconds = -1;
 
 	CacheItemData();
+
+	// Clear any past timers on the handle
+	GetWorld()->GetTimerManager().ClearTimer(ItemTimerHandle);
+}
+
+void AItem::SetDataWithTTL(FName InItemDataRowName, int InQuantity, int InTimeToLiveSeconds)
+{
+	SetData(InItemDataRowName, InQuantity);
+
+	TimeToLiveSeconds = InTimeToLiveSeconds;
+
+	// The item should destroy within the TTL specified
+	GetWorld()->GetTimerManager().SetTimer(ItemTimerHandle, this, &AItem::OnDestroy, TimeToLiveSeconds, false, -1.f);
 }
 
 /// <summary>
@@ -98,4 +122,12 @@ void AItem::CacheItemData()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to find item data for row: %s"), *ItemDataRowName.ToString());
 	}
+}
+
+/// <summary>
+/// Wrapper to destroy item
+/// </summary>
+void AItem::OnDestroy()
+{
+	this->Destroy();
 }

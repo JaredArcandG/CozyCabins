@@ -51,6 +51,9 @@ bool UWorldDroppableItemWidget::NativeOnDrop(const FGeometry& InGeometry, const 
 	int inventoryIdx = pItemOperation->ItemSlotPreviewRef->InventoryIdx;
 	TObjectPtr<UInventoryComponent> pInventoryComp = pItemOperation->InventoryCompRef;
 
+	// World must be valid
+	// Inventory Component should exist
+	// Item must be droppable
 	if (!pWorld || !itemClass || !pInventoryComp || !pItemOperation->ItemSlotPreviewRef->bIsDroppable)
 	{
 		return false;

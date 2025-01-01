@@ -9,4 +9,5 @@ ACustomGameModeBase::ACustomGameModeBase()
 {
 	ItemsDataTable = CreateDefaultSubobject<UDataTable>(TEXT("ItemsDataTable"));
 	GameTimeManager = CreateDefaultSubobject<UGameTimeManager>(TEXT("GameTimeManager"));
+	DroppedItemTimeToLiveSeconds = 0.0f;
 }

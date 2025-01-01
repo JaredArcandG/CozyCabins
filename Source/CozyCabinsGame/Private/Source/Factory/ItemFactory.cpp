@@ -16,8 +16,9 @@
 /// <param name="World"></param>
 /// <param name="Transform"></param>
 /// <param name="ItemClass"></param>
+/// <param name="AddTTL"> If the item should be destroyed after the specified TTL in the game mode</param>
 /// <returns></returns>
-TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<AItem> ItemClass, const FGuid& ItemId, const int& Quantity)
+TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<AItem> ItemClass, const FGuid& ItemId, const int& Quantity, const bool& AddTTL)
 {
 	CHECK_NULLPTR(ItemClass);
 
@@ -31,7 +32,19 @@ TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform
 	CHECK_NULLPTR(pItem);
 
 	FName rowName = FName(ItemId.ToString(EGuidFormats::DigitsWithHyphens));
-	pItem->SetData(rowName, Quantity);
+
+	if (AddTTL)
+	{
+		// Get the item drop TTL settings from the GameMode
+		float fItemTTL = pGameMode->DroppedItemTimeToLiveSeconds;
+	
+		pItem->SetDataWithTTL(rowName, Quantity, fItemTTL);
+	}
+	else
+	{
+		// Item valid forever
+		pItem->SetData(rowName, Quantity);
+	}
 
 	return Cast<AItem>(UGameplayStatics::FinishSpawningActor(pItem, Transform));
 }

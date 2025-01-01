@@ -23,5 +23,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<class UGameTimeManager> GameTimeManager;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Game Settings", meta = (ClampMin = "0.0"))	
+	float DroppedItemTimeToLiveSeconds;
 	
 };

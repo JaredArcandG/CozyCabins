@@ -7,6 +7,7 @@
 #include "IUsable.h"
 #include "Source/Components/IInteractable.h"
 #include "ItemData.h"
+#include "Engine/TimerHandle.h"
 #include "Item.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)
@@ -35,6 +36,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UDataTable> DataTable;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float TimeToLiveSeconds;
+
+	FTimerHandle ItemTimerHandle;
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -51,8 +57,14 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Set the item specific data mesh, data table, row name, etc."))
 	void SetData(FName InItemDataRowName, int InQuantity);
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Set the item specific data mesh, data table, row name, etc. with a time to live. Item disappears after TTL expires"))
+	void SetDataWithTTL(FName InItemDataRowName, int InQuantity, int InTimeToLiveSeconds);
+
 private:
 
 	void CacheItemData();
+
+	void OnDestroy();
+
 
 };
