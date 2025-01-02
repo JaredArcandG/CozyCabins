@@ -9,6 +9,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Source/UI/ItemSlotDragPreview.h"
+#include "Source/UI/ItemSlotHoverPreview.h"
 #include <Source/Components/InventoryComponent.h>
 #include "Components/Button.h"
 #include <Source/Items/Item.h>
@@ -20,7 +21,6 @@
 #include <Source/Player/Controller/CustomPlayerController.h>
 #include <Source/UI/GlobalUIManager.h>
 #include <Source/Components/InteractableComponent.h>
-#include <Source/Items/Item.h>
 
 /// <summary>
 /// Ctor
@@ -36,8 +36,10 @@ void UItemSlot::NativeConstruct()
 	InventoryCompRef = nullptr;
 	PreviewQtyToTransfer = 0;
 	DragPreviewWidget = nullptr;
+	HoverPreviewWidget = nullptr;
 	ItemClass = nullptr;
 	bIsDroppable = false;
+	ItemDescription = FText();
 
 	PlayerController = Cast<ACustomPlayerController>(GetWorld()->GetFirstPlayerController());
 	CHECK(PlayerController);
@@ -52,26 +54,12 @@ void UItemSlot::NativeConstruct()
 }
 
 /// <summary>
-/// Removes previously set slot values
+/// Dtor
 /// </summary>
-/// <param name="InventoryComp"></param>
-void UItemSlot::ClearSlot(UInventoryComponent& InventoryComp)
+void UItemSlot::NativeDestruct()
 {
-	CHECK(ItemImage);
-	CHECK(Quantity);
-	CHECK(Name);
-
-	ItemImage->SetBrushFromTexture(nullptr);
-	Quantity->SetText(FText::GetEmpty());
-	Name->SetText(FText::GetEmpty());
-	InventoryIdx = -1;
-	bIsOccupied = false;
-	ItemId = EMPTY_GUID;
-	ItemQty = -1;
-	InventoryCompRef = &InventoryComp;
-	PreviewQtyToTransfer = 0;
-	ItemClass = nullptr;
-	bIsDroppable = false;
+	RemovePreviewWidgetPreDrag();
+	DestroyHoverPreviewWidget();
 }
 
 /// <summary>
@@ -105,6 +93,7 @@ void UItemSlot::SetSlotData(const FItemData& ItemData, const int& Amount, const 
 	PreviewQtyToTransfer = 0;
 	ItemClass = ItemData.ItemClass;
 	bIsDroppable = ItemData.IsDroppable;
+	ItemDescription = FText::FromString(ItemData.Description);
 }
 
 /// <summary>
@@ -132,6 +121,7 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 	ItemQty = -1;
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
+	ItemDescription = FText();
 }
 
 /// <summary>
@@ -226,6 +216,8 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, co
 		return FEventReply(false).NativeReply;
 	}
 
+	HideHoverPreviewWidget();
+
 	// Full slot drag, preview quantity is the entire slot's quantity
 	PreviewQtyToTransfer = this->ItemQty;
 
@@ -251,8 +243,55 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 		return FEventReply(false).NativeReply;
 	}
 
+	HideHoverPreviewWidget();
 	OnConsumeItem();
 	return FEventReply(true).NativeReply;
+}
+
+/// <summary>
+/// Show the preview widget on hover
+/// Note: This is not the drag preview weidget, but the hover preview widget
+/// </summary>
+/// <param name="InGeometry"></param>
+/// <param name="InMouseEvent"></param>
+void UItemSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (!HoverPreviewWidget && bIsOccupied)
+	{
+		CHECK(HoverPreviewClass);
+		CHECK(this->ItemImage);
+		HoverPreviewWidget = CreateWidget<UItemSlotHoverPreview>(PlayerController, HoverPreviewClass);
+		CHECK(HoverPreviewWidget);
+		CHECK(HoverPreviewWidget->ItemSizeBox);
+
+		FVector2D vDesiredSize = HoverPreviewWidget->ItemSizeBox->GetDesiredSize();
+		HoverPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
+
+		HoverPreviewWidget->SetHoverPreviewSlotData(this->ItemImage, this->Name->GetText(), this->ItemDescription);
+		HoverPreviewWidget->AddToViewport(2);
+		HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
+		return;
+	}
+
+	CHECK(Name);
+	
+	if (bIsOccupied)
+	{
+		HoverPreviewWidget->SetHoverPreviewSlotData(this->ItemImage, this->Name->GetText(), this->ItemDescription);
+		HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+
+}
+
+/// <summary>
+/// Destroy the preview widget on hover
+/// Note: This is not the drag preview widget, but the hover preview widget
+/// </summary>
+/// <param name="InMouseEvent"></param>
+void UItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	// Hide the widget if it exists
+	HideHoverPreviewWidget();
 }
 
 /// <summary>
@@ -375,7 +414,7 @@ void UItemSlot::ShowPreviewWidgetPreDrag()
 
 	DragPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
 
-	DragPreviewWidget->AddToViewport(2);
+	DragPreviewWidget->AddToViewport(3);
 
 	// Get the current mouse position to ensure it's spawned where the mouse is
 	FVector2D vMousePosition;
@@ -413,4 +452,22 @@ void UItemSlot::RemovePreviewWidgetPreDrag()
 	DragPreviewWidget->ConditionalBeginDestroy();
 
 	DragPreviewWidget = nullptr;
+}
+
+void UItemSlot::DestroyHoverPreviewWidget()
+{
+	CHECK(HoverPreviewWidget);
+
+	HoverPreviewWidget->RemoveFromParent();
+	HoverPreviewWidget->ConditionalBeginDestroy();
+
+	HoverPreviewWidget = nullptr;
+}
+
+void UItemSlot::HideHoverPreviewWidget()
+{
+	if (HoverPreviewWidget)
+	{
+		HoverPreviewWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }

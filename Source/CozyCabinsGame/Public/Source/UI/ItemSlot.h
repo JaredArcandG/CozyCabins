@@ -38,12 +38,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemSlotDragPreview> DragPreviewClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class UItemSlotHoverPreview> HoverPreviewClass;
+
 	UPROPERTY()
 	TObjectPtr<class UInventoryComponent> InventoryCompRef;
 
 	FGuid ItemId;
 
 	int ItemQty;
+
+	FText ItemDescription;
 
 	// Reference to where in the inventory the slot is located
 	int InventoryIdx;
@@ -60,6 +65,9 @@ protected:
 	TObjectPtr<class UItemSlotDragPreview> DragPreviewWidget;
 
 	UPROPERTY()
+	TObjectPtr<class UItemSlotHoverPreview> HoverPreviewWidget;
+
+	UPROPERTY()
 	TObjectPtr<class ACustomPlayerController> PlayerController;
 
 	UPROPERTY()
@@ -69,8 +77,6 @@ protected:
 	TObjectPtr<class UInteractableComponent> InteractableComp;
 
 public:
-
-	void ClearSlot(class UInventoryComponent& InventoryComp);
 
 	void SetSlotData(const FItemData& ItemData, const int& Amount, const int& IdxInInventory, class UInventoryComponent& InventoryComp);
 
@@ -82,6 +88,8 @@ protected:
 	
 	virtual void NativeConstruct() override;
 
+	virtual void NativeDestruct() override;
+
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
@@ -89,6 +97,10 @@ protected:
 	virtual FReply NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
 	void OnConsumeItem();
 
@@ -99,5 +111,9 @@ protected:
 	void UpdatePreviewWidgetPreDrag();
 
 	void RemovePreviewWidgetPreDrag();
+
+	void DestroyHoverPreviewWidget();
+
+	void HideHoverPreviewWidget();
 
 };
