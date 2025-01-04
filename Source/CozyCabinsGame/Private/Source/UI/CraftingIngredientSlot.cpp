@@ -25,6 +25,11 @@ void UCraftingIngredientSlot::SetupSlot(FCraftingItem ItemData, UInventoryCompon
 
 	}
 
+	else 
+	{
+		QuantityText = FString::FromInt(0) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
+	}
+
 	TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 }
 
@@ -37,11 +42,12 @@ void UCraftingIngredientSlot::UpdateSlot(UInventoryComponent* InventoryComponent
 	if (InventoryComponent->TryGetItem(ItemDataStruct->Id, tempData, tempQuantity))
 	{
 		QuantityText = FString::FromInt(tempQuantity) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
-		TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 	}
+
 	else 
 	{
 		QuantityText = FString::FromInt(0) + " / " + FString::FromInt(CraftingItemData.Quantity * QuantityMultiplier);
-		TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 	}
+
+	TXT_ItemQuantity->SetText(FText::AsCultureInvariant(QuantityText));
 }
