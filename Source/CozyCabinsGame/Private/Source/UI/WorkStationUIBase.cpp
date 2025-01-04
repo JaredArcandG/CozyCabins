@@ -43,6 +43,8 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 			PC->SetInputMode(FInputModeUIOnly());
 			PC->bShowMouseCursor = true;
 
+			SetCraftingMultiplier(1);
+
 			AddToViewport();
 		}
 	}
@@ -70,6 +72,8 @@ void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 			SelectedItemIngredients->AddChildToVerticalBox(IngredientSlot);
 			IngredientSlot->SetupSlot(Ingredient, InventoryComponent, CraftingMultiplier);
 		}
+
+		SetCraftingMultiplier(1);
 	}
 	else 
 	{
@@ -81,7 +85,23 @@ void UWorkStationUIBase::ChangeCraftingMultiplier(int Value)
 {
 	int tempQuantity = CraftingMultiplier + Value;
 	CraftingMultiplier = FMath::Clamp(tempQuantity, 1, 99);
+
+	UpdateCraftingMultiplierText();
 	UpdateIngredients();
+}
+
+void UWorkStationUIBase::SetCraftingMultiplier(int Value)
+{
+	CraftingMultiplier = FMath::Clamp(Value, 1, 99);
+
+	UpdateCraftingMultiplierText();
+	UpdateIngredients();
+}
+
+void UWorkStationUIBase::UpdateCraftingMultiplierText()
+{
+	FString CraftingMultiplierText = "x" + FString::FromInt(CraftingMultiplier);
+	TXT_CraftingMultiplier->SetText(FText::AsCultureInvariant(CraftingMultiplierText));
 }
 
 void UWorkStationUIBase::IncreaseCraftingMultiplier()
