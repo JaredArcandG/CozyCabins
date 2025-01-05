@@ -83,6 +83,24 @@ int UStatsComponent::GetTotalStamina()
 }
 
 /// <summary>
+/// Gets the current hunger of the actor
+/// </summary>
+/// <returns></returns>
+int UStatsComponent::GetCurrentHunger()
+{
+	return ActorStats.CurrentHunger;
+}
+
+/// <summary>
+/// Gets the total hunger of the actor
+/// </summary>
+/// <returns></returns>
+int UStatsComponent::GetTotalHunger()
+{
+	return ActorStats.TotalHunger;
+}
+
+/// <summary>
 /// Sets the current health of the actor
 /// </summary>
 /// <param name="NewHealth"></param>

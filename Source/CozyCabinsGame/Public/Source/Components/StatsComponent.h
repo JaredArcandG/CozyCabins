@@ -99,6 +99,12 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Get the total stamina of the actor"))
 	int GetTotalStamina();
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Get the current hunger of the actor"))
+	int GetCurrentHunger();
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Get the total hunger of the actor"))
+	int GetTotalHunger();
+
 	UFUNCTION(BlueprintCallable, meta = (Text = "Set the current health of the actor"))
 	void SetCurrentHealth(const int& NewHealth);
 
