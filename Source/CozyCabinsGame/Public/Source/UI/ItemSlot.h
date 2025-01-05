@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemSlotHoverPreview> HoverPreviewClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FVector2D HoverPreviewOffset;
+
 	UPROPERTY()
 	TObjectPtr<class UInventoryComponent> InventoryCompRef;
 

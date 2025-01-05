@@ -122,6 +122,12 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 	InventoryCompRef = &InventoryComp;
 	PreviewQtyToTransfer = 0;
 	ItemDescription = FText();
+
+	if (HoverPreviewWidget)
+	{
+		// Remove the widget
+		DestroyHoverPreviewWidget();
+	}
 }
 
 /// <summary>
@@ -267,8 +273,16 @@ void UItemSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEv
 		FVector2D vDesiredSize = HoverPreviewWidget->ItemSizeBox->GetDesiredSize();
 		HoverPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
 
+		// Get the position of the parent Grid widget
+		TObjectPtr<UWidget> pGridParent = GetParent();
+		CHECK(pGridParent);
+
+		FGeometry gGridGeometry = pGridParent->GetCachedGeometry(); 
+		FVector2D vGridPosition = gGridGeometry.GetAbsolutePosition();
+		HoverPreviewWidget->SetPositionInViewport(vGridPosition + HoverPreviewOffset);
+
 		HoverPreviewWidget->SetHoverPreviewSlotData(this->ItemImage, this->Name->GetText(), this->ItemDescription);
-		HoverPreviewWidget->AddToViewport(2);
+		HoverPreviewWidget->AddToViewport(4);
 		HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
 		return;
 	}
