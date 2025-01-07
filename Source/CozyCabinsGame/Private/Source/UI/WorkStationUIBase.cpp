@@ -81,6 +81,16 @@ void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 	}
 }
 
+void UWorkStationUIBase::IncreaseCraftingMultiplier()
+{
+	ChangeCraftingMultiplier(1);
+}
+
+void UWorkStationUIBase::DecreaseCraftingMultiplier()
+{
+	ChangeCraftingMultiplier(-1);
+}
+
 void UWorkStationUIBase::ChangeCraftingMultiplier(int Value)
 {
 	int tempQuantity = CraftingMultiplier + Value;
@@ -100,19 +110,21 @@ void UWorkStationUIBase::SetCraftingMultiplier(int Value)
 
 void UWorkStationUIBase::UpdateCraftingMultiplierText()
 {
-	FString CraftingMultiplierText = "x" + FString::FromInt(CraftingMultiplier);
+	FString CraftingMultiplierText = "Craft Item x" + FString::FromInt(CraftingMultiplier);
 	TXT_CraftingMultiplier->SetText(FText::AsCultureInvariant(CraftingMultiplierText));
+
+	UpdateCraftingResultQuantity();
 }
 
-void UWorkStationUIBase::IncreaseCraftingMultiplier()
+void UWorkStationUIBase::UpdateCraftingResultQuantity()
 {
-	ChangeCraftingMultiplier(1);
+	if (CurrentRecipe) 
+	{	
+		FString CraftingMultiplierText = "x" + FString::FromInt(CurrentRecipe->CraftingResult.Quantity * CraftingMultiplier);
+		TXT_CraftingResultQuantity->SetText(FText::AsCultureInvariant(CraftingMultiplierText));
+	}
 }
 
-void UWorkStationUIBase::DecreaseCraftingMultiplier()
-{
-	ChangeCraftingMultiplier(-1);
-}
 
 bool UWorkStationUIBase::AttemptCraft()
 {
