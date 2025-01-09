@@ -7,33 +7,6 @@
 #include "Engine/TimerHandle.h"
 #include "GameTimeManager.generated.h"
 
-USTRUCT(Blueprintable, BlueprintType)
-struct COZYCABINSGAME_API FCustomGameTime
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Year = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Month = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Day = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Hour = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Minutes = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Seconds = 0;
-
-};
-
 /**
  * 
  */
@@ -66,7 +39,7 @@ protected:
 
 	FTimerHandle GameTimerHandle;
 
-	FCustomGameTime CurrentGameTime;
+	FDateTime CurrentGameTime;
 
 public:
 
@@ -77,7 +50,10 @@ public:
 	void IncrementGameTime(const int& InAddYears, const int& InAddMonths, const int& InAddDays, const int& InAddHours, const int& InAddMinutes, const int& AddSeconds);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Get the current game time"))
-	FCustomGameTime GetCurrentGameTime();
+	FDateTime GetCurrentGameTime();
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Get the time difference from input time"))
+	FTimespan GetTimeDifferenceFromCurrentTime(const FDateTime& InTime);
 
 protected:
 
@@ -86,17 +62,5 @@ protected:
 	void BroadCastGameTimeHourPassed();
 
 	void BroadCastGameTimeDayPassed();
-
-	void IncrementGameTimeYears(const int& InAddYears);
-
-	void IncrementGameTimeMonths(const int& InAddMonths);
-
-	void IncrementGameTimeDays(const int& InAddDays);
-
-	void IncrementGameTimeHours(const int& InAddHours);
-
-	void IncrementGameTimeMinutes(const int& InAddMinutes);
-
-	void IncrementGameTimeSeconds(const int& InAddSeconds);
 
 };
