@@ -10,7 +10,7 @@ UGameTimeManager::UGameTimeManager()
 {
 	RealTimeMinutesPerGameHour = 2.5f;
 
-	CurrentGameTime = FDateTime(0, 0, 0);
+	CurrentGameTime = FDateTime(1, 1, 1);
 
 }
 
