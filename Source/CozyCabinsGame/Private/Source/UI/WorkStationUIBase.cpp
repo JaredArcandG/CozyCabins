@@ -96,7 +96,7 @@ void UWorkStationUIBase::ChangeCraftingMultiplier(int Value)
 	int tempQuantity = CraftingMultiplier + Value;
 	CraftingMultiplier = FMath::Clamp(tempQuantity, 1, 99);
 
-	UpdateCraftingMultiplierText();
+	UpdateCraftingResultQuantity();
 	UpdateIngredients();
 }
 
@@ -104,23 +104,15 @@ void UWorkStationUIBase::SetCraftingMultiplier(int Value)
 {
 	CraftingMultiplier = FMath::Clamp(Value, 1, 99);
 
-	UpdateCraftingMultiplierText();
-	UpdateIngredients();
-}
-
-void UWorkStationUIBase::UpdateCraftingMultiplierText()
-{
-	FString CraftingMultiplierText = "Craft Item x" + FString::FromInt(CraftingMultiplier);
-	TXT_CraftingMultiplier->SetText(FText::AsCultureInvariant(CraftingMultiplierText));
-
 	UpdateCraftingResultQuantity();
+	UpdateIngredients();
 }
 
 void UWorkStationUIBase::UpdateCraftingResultQuantity()
 {
 	if (CurrentRecipe) 
 	{	
-		FString CraftingMultiplierText = "x" + FString::FromInt(CurrentRecipe->CraftingResult.Quantity * CraftingMultiplier);
+		FString CraftingMultiplierText = "Craft Item x" + FString::FromInt(CurrentRecipe->CraftingResult.Quantity * CraftingMultiplier);
 		TXT_CraftingResultQuantity->SetText(FText::AsCultureInvariant(CraftingMultiplierText));
 	}
 }

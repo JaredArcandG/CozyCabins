@@ -44,9 +44,6 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TXT_CraftingResultQuantity;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TXT_CraftingMultiplier;
-
 	UPROPERTY()
 	TObjectPtr<class UInventoryComponent> InventoryComponent;
 
@@ -65,7 +62,6 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	// Called when amount of crafting multiplier is adjusted
 	void ChangeCraftingMultiplier(int Value);
 	void SetCraftingMultiplier(int Value);
-	void UpdateCraftingMultiplierText();
 
 	//Called to Update the Crafting Result Amount
 	void UpdateCraftingResultQuantity();
