@@ -19,11 +19,13 @@ FItemData& FItemData::operator=(FItemData const& Other)
 	Id = Other.Id;
 	Name = Other.Name;
 	Description = Other.Description;
+	ItemCategories = Other.ItemCategories;
 	Icon = Other.Icon;
 	Mesh = Other.Mesh;
 	IsConsumable = Other.IsConsumable;
 	IsDroppable = Other.IsDroppable;
 	ItemClass = Other.ItemClass;
+	CropStageData = Other.CropStageData;
 	return *this;
 }
 
