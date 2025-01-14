@@ -28,9 +28,9 @@ void UGameTimeManager::BeginPlay()
 	float fRealtimeSecsGameDay = fRealtimeSecsGameHour * 60;
 
 	// Broadcast event for game time passed every fRealtime seconds
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, FTimerDelegate::CreateUObject(this, &UGameTimeManager::BroadCastGameTimeMinutePassed), fRealtimeSecsGameMinute, true);
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, FTimerDelegate::CreateUObject(this, &UGameTimeManager::BroadCastGameTimeHourPassed), fRealtimeSecsGameHour, true);
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, FTimerDelegate::CreateUObject(this, &UGameTimeManager::BroadCastGameTimeDayPassed), fRealtimeSecsGameDay, true);
+	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleMinute, this, &UGameTimeManager::BroadCastGameTimeMinutePassed, fRealtimeSecsGameMinute, true);
+	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleHour, this, &UGameTimeManager::BroadCastGameTimeHourPassed, fRealtimeSecsGameHour, true);
+	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleDay, this, &UGameTimeManager::BroadCastGameTimeDayPassed, fRealtimeSecsGameDay, true);
 }
 
 /// <summary>
@@ -45,7 +45,7 @@ void UGameTimeManager::BeginPlay()
 void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAddMonths, const int& InAddDays, const int& InAddHours, const int& InAddMinutes, const int& InAddSeconds)
 {
 	// Since timespan can only increase by a day max, convert years and months todays
-	int totalDays = InAddDays + (360 * InAddYears) + (30 * InAddMonths);
+	int totalDays = InAddDays + (365 * InAddYears) + (30 * InAddMonths);
 	FTimespan incrementTS(totalDays, InAddHours, InAddMinutes, InAddSeconds);
 
 	CurrentGameTime += incrementTS;
