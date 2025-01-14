@@ -7,6 +7,45 @@
 #include "Engine/TimerHandle.h"
 #include "GameTimeManager.generated.h"
 
+USTRUCT(Blueprintable, BlueprintType)
+struct COZYCABINSGAME_API FCustomTimespan
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Years = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Months = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Days = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Hours = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Minutes = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Seconds = 0;
+
+	/// <summary>
+	/// Converts custom timespan to actual FTimespan
+	/// </summary>
+	/// <returns></returns>
+	FTimespan ConvertToTimespan()
+	{
+		int daysInYears = Years * 365;
+		int daysInMonths = Months * 30;
+
+		return FTimespan(daysInYears + daysInMonths + Days, Hours, Minutes, Seconds);
+	}
+
+};
+
 /**
  * 
  */
@@ -37,7 +76,11 @@ public:
 
 protected:
 
-	FTimerHandle GameTimerHandle;
+	FTimerHandle GameTimerHandleDay;
+
+	FTimerHandle GameTimerHandleHour;
+
+	FTimerHandle GameTimerHandleMinute;
 
 	FDateTime CurrentGameTime;
 
@@ -57,10 +100,13 @@ public:
 
 protected:
 
+	UFUNCTION()
 	void BroadCastGameTimeMinutePassed();
 
+	UFUNCTION()
 	void BroadCastGameTimeHourPassed();
 
+	UFUNCTION()
 	void BroadCastGameTimeDayPassed();
 
 };
