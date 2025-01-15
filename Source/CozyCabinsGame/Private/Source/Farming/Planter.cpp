@@ -39,8 +39,6 @@ void APlanter::BeginPlay()
 	ACustomGameModeBase* GameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	GameTimeManager = GameMode->GetComponentByClass<UGameTimeManager>();
-
-	//GameTimeManager->OnGameMinutePassed.AddDynamic(this, &APlanter::TimePassed);
 }
 
 
@@ -69,13 +67,13 @@ void APlanter::DisplayWidget(UWorld* World, ACharacter* SourceCharacter)
 	}*/
 }
 
-void APlanter::TimePassed()
+void APlanter::TimePassed(FTimespan PassedTime)
 {
-	UpdateTimeOfCrops();
+	UpdateTimeOfCrops(PassedTime);
 	CheckAndFillEmptySlots();
 }
 
-void APlanter::UpdateTimeOfCrops()
+void APlanter::UpdateTimeOfCrops(FTimespan PassedTime)
 {
 	TArray<TObjectPtr<USceneComponent>> Keys;
 	FarmingSpots.GetKeys(Keys);
@@ -86,7 +84,7 @@ void APlanter::UpdateTimeOfCrops()
 		{
 			if (TObjectPtr<ACrop> Crop = Cast<ACrop>(FarmingSpots.FindRef(Key)))
 			{
-				Crop->UpdateTime();
+				Crop->UpdateTime(PassedTime);
 			}
 		}
 	}
@@ -137,10 +135,8 @@ void APlanter::CheckAndFillEmptySlots()
 
 void APlanter::CropFinished(USceneComponent* FarmSpot, FItemData ItemData, AActor* CropActor)
 {
-	//TObjectPtr<AActor> FarmingSpot = FarmingSpots.FindRef(FarmSpot);
 	FTransform TempTransform(FRotator(0.0f, 0.0f, 0.0f), FarmSpot->GetComponentLocation(), FVector(1.0f));
 
-	//TObjectPtr<AItem> NewHarvestable = GetWorld()->SpawnActor<AItem>(ItemData.ItemClass, Location, Rotation);
 	TObjectPtr<AItem> NewHarvestable = GetWorld()->SpawnActor<AItem>(ItemData.ItemClass, TempTransform);
 
 	FarmingSpots.Add(FarmSpot, NewHarvestable);

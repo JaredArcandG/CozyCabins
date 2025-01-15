@@ -33,14 +33,14 @@ void ACrop::InitCrop(FItemData ItemDataInput, APlanter* Planter, UGameTimeManage
 	ParentPlanter = Planter;
 	FarmSpot = SceneComponent;
 
-	TimePlanted = GameTimeManager->GetCurrentGameTime();
+	TimePassedSincePlanted = FTimespan(0, 0, 0, 0, 0);
 }
 
-void ACrop::UpdateTime()
+void ACrop::UpdateTime(FTimespan PassedTime)
 {
-	FTimespan TimePassed = GameTimeManager->GetTimeDifferenceFromCurrentTime(TimePlanted);
+	TimePassedSincePlanted += PassedTime;
 
-	ECropStage NewCropStage = CheckCropStage(TimePassed);
+	ECropStage NewCropStage = CheckCropStage();
 
 	if (CurrentCropStage != NewCropStage) 
 	{
@@ -48,10 +48,9 @@ void ACrop::UpdateTime()
 	}
 }
 
-ECropStage ACrop::CheckCropStage(FTimespan TimePassed)
+ECropStage ACrop::CheckCropStage()
 {
-	float PassedTime = TimePassed.GetTotalMinutes();
-	ECropStage NewCropStage = ECropStage::StageOne;
+	float TimePassed = TimePassedSincePlanted.GetTotalMinutes();
 
 	float AccumulatedTime = 0.0f;
 
@@ -60,23 +59,16 @@ ECropStage ACrop::CheckCropStage(FTimespan TimePassed)
 
 	for (ECropStage CropStageInfo : Keys) 
 	{
-		float StageDuration = ItemData.CropStageData.FindRef(CropStageInfo).StageTime;
+		AccumulatedTime += ItemData.CropStageData.FindRef(CropStageInfo).StageTime;
 
-		if (PassedTime >= AccumulatedTime && PassedTime < AccumulatedTime + StageDuration)
+		if (TimePassed < AccumulatedTime)
 		{
-			NewCropStage = CropStageInfo;
-			break;
+			return CropStageInfo;
 		}
 
-		AccumulatedTime += StageDuration;
 	}
 
-	if (CurrentCropStage == ECropStage::StageThree && PassedTime >= AccumulatedTime)
-	{
-		return ECropStage::Completed;
-	}
-
-	return NewCropStage;
+	return ECropStage::Completed;
 }
 
 void ACrop::UpdateCropStage(ECropStage NewCropStage)

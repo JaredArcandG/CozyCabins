@@ -47,7 +47,7 @@ public:
 	void DisplayWidget(UWorld* World, ACharacter* SourceCharacter);
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateTimeOfCrops();
+	void UpdateTimeOfCrops(FTimespan PassedTime);
 
 	UFUNCTION(BlueprintCallable)
 	void PlantSeed(USceneComponent* FarmSpot, FItemData ItemData);
@@ -59,7 +59,7 @@ public:
 	void CropFinished(USceneComponent* FarmSpot, FItemData ItemData, AActor* CropActor);
 
 	UFUNCTION(BlueprintCallable)
-	void TimePassed();
+	void TimePassed(FTimespan PassedTime);
 
 	//// ------- Debug ------- ////
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

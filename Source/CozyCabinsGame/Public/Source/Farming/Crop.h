@@ -30,7 +30,7 @@ public:
 	ECropStage CurrentCropStage;
 
 	UPROPERTY(VisibleAnywhere)
-	FDateTime TimePlanted;
+	FTimespan TimePassedSincePlanted = FTimespan(0,0,0,0,0);
 
 	UPROPERTY(VisibleAnywhere)
 	FItemData ItemData;
@@ -45,10 +45,10 @@ public:
 	void InitCrop(FItemData ItemDataInput, APlanter* Planter, UGameTimeManager* TimeManager, USceneComponent* SceneComponent);
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateTime();
+	void UpdateTime(FTimespan PassedTime);
 
 	UFUNCTION(BlueprintCallable)
-	ECropStage CheckCropStage(FTimespan TimePassed);
+	ECropStage CheckCropStage();
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateCropStage(ECropStage NewCropStage);
