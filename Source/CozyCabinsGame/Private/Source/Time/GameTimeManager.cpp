@@ -18,19 +18,11 @@ void UGameTimeManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Number of real time seconds that represent one game hour
-	float fRealtimeSecsGameHour = 60 * RealTimeMinutesPerGameHour;
-
 	// Number of real time seconds that represent one game minute
-	float fRealtimeSecsGameMinute = fRealtimeSecsGameHour / 60;
-
-	// Number of real time seconds that represent one game day
-	float fRealtimeSecsGameDay = fRealtimeSecsGameHour * 60;
+	float fRealtimeSecsGameMinute = RealTimeMinutesPerGameHour;
 
 	// Broadcast event for game time passed every fRealtime seconds
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleMinute, this, &UGameTimeManager::BroadCastGameTimeMinutePassed, fRealtimeSecsGameMinute, true);
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleHour, this, &UGameTimeManager::BroadCastGameTimeHourPassed, fRealtimeSecsGameHour, true);
-	GetWorld()->GetTimerManager().SetTimer(GameTimerHandleDay, this, &UGameTimeManager::BroadCastGameTimeDayPassed, fRealtimeSecsGameDay, true);
+	GetWorld()->GetTimerManager().SetTimer(GameTimerHandle, this, &UGameTimeManager::BroadCastGameTimeMinutePassed, fRealtimeSecsGameMinute, true);
 }
 
 /// <summary>
@@ -44,11 +36,13 @@ void UGameTimeManager::BeginPlay()
 /// <param name="AddSeconds"></param>
 void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAddMonths, const int& InAddDays, const int& InAddHours, const int& InAddMinutes, const int& InAddSeconds)
 {
-	// Since timespan can only increase by a day max, convert years and months todays
+	// Since timespan can only increase by a day max, convert years and months to days
 	int totalDays = InAddDays + (365 * InAddYears) + (30 * InAddMonths);
 	FTimespan incrementTS(totalDays, InAddHours, InAddMinutes, InAddSeconds);
 
 	CurrentGameTime += incrementTS;
+
+	OnGameTimePassed.Broadcast(incrementTS, CurrentGameTime);
 }
 
 /// <summary>
@@ -76,28 +70,6 @@ FTimespan UGameTimeManager::GetTimeDifferenceFromCurrentTime(const FDateTime& In
 /// </summary>
 void UGameTimeManager::BroadCastGameTimeMinutePassed()
 {
-	OnGameMinutePassed.Broadcast();
-
-	// We only want to increment on the lowest broadcast
-	// If we add this in other broadcasts, we are double counting
-	FTimespan minute(0, 1, 0);
-	CurrentGameTime += minute;
-}
-
-/// <summary>
-/// Broadcasts when one game hour has passed
-/// Can be hooked via OnGameHourPassed event to allow various time related functionality
-/// </summary>
-void UGameTimeManager::BroadCastGameTimeHourPassed()
-{
-	OnGameHourPassed.Broadcast();
-}
-
-/// <summary>
-/// Broadcasts when one game day has passed
-/// Can be hooked via OnGameDayPassed event to allow various time related functionality
-/// </summary>
-void UGameTimeManager::BroadCastGameTimeDayPassed()
-{
-	OnGameDayPassed.Broadcast();
+	// Increment game time by one minute
+	IncrementGameTime(0, 0, 0, 0, 1, 0);
 }

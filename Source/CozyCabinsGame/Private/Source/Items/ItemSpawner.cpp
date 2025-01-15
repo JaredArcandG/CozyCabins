@@ -83,7 +83,7 @@ bool AItemSpawner::CheckSpawnItemBeginPlay()
 	// Spawner is waiting for the respawn (triggered when a player picks it up), calculate how much game time has passed, create spawner
 	if (bAwaitingRespawnAfterPlayerPickup)
 	{
-		GameTimeManagerRef->OnGameHourPassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
+		//GameTimeManagerRef->OnGameHourPassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 		return true;
 	}
 
