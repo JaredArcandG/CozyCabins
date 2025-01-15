@@ -28,7 +28,7 @@ TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform
 	TObjectPtr<UDataTable> pItemDataTable = pGameMode->ItemsDataTable;
 	CHECK_NULLPTR(pItemDataTable);
 
-	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding);
 	CHECK_NULLPTR(pItem);
 
 	FName rowName = FName(ItemId.ToString(EGuidFormats::DigitsWithHyphens));
@@ -45,6 +45,36 @@ TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform
 		// Item valid forever
 		pItem->SetData(rowName, Quantity);
 	}
+
+	return Cast<AItem>(UGameplayStatics::FinishSpawningActor(pItem, Transform));
+}
+
+/// <summary>
+/// Spawns an item that is valid forever in the world
+/// </summary>
+/// <param name="World"></param>
+/// <param name="Transform"></param>
+/// <param name="ItemClass"></param>
+/// <param name="Quantity"></param>
+/// <returns></returns>
+TObjectPtr<class AItem> UItemFactory::SpawnBPDefaultItemInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass, const int& Quantity)
+{
+	CHECK_NULLPTR(ItemClass);
+
+	TObjectPtr<ACustomGameModeBase> pGameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(&World));
+	CHECK_NULLPTR(pGameMode);
+
+	TObjectPtr<UDataTable> pItemDataTable = pGameMode->ItemsDataTable;
+	CHECK_NULLPTR(pItemDataTable);
+
+	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding);
+	CHECK_NULLPTR(pItem);
+
+	FName rowName = pItem->ItemDataRowName;
+
+	// Item valid forever
+	// Since it was spawned via BP default, we keep the original values
+	pItem->SetData(rowName, Quantity);
 
 	return Cast<AItem>(UGameplayStatics::FinishSpawningActor(pItem, Transform));
 }

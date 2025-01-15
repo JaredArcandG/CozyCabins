@@ -9,6 +9,8 @@
 #include <Kismet/GameplayStatics.h>
 #include "Source/GameMode/CustomGameModeBase.h"
 #include "TimerManager.h"
+#include <Source/Player/PlayerCharacter.h>
+#include "Source/Components/InventoryComponent.h"
 
 // Sets default values
 AItem::AItem()
@@ -23,7 +25,7 @@ AItem::AItem()
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Mesh->SetCollisionResponseToChannel(ECC_InteractableChannel, ECollisionResponse::ECR_Block);
 
-	// Assume only one dropped by default
+	// Assume quantity 1 by default
 	ItemDataRowName = FName();
 	Quantity = 1;
 
@@ -83,6 +85,12 @@ void AItem::SetData(FName InItemDataRowName, int InQuantity)
 	GetWorld()->GetTimerManager().ClearTimer(ItemTimerHandle);
 }
 
+/// <summary>
+/// Sets the item data with TTL
+/// </summary>
+/// <param name="InItemDataRowName"></param>
+/// <param name="InQuantity"></param>
+/// <param name="InTimeToLiveSeconds"></param>
 void AItem::SetDataWithTTL(FName InItemDataRowName, int InQuantity, int InTimeToLiveSeconds)
 {
 	SetData(InItemDataRowName, InQuantity);
@@ -130,4 +138,30 @@ void AItem::CacheItemData()
 void AItem::OnDestroy()
 {
 	this->Destroy();
+}
+
+/// <summary>
+///  Common interact functionality
+/// </summary>
+/// <param name="World"></param>
+/// <param name="SourceCharacter"></param>
+void AItem::OnInteract_Implementation(UWorld* World, ACharacter* SourceCharacter)
+{
+	CHECK(World);
+	CHECK(SourceCharacter);
+
+	// Get inventory component from character
+	// Try adding to inventory
+	auto pPlayer = Cast<APlayerCharacter>(SourceCharacter);
+	CHECK(pPlayer);
+
+	auto pInventory = pPlayer->GetInventoryComponent();
+	CHECK(pInventory);
+
+	if (pInventory->TryAdd(CachedItemData.Id, Quantity))
+	{
+		// If successful, notify the parent item spawner of the pickup call
+		OnItemInteract.Broadcast();
+	}
+
 }

@@ -17,6 +17,10 @@ class COZYCABINSGAME_API AItem : public AActor, public IUsable, public IInteract
 	
 public:
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemInteract);
+	
+	FOnItemInteract OnItemInteract;
+
 	// Sets default values for this actor's properties
 	AItem();
 
@@ -26,7 +30,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemDataRowName;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	int Quantity;
 
 protected:
@@ -40,6 +44,7 @@ protected:
 	float TimeToLiveSeconds;
 
 	FTimerHandle ItemTimerHandle;
+
 
 protected:
 
@@ -59,6 +64,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Set the item specific data mesh, data table, row name, etc. with a time to live. Item disappears after TTL expires"))
 	void SetDataWithTTL(FName InItemDataRowName, int InQuantity, int InTimeToLiveSeconds);
+
+	virtual void OnInteract_Implementation(UWorld* World, ACharacter* SourceCharacter) override;
 
 private:
 
