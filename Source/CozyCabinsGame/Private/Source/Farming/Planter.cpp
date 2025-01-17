@@ -8,6 +8,8 @@
 #include "Source/Items/ItemData.h"
 #include "Source/GameMode/CustomGameModeBase.h"
 #include "Source/Items/Item.h"
+#include "Source/UI/PlanterUI.h"
+#include "Source/Player/PlayerCharacter.h"
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -53,18 +55,27 @@ void APlanter::DebugTest()
 
 void APlanter::DisplayWidget(UWorld* World, ACharacter* SourceCharacter)
 {
-	/*if (!IsValid(PlanterUIWidget))
+	if (!IsValid(PlanterUIWidget))
 	{
 		if (PlanterUIWidgetClass)
 		{
 			PlanterUIWidget = CreateWidget<UPlanterUI>(World, PlanterUIWidgetClass);
+			APlayerCharacter* Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			UInventoryComponent* PlayerInventory = Player->FindComponentByClass<UInventoryComponent>();
+
+			PlanterUIWidget->InitUI(PlayerInventory, InventoryComponent);
 		}
 	}
 
 	if (!PlanterUIWidget->IsInViewport() && IsValid(PlanterUIWidget))
 	{
-		//PlanterUIWidget->InitializeStation(DataTable, SourceCharacter);
-	}*/
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+
+		PlanterUIWidget->UpdateUI();
+		PlanterUIWidget->AddToViewport(10);
+	}
 }
 
 void APlanter::TimePassed(FTimespan PassedTime)

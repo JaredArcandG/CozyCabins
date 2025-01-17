@@ -25,14 +25,14 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UGameTimeManager> GameTimeManager;
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	//TSubclassOf<class UPlanterUI> PlanterUIWidgetClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UPlanterUI> PlanterUIWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class ACrop> CropClass;
 
-	//UPROPERTY(VisibleAnywhere)
-	//TObjectPtr<class UPlanterUI> PlanterUIWidget;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UPlanterUI> PlanterUIWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UDataTable> ItemsDataTable;
