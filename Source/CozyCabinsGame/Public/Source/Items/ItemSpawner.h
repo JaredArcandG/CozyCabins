@@ -71,7 +71,7 @@ protected:
 	bool TrySpawnItem();
 
 	UFUNCTION()
-	void OnCheckRespawnItemAfterPickup();
+	void OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime CurrentDateTime);
 
 	UFUNCTION()
 	void OnCheckSpawnItem();

@@ -80,10 +80,11 @@ void AItemSpawner::SpawnPreviewMesh()
 bool AItemSpawner::CheckSpawnItemBeginPlay()
 {
 
+	// TODO: Update after saving/load is implemented
 	// Spawner is waiting for the respawn (triggered when a player picks it up), calculate how much game time has passed, create spawner
 	if (bAwaitingRespawnAfterPlayerPickup)
 	{
-		//GameTimeManagerRef->OnGameHourPassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
+		GameTimeManagerRef->OnGameTimePassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 		return true;
 	}
 
@@ -115,22 +116,20 @@ bool AItemSpawner::TrySpawnItem()
 /// <summary>
 /// Checks if item needs to be respawned after player pickup, then respawns the item
 /// </summary>
-void AItemSpawner::OnCheckRespawnItemAfterPickup()
+void AItemSpawner::OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime CurrentDateTime)
 {
 	CHECK(GameTimeManagerRef);
 
 	// Only look to respawn if it's possible
 	if (bAwaitingRespawnAfterPlayerPickup && !SpawnedItem && bIsRespawnable)
 	{
-		FTimespan timespan = GameTimeManagerRef->GetTimeDifferenceFromCurrentTime(PickupTime);
-
-		if (timespan >= RespawnTimeInGameTime)
+		if (TimePassed >= RespawnTimeInGameTime)
 		{
 			if (TrySpawnItem())
 			{
 				// Clear check respawn item event
 				bAwaitingRespawnAfterPlayerPickup = false;
-				GameTimeManagerRef->OnGameMinutePassed.RemoveDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
+				GameTimeManagerRef->OnGameTimePassed.RemoveDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 			}
 		}
 	}
@@ -171,7 +170,7 @@ void AItemSpawner::OnPickUp()
 {
 	CHECK(GameTimeManagerRef);
 	bAwaitingRespawnAfterPlayerPickup = true;
-	GameTimeManagerRef->OnGameMinutePassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
+	GameTimeManagerRef->OnGameTimePassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 	SpawnedItem = nullptr;
 	PickupTime = GameTimeManagerRef->GetCurrentGameTime();
 }

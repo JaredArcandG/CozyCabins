@@ -42,6 +42,7 @@ void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAdd
 
 	CurrentGameTime += incrementTS;
 
+	// Broadcasts that X amount of time has passed
 	OnGameTimePassed.Broadcast(incrementTS, CurrentGameTime);
 }
 
@@ -65,8 +66,7 @@ FTimespan UGameTimeManager::GetTimeDifferenceFromCurrentTime(const FDateTime& In
 }
 
 /// <summary>
-/// Broadcasts when one game minute has passed
-/// Can be hooked via the OnGameMinutePassed event to allow various time related functionality
+/// Increments the game time by one minute
 /// </summary>
 void UGameTimeManager::BroadCastGameTimeMinutePassed()
 {

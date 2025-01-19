@@ -14,8 +14,7 @@ UStatsComponent::UStatsComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	HungerDecayRate = 1.0f;
-	HungerDecayGametimeMins = 1.0f;
-	MinsPassedSinceLastHungerDecay = 0.f;
+	HungerDecayGametimeMins = 1;
 
 	// ...
 }
@@ -25,16 +24,15 @@ void UStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	MinsPassedSinceLastHungerDecay = HungerDecayGametimeMins;
-
 	TObjectPtr<AGameModeBase> pGameMode = UGameplayStatics::GetGameMode(GetWorld());
 	CHECK(pGameMode);
 
-	TObjectPtr<UGameTimeManager> pGameManager = pGameMode->FindComponentByClass<UGameTimeManager>();
-	CHECK(pGameManager);
+	GameTimeManager = pGameMode->FindComponentByClass<UGameTimeManager>();
+	CHECK(GameTimeManager);
 
-	pGameManager->OnGameMinutePassed.AddUniqueDynamic(this, &UStatsComponent::DecayHunger);
+	TimeSinceLastHungerDecay = GameTimeManager->GetCurrentGameTime();
+
+	GameTimeManager->OnGameTimePassed.AddUniqueDynamic(this, &UStatsComponent::DecayHunger);
 	
 }
 
@@ -223,16 +221,17 @@ float UStatsComponent::GetHungerRatio()
 /// <summary>
 /// Decays hunger based on the specified decay class params
 /// </summary>
-void UStatsComponent::DecayHunger()
+void UStatsComponent::DecayHunger(FTimespan Timespan, FDateTime CurrentDateTime)
 {
-	if (MinsPassedSinceLastHungerDecay >= HungerDecayGametimeMins)
+	CHECK(GameTimeManager);
+
+	FTimespan tsHungerDecayGametimeMins = FTimespan(0, HungerDecayGametimeMins, 0);
+
+	if (Timespan >= tsHungerDecayGametimeMins)
 	{
 		SetCurrentHunger(ActorStats.CurrentHunger - HungerDecayRate);
-		MinsPassedSinceLastHungerDecay = 0;
-		return;
+		TimeSinceLastHungerDecay = CurrentDateTime;
 	}
-
-	MinsPassedSinceLastHungerDecay += 1;
 
 }
 

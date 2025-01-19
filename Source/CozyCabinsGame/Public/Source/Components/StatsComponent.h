@@ -71,11 +71,12 @@ protected:
 	int HungerDecayRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HungerDecayGametimeMins;
+	int HungerDecayGametimeMins;
 
-	// In game minutes
-	float MinsPassedSinceLastHungerDecay;
+	FDateTime TimeSinceLastHungerDecay;
 
+	UPROPERTY()
+	TObjectPtr<class UGameTimeManager> GameTimeManager;
 
 protected:
 
@@ -132,6 +133,6 @@ public:
 protected:
 
 	UFUNCTION()
-	void DecayHunger();
+	void DecayHunger(FTimespan Timespan, FDateTime CurrentDateTime);
 		
 };
