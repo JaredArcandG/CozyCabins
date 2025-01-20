@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include <UObject/NoExportTypes.h>
+#include "Source/UI/ItemSlotHoverPreview.h"
 #include "ItemSlotContainer.generated.h"
 
 
@@ -22,6 +23,9 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UWrapBox> GridBox;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UItemSlotHoverPreview> HoverPreviewWidget;
 
 protected:
 
@@ -48,5 +52,11 @@ public:
 protected:
 
 	void CreateNewItemSlotAddToGrid(const int& ItemIdx);
+
+	UFUNCTION()
+	void ShowHoverPreviewWidget(const FHoverPreviewData HoverPreviewData);
+
+	UFUNCTION()
+	void HideHoverPreviewWidget();
 
 };

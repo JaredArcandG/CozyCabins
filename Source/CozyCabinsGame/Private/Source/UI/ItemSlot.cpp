@@ -36,7 +36,6 @@ void UItemSlot::NativeConstruct()
 	InventoryCompRef = nullptr;
 	PreviewQtyToTransfer = 0;
 	DragPreviewWidget = nullptr;
-	HoverPreviewWidget = nullptr;
 	ItemClass = nullptr;
 	bIsDroppable = false;
 	ItemDescription = FText();
@@ -59,7 +58,6 @@ void UItemSlot::NativeConstruct()
 void UItemSlot::NativeDestruct()
 {
 	RemovePreviewWidgetPreDrag();
-	DestroyHoverPreviewWidget();
 }
 
 /// <summary>
@@ -123,11 +121,8 @@ void UItemSlot::SetEmptySlot(const int& IdxInInventory, UInventoryComponent& Inv
 	PreviewQtyToTransfer = 0;
 	ItemDescription = FText();
 
-	if (HoverPreviewWidget)
-	{
-		// Remove the widget
-		DestroyHoverPreviewWidget();
-	}
+	OnExitHoverPreview.Broadcast();
+
 }
 
 /// <summary>
@@ -222,7 +217,8 @@ FReply UItemSlot::NativeOnPreviewMouseButtonDown(const FGeometry& MyGeometry, co
 		return FEventReply(false).NativeReply;
 	}
 
-	HideHoverPreviewWidget();
+	// Broadcast so hover preview is hidden
+	OnExitHoverPreview.Broadcast();
 
 	// Full slot drag, preview quantity is the entire slot's quantity
 	PreviewQtyToTransfer = this->ItemQty;
@@ -249,7 +245,9 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 		return FEventReply(false).NativeReply;
 	}
 
-	HideHoverPreviewWidget();
+	// Broadcast so hover preview is hidden
+	OnExitHoverPreview.Broadcast();
+
 	OnConsumeItem();
 	return FEventReply(true).NativeReply;
 }
@@ -262,39 +260,16 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 /// <param name="InMouseEvent"></param>
 void UItemSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (!HoverPreviewWidget && bIsOccupied)
-	{
-		CHECK(HoverPreviewClass);
-		CHECK(this->ItemImage);
-		HoverPreviewWidget = CreateWidget<UItemSlotHoverPreview>(PlayerController, HoverPreviewClass);
-		CHECK(HoverPreviewWidget);
-		CHECK(HoverPreviewWidget->ItemSizeBox);
-
-		FVector2D vDesiredSize = HoverPreviewWidget->ItemSizeBox->GetDesiredSize();
-		HoverPreviewWidget->SetDesiredSizeInViewport(vDesiredSize); // Adjust the size as needed
-
-		// Get the position of the parent Grid widget
-		TObjectPtr<UWidget> pGridParent = GetParent();
-		CHECK(pGridParent);
-
-		FGeometry gGridGeometry = pGridParent->GetCachedGeometry(); 
-		FVector2D vGridPosition = gGridGeometry.GetAbsolutePosition();
-		HoverPreviewWidget->SetPositionInViewport(vGridPosition + HoverPreviewOffset);
-
-		HoverPreviewWidget->SetHoverPreviewSlotData(this->ItemImage, this->Name->GetText(), this->ItemDescription);
-		HoverPreviewWidget->AddToViewport(4);
-		HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
-		return;
-	}
-
-	CHECK(Name);
-	
 	if (bIsOccupied)
 	{
-		HoverPreviewWidget->SetHoverPreviewSlotData(this->ItemImage, this->Name->GetText(), this->ItemDescription);
-		HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
-	}
+		const FHoverPreviewData previewData = FHoverPreviewData {
+			this->ItemImage,
+			this->Name->GetText(),
+			this->ItemDescription
+		};
 
+		OnEnterHoverPreview.Broadcast(previewData);
+	}
 }
 
 /// <summary>
@@ -305,7 +280,7 @@ void UItemSlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEv
 void UItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	// Hide the widget if it exists
-	HideHoverPreviewWidget();
+	OnExitHoverPreview.Broadcast();
 }
 
 /// <summary>
@@ -468,20 +443,3 @@ void UItemSlot::RemovePreviewWidgetPreDrag()
 	DragPreviewWidget = nullptr;
 }
 
-void UItemSlot::DestroyHoverPreviewWidget()
-{
-	CHECK(HoverPreviewWidget);
-
-	HoverPreviewWidget->RemoveFromParent();
-	HoverPreviewWidget->ConditionalBeginDestroy();
-
-	HoverPreviewWidget = nullptr;
-}
-
-void UItemSlot::HideHoverPreviewWidget()
-{
-	if (HoverPreviewWidget)
-	{
-		HoverPreviewWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-}

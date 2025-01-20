@@ -6,6 +6,7 @@
 #include <Source/Utils/CheckUtils.h>
 #include "Source/Components/InventoryComponent.h"
 #include "Components/WrapBox.h"
+#include <Source/Player/Controller/CustomPlayerController.h>
 
 /// <summary>
 /// Ctor
@@ -16,7 +17,9 @@ void UItemSlotContainer::NativeConstruct()
 
 	TotalSlots = 36;
 	bIsFocusable = true;
-	
+
+	CHECK(HoverPreviewWidget);
+	HoverPreviewWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 /// <summary>
@@ -124,7 +127,33 @@ void UItemSlotContainer::CreateNewItemSlotAddToGrid(const int& ItemIdx)
 		pItemSlot->SetEmptySlot(ItemIdx, *InventoryCompRef);
 	}
 
+	// Subscribe to hover preview event in slot
+	pItemSlot->OnEnterHoverPreview.AddUniqueDynamic(this, &UItemSlotContainer::ShowHoverPreviewWidget);
+	pItemSlot->OnExitHoverPreview.AddUniqueDynamic(this, &UItemSlotContainer::HideHoverPreviewWidget);
+
 	GridBox->AddChildToWrapBox(pItemSlot);
 
 	ItemSlots.Add(pItemSlot);
+}
+
+/// <summary>
+/// Shows the hover preview widget with the appropriate data
+/// </summary>
+/// <param name="HoverPreviewData"></param>
+void UItemSlotContainer::ShowHoverPreviewWidget(const FHoverPreviewData HoverPreviewData)
+{
+	CHECK(HoverPreviewWidget);
+
+	HoverPreviewWidget->SetHoverPreviewSlotData(HoverPreviewData.Image, HoverPreviewData.ItemName, HoverPreviewData.ItemDescription);
+	HoverPreviewWidget->SetVisibility(ESlateVisibility::Visible);
+}
+
+/// <summary>
+/// Hides the hover preview widget
+/// </summary>
+void UItemSlotContainer::HideHoverPreviewWidget()
+{
+	CHECK(HoverPreviewWidget);
+
+	HoverPreviewWidget->SetVisibility(ESlateVisibility::Hidden);
 }

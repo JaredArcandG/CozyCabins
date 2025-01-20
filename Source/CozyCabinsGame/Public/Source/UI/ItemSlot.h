@@ -7,6 +7,7 @@
 #include <Source/Items/ItemData.h>
 #include "Source/UI/DraggableWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
+#include "Source/UI/ItemSlotHoverPreview.h"
 #include "ItemSlot.generated.h"
 
 
@@ -17,6 +18,18 @@ UCLASS(Blueprintable, BlueprintType)
 class COZYCABINSGAME_API UItemSlot : public UDraggableWidget
 {
 	GENERATED_BODY()
+
+public:
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnterHoverPreview, const FHoverPreviewData, PreviewData);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnEnterHoverPreview OnEnterHoverPreview;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitHoverPreview);
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnExitHoverPreview OnExitHoverPreview;
 
 protected:
 
@@ -37,12 +50,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemSlotDragPreview> DragPreviewClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<class UItemSlotHoverPreview> HoverPreviewClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FVector2D HoverPreviewOffset;
 
 	UPROPERTY()
 	TObjectPtr<class UInventoryComponent> InventoryCompRef;
@@ -66,9 +73,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UItemSlotDragPreview> DragPreviewWidget;
-
-	UPROPERTY()
-	TObjectPtr<class UItemSlotHoverPreview> HoverPreviewWidget;
 
 	UPROPERTY()
 	TObjectPtr<class ACustomPlayerController> PlayerController;
@@ -114,9 +118,5 @@ protected:
 	void UpdatePreviewWidgetPreDrag();
 
 	void RemovePreviewWidgetPreDrag();
-
-	void DestroyHoverPreviewWidget();
-
-	void HideHoverPreviewWidget();
 
 };

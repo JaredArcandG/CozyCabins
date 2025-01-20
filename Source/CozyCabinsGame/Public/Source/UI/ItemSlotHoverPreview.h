@@ -6,6 +6,24 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemSlotHoverPreview.generated.h"
 
+USTRUCT(Blueprintable, BlueprintType)
+struct COZYCABINSGAME_API FHoverPreviewData
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UImage> Image;
+
+	UPROPERTY(BlueprintReadOnly)
+	FText ItemName;
+
+	UPROPERTY(BlueprintReadOnly)
+	FText ItemDescription;
+
+};
+
 /**
  * 
  */
