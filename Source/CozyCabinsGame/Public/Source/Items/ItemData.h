@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include <Source/Time/GameTimeManager.h>
 #include "ItemData.generated.h"
 
 /**
@@ -91,17 +92,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Data for each Crop Stage"))
 	TMap<ECropStage, FCropItemData> CropStageData;
 
-	FItemData() 
+	// Item spawner information
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Whether the item is respawnable on drop or not"))
+	bool IsRespawnableOnDrop = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "After how much time the item should respawn after being picked up"))
+	FCustomTimespan RespawnTimeInGameTime = FCustomTimespan();
+
+	//
+
+	FItemData()
 		: Id(FGuid::NewGuid()),
 		Name(FString()),
 		Description(FString()),
 		ItemCategories({}),
 		Icon(nullptr),
-		Mesh (nullptr),
+		Mesh(nullptr),
 		IsConsumable(false),
 		IsDroppable(false),
 		ItemClass(nullptr),
-		CropStageData(){ }
+		CropStageData(),
+		IsRespawnableOnDrop(false),
+		RespawnTimeInGameTime() {}
 
 	FItemData(const FItemData& Other);
 	FItemData& operator=(FItemData const& Other);

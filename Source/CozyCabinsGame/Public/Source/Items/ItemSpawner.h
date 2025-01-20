@@ -78,6 +78,8 @@ protected:
 
 public:
 
+	void Setup(const TSubclassOf<AItem>& ItemClass, const int& InQuantity);
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

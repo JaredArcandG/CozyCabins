@@ -31,8 +31,6 @@ void AItemSpawner::BeginPlay()
 	CHECK(VisualEditorMesh);
 	VisualEditorMesh->SetStaticMesh(nullptr);
 
-	RespawnTimeInGameTime = RespawnTimeInGameTimeCustom.ConvertToTimespan();
-
 	WorldRef = GetWorld();
 
 	TObjectPtr<AGameModeBase> pGameMode = UGameplayStatics::GetGameMode(WorldRef);
@@ -106,6 +104,11 @@ bool AItemSpawner::TrySpawnItem()
 		if (SpawnedItem)
 		{
 			SpawnedItem->OnItemInteract.AddUniqueDynamic(this, &AItemSpawner::OnPickUp);
+
+			bIsRespawnable = SpawnedItem->GetData().IsRespawnableOnDrop;
+			RespawnTimeInGameTimeCustom = SpawnedItem->GetData().RespawnTimeInGameTime;
+			RespawnTimeInGameTime = RespawnTimeInGameTimeCustom.ConvertToTimespan();
+
 			return true;
 		}
 	}
@@ -156,6 +159,18 @@ void AItemSpawner::OnCheckSpawnItem()
 	}
 }
 
+/// <summary>
+/// Setup to be used with deferred spawn to manually change the variables
+/// </summary>
+/// <param name="ItemClass"></param>
+/// <param name="IsRespawnable"></param>
+/// <param name="InRespawnTimeInGameTimeCustom"></param>
+void AItemSpawner::Setup(const TSubclassOf<AItem>& ItemClass, const int& InQuantity)
+{
+	ItemClassToSpawn = ItemClass;
+	Quantity = InQuantity;
+}
+
 // Called every frame
 void AItemSpawner::Tick(float DeltaTime)
 {
@@ -169,6 +184,14 @@ void AItemSpawner::Tick(float DeltaTime)
 void AItemSpawner::OnPickUp()
 {
 	CHECK(GameTimeManagerRef);
+
+	// If the item is not respawnable, we ne longer need the spawner
+	if (!bIsRespawnable)
+	{
+		this->Destroy();
+		return;
+	}
+
 	bAwaitingRespawnAfterPlayerPickup = true;
 	GameTimeManagerRef->OnGameTimePassed.AddUniqueDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 	SpawnedItem = nullptr;

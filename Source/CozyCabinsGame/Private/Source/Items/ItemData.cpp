@@ -26,6 +26,8 @@ FItemData& FItemData::operator=(FItemData const& Other)
 	IsDroppable = Other.IsDroppable;
 	ItemClass = Other.ItemClass;
 	CropStageData = Other.CropStageData;
+	IsRespawnableOnDrop = Other.IsRespawnableOnDrop;
+	RespawnTimeInGameTime = Other.RespawnTimeInGameTime;
 	return *this;
 }
 

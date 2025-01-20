@@ -9,6 +9,7 @@
 #include <Source/GameMode/CustomGameModeBase.h>
 #include <Kismet/GameplayStatics.h>
 #include <Source/Utils/CheckUtils.h>
+#include "Source/Items/ItemSpawner.h"
 
 /// <summary>
 /// Spawns an item in the world with the given parameters
@@ -28,7 +29,7 @@ TObjectPtr<AItem> UItemFactory::SpawnItemInWorld(UWorld& World, const FTransform
 	TObjectPtr<UDataTable> pItemDataTable = pGameMode->ItemsDataTable;
 	CHECK_NULLPTR(pItemDataTable);
 
-	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding);
+	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 	CHECK_NULLPTR(pItem);
 
 	FName rowName = FName(ItemId.ToString(EGuidFormats::DigitsWithHyphens));
@@ -67,7 +68,7 @@ TObjectPtr<class AItem> UItemFactory::SpawnBPDefaultItemInWorld(UWorld& World, c
 	TObjectPtr<UDataTable> pItemDataTable = pGameMode->ItemsDataTable;
 	CHECK_NULLPTR(pItemDataTable);
 
-	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding);
+	TObjectPtr<AItem> pItem = World.SpawnActorDeferred<AItem>(ItemClass, Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 	CHECK_NULLPTR(pItem);
 
 	FName rowName = pItem->ItemDataRowName;
@@ -77,4 +78,25 @@ TObjectPtr<class AItem> UItemFactory::SpawnBPDefaultItemInWorld(UWorld& World, c
 	pItem->SetData(rowName, Quantity);
 
 	return Cast<AItem>(UGameplayStatics::FinishSpawningActor(pItem, Transform));
+}
+
+/// <summary>
+/// Spawn the ItemSpawner actor
+/// </summary>
+/// <param name="World"></param>
+/// <param name="Transform"></param>
+/// <param name="ItemClass"></param>
+/// <param name="Quantity"></param>
+/// <returns></returns>
+TObjectPtr<AItemSpawner> UItemFactory::SpawnBPDefaultItemSpawnerInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass, const int& Quantity)
+{
+	CHECK_NULLPTR(ItemClass);
+
+	TObjectPtr<AItemSpawner> pItemSpawner = World.SpawnActorDeferred<AItemSpawner>(AItemSpawner::StaticClass(), Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+	CHECK_NULLPTR(pItemSpawner);
+
+	pItemSpawner->Setup(ItemClass, Quantity);
+
+	return Cast<AItemSpawner>(UGameplayStatics::FinishSpawningActor(pItemSpawner, Transform));
+
 }
