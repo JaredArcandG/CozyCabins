@@ -19,7 +19,7 @@ void UWorkStationUIBase::NativeConstruct()
 
 }
 
-void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter)
+void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter, FCraftingItem FuelItemValue, bool RequireFuelItemValue)
 {
 	if (SourceCharacter)
 	{
@@ -27,6 +27,10 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 		{
 			TArray<FName> DataTableRowNames = DataTable->GetRowNames();
 			WrapBox->ClearChildren();
+
+			RequireFuelItem = RequireFuelItemValue;
+			FuelItem = FuelItemValue;
+
 
 			for (FName CurrentRow : DataTableRowNames)
 			{
@@ -65,12 +69,29 @@ void UWorkStationUIBase::ChangeSelection(FCraftingRecipe* ActiveRecipe)
 		SelectedItemName->SetText(FText::AsCultureInvariant(CraftingResultData->Name));
 
 		SelectedItemIngredients->ClearChildren();
+		SelectedItemFuelIngredients->ClearChildren();
 
 		for (FCraftingItem Ingredient : IngredientsData) 
 		{
 			UCraftingIngredientSlot* IngredientSlot = CreateWidget<UCraftingIngredientSlot>(GetWorld(), IngredientSlotWidget);
 			SelectedItemIngredients->AddChildToVerticalBox(IngredientSlot);
 			IngredientSlot->SetupSlot(Ingredient, InventoryComponent, CraftingMultiplier);
+		}
+
+		// Check Fuel Ingredients
+		if (RequireFuelItem) 
+		{
+			UCraftingIngredientSlot* IngredientFuelSlot = CreateWidget<UCraftingIngredientSlot>(GetWorld(), IngredientSlotWidget);
+			SelectedItemFuelIngredients->AddChildToVerticalBox(IngredientFuelSlot);
+			IngredientFuelSlot->SetupSlot(FuelItem, InventoryComponent, CraftingMultiplier);
+
+			SelectedItemFuelIngredients->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			FuelRequirementText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+		else 
+		{
+			SelectedItemFuelIngredients->SetVisibility(ESlateVisibility::Collapsed);
+			FuelRequirementText->SetVisibility(ESlateVisibility::Collapsed);
 		}
 
 		SetCraftingMultiplier(1);
@@ -122,6 +143,11 @@ bool UWorkStationUIBase::AttemptCraft()
 {
 	TArray<FCraftingItem> IngredientsData = CurrentRecipe->CraftingIngredients;
 
+	if (RequireFuelItem) 
+	{
+		IngredientsData.Add(FuelItem);
+	}
+
 	if (InventoryComponent)
 	{
 		// Check if Quantity to craft matches
@@ -136,7 +162,7 @@ bool UWorkStationUIBase::AttemptCraft()
 					UpdateIngredients();
 					return true;
 				}
-			}
+			}		
 		}
 	}
 
@@ -198,10 +224,27 @@ bool UWorkStationUIBase::AttemptAdd(FCraftingItem ResultData)
 void UWorkStationUIBase::UpdateIngredients()
 {
 	TArray<UWidget*> Childs = SelectedItemIngredients->GetAllChildren();
-
-	for (UWidget* Ingredient : Childs)
+	if (!Childs.IsEmpty()) 
 	{
-		TObjectPtr<UCraftingIngredientSlot> IngredientSlot = Cast<UCraftingIngredientSlot>(Ingredient);
-		IngredientSlot->UpdateSlot(InventoryComponent, CraftingMultiplier);
+		for (UWidget* Ingredient : Childs)
+		{
+			if (TObjectPtr<UCraftingIngredientSlot> IngredientSlot = Cast<UCraftingIngredientSlot>(Ingredient)) 
+			{
+				IngredientSlot->UpdateSlot(InventoryComponent, CraftingMultiplier);
+			}
+		}
 	}
+
+	TArray<UWidget*> FuelChilds = SelectedItemFuelIngredients->GetAllChildren();
+	if (!FuelChilds.IsEmpty()) 
+	{
+		for (UWidget* FuelIngredient : FuelChilds)
+		{
+			if (TObjectPtr<UCraftingIngredientSlot> FuelIngredientSlot = Cast<UCraftingIngredientSlot>(FuelIngredient)) 
+			{
+				FuelIngredientSlot->UpdateSlot(InventoryComponent, CraftingMultiplier);
+			}
+		}
+	}
+
 }

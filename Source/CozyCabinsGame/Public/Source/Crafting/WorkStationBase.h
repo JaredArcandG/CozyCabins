@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Source/Components/IInteractable.h"
+#include "Source/Crafting/CraftingData.h"
 #include "WorkStationBase.generated.h"
 
 UCLASS()
@@ -24,6 +25,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<class UDataTable> DataTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool RequireFuelItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FCraftingItem FuelItem;
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayWidget(UWorld* World, ACharacter* SourceCharacter);

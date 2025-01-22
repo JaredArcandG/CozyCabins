@@ -28,7 +28,7 @@ void AWorkStationBase::DisplayWidget(UWorld* World, ACharacter* SourceCharacter)
 
 	if (!StationWidget->IsInViewport() && IsValid(StationWidget))
 	{
-		StationWidget->InitializeStation(DataTable, SourceCharacter);
+		StationWidget->InitializeStation(DataTable, SourceCharacter, FuelItem, RequireFuelItem);
 	}
 }
 

@@ -30,6 +30,12 @@ class COZYCABINSGAME_API UWorkStationUIBase : public UUserWidget
 	TObjectPtr<class UVerticalBox> SelectedItemIngredients;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVerticalBox> SelectedItemFuelIngredients;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> FuelRequirementText;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UVerticalBox> VBOX_CraftingRecipe;
 
 	UPROPERTY(meta = (BindWidget))
@@ -74,8 +80,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UCraftingIngredientSlot> IngredientSlotWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool RequireFuelItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FCraftingItem FuelItem;
+
 	// Called when Interacting with the Station
-	void InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter);
+	void InitializeStation(TObjectPtr<class UDataTable> DataTable, TObjectPtr<ACharacter> SourceCharacter, FCraftingItem FuelItemValue, bool RequireFuelItemValue);
 
 	// Called when a new Recipe is being clicked
 	void ChangeSelection(FCraftingRecipe* ActiveRecipe);
