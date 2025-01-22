@@ -19,9 +19,6 @@ public:
 	TSubclassOf<class AItem> ItemClassToSpawn;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
-	bool bOverrideItemDataRespawnSettings = false;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	bool bIsRespawnable = false;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (ClampMin = 1.0f, Text="Time in game time that the item should respawn. Must be 1 minute or more"))
@@ -73,6 +70,10 @@ protected:
 	static constexpr float TryRespawnRealSeconds = 60.f;
 
 	FTimespan RespawnTimeInGameTime;
+
+	// Used to track if the item was created in editor or manually on drop
+	// Override when created on drop
+	bool bOverrideItemDataRespawnSettings;
 
 protected:
 

@@ -18,6 +18,8 @@ AItemSpawner::AItemSpawner()
 
 	VisualEditorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Editor Preview Mesh"));
 
+	bOverrideItemDataRespawnSettings = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -103,7 +105,7 @@ bool AItemSpawner::TrySpawnItem()
 		{
 			SpawnedItem->OnItemInteract.AddUniqueDynamic(this, &AItemSpawner::OnPickUp);
 
-			if (!SpawnSettings.bOverrideItemDataRespawnSettings)
+			if (bOverrideItemDataRespawnSettings)
 			{
 				SpawnSettings.bIsRespawnable = SpawnedItem->GetData().IsRespawnableOnDrop;
 				RespawnTimeInGameTime = SpawnedItem->GetData().RespawnTimeInGameTime.ConvertToFTimespan();
@@ -169,6 +171,7 @@ void AItemSpawner::Setup(const TSubclassOf<AItem>& ItemClass, const int& InQuant
 {
 	SpawnSettings.ItemClassToSpawn = ItemClass;
 	SpawnSettings.Quantity = InQuantity;
+	bOverrideItemDataRespawnSettings = true;
 }
 
 // Called every frame
