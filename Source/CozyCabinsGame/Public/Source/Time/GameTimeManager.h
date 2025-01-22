@@ -36,7 +36,7 @@ public:
 	/// Converts custom timespan to actual FTimespan
 	/// </summary>
 	/// <returns></returns>
-	FTimespan ConvertToTimespan()
+	FTimespan ConvertToFTimespan()
 	{
 		int daysInYears = Years * 365;
 		int daysInMonths = Months * 30;

@@ -82,7 +82,7 @@ bool UWorldDroppableItemWidget::NativeOnDrop(const FGeometry& InGeometry, const 
 	itemTransform.SetLocation(vLocationToSpawn);
 	itemTransform.SetRotation(vRotationToSpawn.Quaternion());
 
-	if (UItemFactory::SpawnItemInWorld(*pWorld, itemTransform, itemClass, itemId, qty))
+	if (UItemFactory::SpawnBPDefaultItemSpawnerInWorld(*pWorld, itemTransform, itemClass, qty))
 	{
 		return pInventoryComp->TryRemoveAtIndex(itemId, inventoryIdx, qty);
 	}

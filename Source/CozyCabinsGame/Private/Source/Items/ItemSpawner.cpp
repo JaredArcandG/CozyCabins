@@ -14,9 +14,7 @@ AItemSpawner::AItemSpawner()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	SpawnedItem = nullptr;
-	bIsRespawnable = false;
 	bAwaitingRespawnAfterPlayerPickup = false;
-	Quantity = 1;
 
 	VisualEditorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Editor Preview Mesh"));
 
@@ -56,12 +54,12 @@ void AItemSpawner::BeginPlay()
 void AItemSpawner::SpawnPreviewMesh()
 {
 	CHECK(VisualEditorMesh);
-	CHECK(ItemClassToSpawn);
+	CHECK(SpawnSettings.ItemClassToSpawn);
 
 	auto pWorld = GetWorld();
 	CHECK(pWorld);
 
-	auto pItem = GetWorld()->SpawnActorDeferred<AItem>(ItemClassToSpawn, FTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	auto pItem = GetWorld()->SpawnActorDeferred<AItem>(SpawnSettings.ItemClassToSpawn, FTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	CHECK(pItem);
 	CHECK(pItem->Mesh);
 
@@ -99,15 +97,17 @@ bool AItemSpawner::TrySpawnItem()
 	// Spawner should spawn the item if possible
 	if (WorldRef)
 	{
-		SpawnedItem = UItemFactory::SpawnBPDefaultItemInWorld(*WorldRef, GetActorTransform(), ItemClassToSpawn, Quantity);
+		SpawnedItem = UItemFactory::SpawnBPDefaultItemInWorld(*WorldRef, GetActorTransform(), SpawnSettings.ItemClassToSpawn, SpawnSettings.Quantity);
 
 		if (SpawnedItem)
 		{
 			SpawnedItem->OnItemInteract.AddUniqueDynamic(this, &AItemSpawner::OnPickUp);
 
-			bIsRespawnable = SpawnedItem->GetData().IsRespawnableOnDrop;
-			RespawnTimeInGameTimeCustom = SpawnedItem->GetData().RespawnTimeInGameTime;
-			RespawnTimeInGameTime = RespawnTimeInGameTimeCustom.ConvertToTimespan();
+			if (!SpawnSettings.bOverrideItemDataRespawnSettings)
+			{
+				SpawnSettings.bIsRespawnable = SpawnedItem->GetData().IsRespawnableOnDrop;
+				RespawnTimeInGameTime = SpawnedItem->GetData().RespawnTimeInGameTime.ConvertToFTimespan();
+			}
 
 			return true;
 		}
@@ -124,7 +124,7 @@ void AItemSpawner::OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime
 	CHECK(GameTimeManagerRef);
 
 	// Only look to respawn if it's possible
-	if (bAwaitingRespawnAfterPlayerPickup && !SpawnedItem && bIsRespawnable)
+	if (bAwaitingRespawnAfterPlayerPickup && !SpawnedItem && SpawnSettings.bIsRespawnable)
 	{
 		if (TimePassed >= RespawnTimeInGameTime)
 		{
@@ -144,7 +144,7 @@ void AItemSpawner::OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime
 void AItemSpawner::OnCheckSpawnItem()
 {
 	// Not respawnable or already exists
-	if (!bIsRespawnable || SpawnedItem)
+	if (!SpawnSettings.bIsRespawnable || SpawnedItem)
 	{
 		return;
 	}
@@ -167,8 +167,8 @@ void AItemSpawner::OnCheckSpawnItem()
 /// <param name="InRespawnTimeInGameTimeCustom"></param>
 void AItemSpawner::Setup(const TSubclassOf<AItem>& ItemClass, const int& InQuantity)
 {
-	ItemClassToSpawn = ItemClass;
-	Quantity = InQuantity;
+	SpawnSettings.ItemClassToSpawn = ItemClass;
+	SpawnSettings.Quantity = InQuantity;
 }
 
 // Called every frame
@@ -186,7 +186,7 @@ void AItemSpawner::OnPickUp()
 	CHECK(GameTimeManagerRef);
 
 	// If the item is not respawnable, we ne longer need the spawner
-	if (!bIsRespawnable)
+	if (!SpawnSettings.bIsRespawnable)
 	{
 		this->Destroy();
 		return;

@@ -238,7 +238,7 @@ FReply UItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 {
 	// 1. Slot should have an item
 	// 2. Right mouse button should be pressed
-	// 3. Can't consume an item while actively dragging something n 
+	// 3. Can't consume an item while actively dragging something 
 	if (!bIsOccupied || !InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton) || GlobalUIManager->IsActiveDragState())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Right Mouse Down Failed."));

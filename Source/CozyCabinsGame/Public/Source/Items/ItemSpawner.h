@@ -8,6 +8,30 @@
 #include <Source/Time/GameTimeManager.h>
 #include "ItemSpawner.generated.h"
 
+USTRUCT(Blueprintable, BlueprintType)
+struct COZYCABINSGAME_API FItemSpawnSettings
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	TSubclassOf<class AItem> ItemClassToSpawn;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	bool bOverrideItemDataRespawnSettings = false;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	bool bIsRespawnable = false;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (ClampMin = 1.0f, Text="Time in game time that the item should respawn. Must be 1 minute or more"))
+	FCustomTimespan RespawnTimeInGameTimeCustom = FCustomTimespan();
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	int Quantity = 1;
+
+};
+
 /// <summary>
 /// Responsible as a wrapper class that dictates spawning logic for items
 /// </summary>
@@ -22,16 +46,7 @@ public:
 	AItemSpawner();
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Item Settings")
-	TSubclassOf<class AItem> ItemClassToSpawn;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Item Settings")
-	bool bIsRespawnable;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Item Settings", meta = (ClampMin = 1.0f, Text="Time in game time that the item should respawn. Must be 1 minute or more"))
-	FCustomTimespan RespawnTimeInGameTimeCustom;
-
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Item Settings")
-	int Quantity;
+	FItemSpawnSettings SpawnSettings;
 
 	// This is a temporary mesh to see the item in the editor
 	UPROPERTY()
