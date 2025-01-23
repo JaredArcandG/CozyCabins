@@ -133,7 +133,7 @@ void APlanter::CheckAndFillEmptySlots()
 			{
 				if (InventoryComponent->TryGetItemAtIndex(i, ItemData, Quantity))
 				{
-					if (ItemData.ItemCategories.Contains(EItemCatgeory::Plantable))
+					if (ItemData.ItemCategories.Contains(EItemCategory::Plantable))
 					{
 						PlantSeed(Key, ItemData);
 						break;

@@ -107,7 +107,14 @@ public:
 
 	void ToggleInventory();
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Gets all indexes that have the specified item in the inventory"))
 	TArray<int> GetIndexesWithItem(const FGuid& TargetGuid);
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Gets all indexes that have the specified item in the inventory"))
+	bool TryGetFirstItemWithId(const FGuid& InTargetGuid, FItemData& OutResultData, int& OutQuantity, int& OutIndex);
+
+	UFUNCTION(Blueprintcallable, meta = (Text = "Get all item indexes where the item meets the specified filter params"))
+	TArray<int> GetIndexesWithItemFilter(const struct FItemSearchFilterParams& FilterParams);
 
 protected:
 

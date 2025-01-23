@@ -25,8 +25,9 @@ ENUM_RANGE_BY_FIRST_AND_LAST(ECropStage, ECropStage::StageOne, ECropStage::Stage
  * Enum representing an Item Category
  */
 UENUM(BlueprintType)
-enum class EItemCatgeory : uint8
+enum class EItemCategory : uint8
 {
+	None,
 	Plantable
 };
 
@@ -52,6 +53,22 @@ public:
 		Mesh(nullptr) { }
 };
 
+/*
+* Item search filter struct to use for item searching in inventory
+*/
+USTRUCT(Blueprintable, BlueprintType)
+struct COZYCABINSGAME_API FItemSearchFilterParams
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EItemCategory ItemCategory = EItemCategory::None;
+
+};
+
+
 /**
  * Item Data to be stored in the Item Data Table
  */
@@ -72,7 +89,7 @@ public:
 	FString Description = FString();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Category of Item"))
-	TArray<EItemCatgeory> ItemCategories = {};
+	TArray<EItemCategory> ItemCategories = {};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (Text = "Item Icon to show in Widgets"))
 	TObjectPtr<UTexture2D> Icon = nullptr;

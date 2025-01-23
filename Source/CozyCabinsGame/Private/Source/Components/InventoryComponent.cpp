@@ -606,6 +606,85 @@ TArray<int> UInventoryComponent::GetIndexesWithItem(const FGuid& TargetGuid)
 }
 
 /// <summary>
+/// Gets the first item with the target guid, along with the item information, quantity, and the index it was found
+/// </summary>
+/// <param name="InTargetGuid"></param>
+/// <param name="OutResultData"></param>
+/// <param name="OutQuantity"></param>
+/// <param name="OutIndex"></param>
+/// <returns></returns>
+bool UInventoryComponent::TryGetFirstItemWithId(const FGuid& InTargetGuid, FItemData& OutResultData, int& OutQuantity, int& OutIndex)
+{
+	TArray<int> arrValidIndexes = GetIndexesWithItem(InTargetGuid);
+
+	if (arrValidIndexes.IsEmpty())
+	{
+		return false;
+	}
+
+	int targetItemIdx = arrValidIndexes[0];
+	FItemData resultData;
+	int qty;
+
+	if (TryGetItemAtIndex(targetItemIdx, resultData, qty))
+	{
+		OutResultData = resultData;
+		OutQuantity = qty;
+		OutIndex = targetItemIdx;
+		return true;
+	}
+
+	return false;
+}
+
+/// <summary>
+/// Gets a list of all item indexes which have the item with the specified filter
+/// </summary>
+/// <param name="FilterParams"></param>
+/// <returns></returns>
+TArray<int> UInventoryComponent::GetIndexesWithItemFilter(const FItemSearchFilterParams& FilterParams)
+{
+	if (FilterParams.ItemCategory == EItemCategory::None)
+	{
+		// return all items
+		TArray<int> resultItemIdxs;
+
+		for (int i = 0; i < ItemIdArr.Num(); i++)
+		{
+			if (ItemIdArr[i] != EMPTY_GUID)
+			{
+				resultItemIdxs.Add(i);
+			}
+		}
+
+		return resultItemIdxs;
+	}
+
+	// Do a search of items with that item category, then check if there are any such items in the inventory
+	TArray<int> targetItems;
+
+	for (int i = 0; i < ItemIdArr.Num(); i++)
+	{
+		FGuid targetGuid = ItemIdArr[i];
+
+		if (targetGuid != EMPTY_GUID)
+		{
+			// Check the data table for the value, add to target items if it meets the criteria
+			FString sContextString;
+			FName rowName = FName(targetGuid.ToString(EGuidFormats::DigitsWithHyphens));
+			auto pItemData = DataTable->FindRow<FItemData>(rowName, sContextString);
+
+			if (pItemData && pItemData->ItemCategories.Contains(FilterParams.ItemCategory))
+			{
+				targetItems.Add(i);
+			}
+		}
+	}
+
+	return targetItems;
+}
+
+/// <summary>
 /// Gets the quantity of an item at the index
 /// </summary>
 /// <param name="idx"></param>
