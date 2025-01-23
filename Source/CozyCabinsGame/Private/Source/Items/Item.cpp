@@ -162,6 +162,9 @@ void AItem::OnInteract_Implementation(UWorld* World, ACharacter* SourceCharacter
 	{
 		// If successful, notify the parent item spawner of the pickup call
 		OnItemInteract.Broadcast();
+
+		// Destroy the item
+		this->OnDestroy();
 	}
 
 }
