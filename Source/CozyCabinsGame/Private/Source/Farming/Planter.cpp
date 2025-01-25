@@ -129,9 +129,13 @@ void APlanter::CheckAndFillEmptySlots()
 			FItemData ItemData;
 			int Quantity;
 
-			for (int i = 0; i < DebugItems.Num(); i++)
+			FItemSearchFilterParams Params;
+			Params.ItemCategory = EItemCategory::Plantable;
+
+			TArray<int> Indexes = InventoryComponent->GetIndexesWithItemFilter(Params);
+			for (int Index : Indexes) 
 			{
-				if (InventoryComponent->TryGetItemAtIndex(i, ItemData, Quantity))
+				if (InventoryComponent->TryGetItemAtIndex(Index, ItemData, Quantity))
 				{
 					if (ItemData.ItemCategories.Contains(EItemCategory::Plantable))
 					{
