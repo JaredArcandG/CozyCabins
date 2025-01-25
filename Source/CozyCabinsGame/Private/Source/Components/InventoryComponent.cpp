@@ -16,7 +16,6 @@ UInventoryComponent::UInventoryComponent()
 	CurrentSize = 0;
 	bCanUseInventory = true;
 	bIsInventoryOpen = false;
-	ItemSlotContainer = nullptr;
 
 	for (int i = 0; i < MaxInventorySize; i++)
 	{
@@ -30,18 +29,6 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	CHECK(ItemSlotContainerClass);
-
-	TObjectPtr<APlayerController> pPlayerController = GetWorld()->GetFirstPlayerController();
-	CHECK(pPlayerController);
-
-	ItemSlotContainer = CreateWidget<UItemSlotContainer>(pPlayerController, ItemSlotContainerClass);
-	CHECK(ItemSlotContainer);
-
-	ItemSlotContainer->SetVisibility(ESlateVisibility::Hidden);
-	ItemSlotContainer->AddToViewport(3);
-	ItemSlotContainer->Setup(*this);
 }
 
 /// <summary>
@@ -553,36 +540,6 @@ bool UInventoryComponent::CanAddAtIndex(const FGuid& ItemId, const int& ArrIdx, 
 
 	// Case adding to a new index
 	return true;
-}
-
-/// <summary>
-/// Toggles the inventory UI
-/// </summary>
-void UInventoryComponent::ToggleInventory()
-{
-	if (bCanUseInventory)
-	{
-		CHECK(ItemSlotContainer);
-
-		bIsInventoryOpen = !bIsInventoryOpen;
-		ESlateVisibility targetVisibility = bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-		ItemSlotContainer->SetVisibility(targetVisibility);
-
-		if (targetVisibility == ESlateVisibility::Visible)
-		{
-			FInputModeGameAndUI inputMode;
-			inputMode.SetWidgetToFocus(ItemSlotContainer->TakeWidget());
-			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
-			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
-		} 
-		else if (targetVisibility == ESlateVisibility::Hidden)
-		{
-			FInputModeGameOnly inputMode;
-			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
-			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-			ItemSlotContainer->HandleOnCloseSlotContainer();
-		}
-	}
 }
 
 /// <summary>

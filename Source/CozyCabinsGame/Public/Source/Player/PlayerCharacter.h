@@ -50,6 +50,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<class UInventoryComponent> InventoryComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
+	TSubclassOf<class UItemSlotContainer> ItemSlotContainerClass;
+
+	// UI For the inventory
+	UPROPERTY()
+	TObjectPtr<class UItemSlotContainer> InventoryUI;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<class UStatsComponent> StatsComp;
 
@@ -61,6 +68,9 @@ protected:
 
 	// Whether character can interact or not
 	bool bCanInteract;
+
+	// Whether the character's inventory is open or not
+	bool bIsInventoryOpen;
 
 public:
 

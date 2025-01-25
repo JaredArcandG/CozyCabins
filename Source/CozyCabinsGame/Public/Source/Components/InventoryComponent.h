@@ -38,9 +38,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
 	bool bCanUseInventory = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
-	TSubclassOf<class UItemSlotContainer> ItemSlotContainerClass;
-
 protected:
 
 	// Represents an item stack with the arr idx as the slot number, and value as the quantity of the item
@@ -56,9 +53,6 @@ protected:
 	TObjectPtr<class UDataTable> DataTable;
 
 	bool bIsInventoryOpen;
-
-	UPROPERTY()
-	TObjectPtr<class UItemSlotContainer> ItemSlotContainer;
 
 protected:
 
@@ -104,8 +98,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory for a specific index. Returns true if successful, false otherwise"))
 	bool CanAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
-
-	void ToggleInventory();
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Gets all indexes that have the specified item in the inventory"))
 	TArray<int> GetIndexesWithItem(const FGuid& TargetGuid);

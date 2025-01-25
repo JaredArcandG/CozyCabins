@@ -11,6 +11,7 @@
 #include "Source/Components/InteractableComponent.h"
 #include "Source/Components/InventoryComponent.h"
 #include "Source/Components/StatsComponent.h"
+#include "Source/UI/ItemSlotContainer.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -21,6 +22,7 @@ APlayerCharacter::APlayerCharacter()
 	bCanMove = true;
 	bCanLook = true;
 	bCanInteract = true;
+	bIsInventoryOpen = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -124,6 +126,18 @@ void APlayerCharacter::BeginPlay()
 	CHECK(InteractionComp);
 
 	InteractionComp->RegisterComponent();
+
+	CHECK(ItemSlotContainerClass);
+
+	TObjectPtr<APlayerController> pPlayerController = GetWorld()->GetFirstPlayerController();
+	CHECK(pPlayerController);
+
+	InventoryUI = CreateWidget<UItemSlotContainer>(pPlayerController, ItemSlotContainerClass);
+	CHECK(InventoryUI);
+
+	InventoryUI->SetVisibility(ESlateVisibility::Hidden);
+	InventoryUI->AddToViewport(3);
+	InventoryUI->Setup(*InventoryComp);
 	
 }
 
@@ -285,5 +299,27 @@ void APlayerCharacter::TriggerInventory(const FInputActionValue& InputValue)
 {
 	CHECK(InventoryComp);
 
-	InventoryComp->ToggleInventory();
+	if (InventoryComp->bCanUseInventory)
+	{
+		CHECK(InventoryUI);
+
+		bIsInventoryOpen = !bIsInventoryOpen;
+		ESlateVisibility targetVisibility = bIsInventoryOpen ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
+		InventoryUI->SetVisibility(targetVisibility);
+
+		if (targetVisibility == ESlateVisibility::Visible)
+		{
+			FInputModeGameAndUI inputMode;
+			inputMode.SetWidgetToFocus(InventoryUI->TakeWidget());
+			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
+			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+		}
+		else if (targetVisibility == ESlateVisibility::Hidden)
+		{
+			FInputModeGameOnly inputMode;
+			GetWorld()->GetFirstPlayerController()->SetInputMode(inputMode);
+			GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+			InventoryUI->HandleOnCloseSlotContainer();
+		}
+	}
 }
