@@ -73,8 +73,8 @@ void APlanter::DisplayWidget(UWorld* World, ACharacter* SourceCharacter)
 		PC->SetInputMode(FInputModeUIOnly());
 		PC->bShowMouseCursor = true;
 
-		PlanterUIWidget->UpdateUI();
 		PlanterUIWidget->AddToViewport(10);
+		PlanterUIWidget->UpdateUI();
 	}
 }
 

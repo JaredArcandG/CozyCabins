@@ -29,6 +29,7 @@ public:
 
 protected:
 
+	UPROPERTY()
 	TArray<TObjectPtr<class UItemSlot>> ItemSlots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container Settings")
