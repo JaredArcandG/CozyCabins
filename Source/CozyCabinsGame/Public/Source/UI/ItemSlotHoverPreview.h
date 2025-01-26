@@ -14,7 +14,7 @@ struct COZYCABINSGAME_API FHoverPreviewData
 public:
 	
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UImage> Image;
+	TObjectPtr<class UImage> Image;
 
 	UPROPERTY(BlueprintReadOnly)
 	FText ItemName;
@@ -50,6 +50,6 @@ protected:
 
 public:
 
-	void SetHoverPreviewSlotData(TObjectPtr<UImage> Image, const FText& ItemName, const FText& ItemDescription);
+	void SetHoverPreviewSlotData(TObjectPtr<class UImage> Image, const FText& ItemName, const FText& ItemDescription);
 	
 };
