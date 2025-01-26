@@ -30,6 +30,22 @@ void UStatsHUD::InitializeWidget(APlayerCharacter& PlayerCharacter)
 }
 
 /// <summary>
+/// Shows the widget in the viewport
+/// </summary>
+void UStatsHUD::HideWidget()
+{
+	this->SetVisibility(ESlateVisibility::Hidden);
+}
+
+/// <summary>
+/// Hides the widget in the viewport
+/// </summary>
+void UStatsHUD::ShowWidget()
+{
+	this->SetVisibility(ESlateVisibility::Visible);
+}
+
+/// <summary>
 /// Dynamic function linked to the on stat changed variable
 /// </summary>
 /// <param name="UpdatedStat"></param>

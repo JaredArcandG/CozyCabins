@@ -32,6 +32,12 @@ public:
 
 	void InitializeWidget(class APlayerCharacter& PlayerCharacter);
 
+	UFUNCTION(BlueprintCallable)
+	void HideWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowWidget();
+
 protected:
 
 	UFUNCTION()
