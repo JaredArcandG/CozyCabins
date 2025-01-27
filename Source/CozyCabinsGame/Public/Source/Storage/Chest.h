@@ -36,6 +36,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class APlayerController> PlayerController;
 
+	UPROPERTY()
+	TObjectPtr<class APlayerCharacter> Player;
+
 protected:
 
 	// Called when the game starts or when spawned

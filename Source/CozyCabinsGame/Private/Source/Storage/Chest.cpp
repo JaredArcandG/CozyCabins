@@ -31,10 +31,10 @@ void AChest::BeginPlay()
 	PlayerController = GetWorld()->GetFirstPlayerController();
 	CHECK(PlayerController);
 
-	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(PlayerController->GetPawn());
-	CHECK(pPlayer);
+	Player = Cast<APlayerCharacter>(PlayerController->GetPawn());
+	CHECK(Player);
 
-	if (auto pPlayerInventoryComp = pPlayer->GetComponentByClass<UInventoryComponent>())
+	if (auto pPlayerInventoryComp = Player->GetComponentByClass<UInventoryComponent>())
 	{
 		// Create the widget, set it up with the two required inventory components
 		ChestUIWidget = CreateWidget<UChestUI>(GetWorld(), ChestUIClass);
@@ -74,8 +74,13 @@ void AChest::OpenChestUIWidget()
 {
 	CHECK(ChestUIWidget);
 	CHECK(PlayerController);
+	CHECK(Player);
 
-	PlayerController->SetInputMode(FInputModeUIOnly());
+	// Disable player movement while interacting with chest
+	Player->AllowPlayerMove(false);
+	Player->AllowPlayerLook(false);
+
+	PlayerController->SetInputMode(FInputModeGameAndUI());
 	PlayerController->bShowMouseCursor = true;
 
 	ChestUIWidget->SetVisibility(ESlateVisibility::Visible);
@@ -89,6 +94,11 @@ void AChest::CloseChestUIWidget()
 {
 	CHECK(ChestUIWidget);
 	CHECK(PlayerController);
+	CHECK(Player);
+
+	// Enable player movement again
+	Player->AllowPlayerMove(true);
+	Player->AllowPlayerLook(true);
 
 	PlayerController->SetInputMode(FInputModeGameOnly());
 	PlayerController->bShowMouseCursor = false;
