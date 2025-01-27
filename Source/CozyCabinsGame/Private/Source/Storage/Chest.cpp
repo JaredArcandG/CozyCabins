@@ -43,6 +43,7 @@ void AChest::BeginPlay()
 		ChestUIWidget->AddToViewport(3);
 		ChestUIWidget->SetVisibility(ESlateVisibility::Hidden);
 		ChestUIWidget->Setup(*pPlayerInventoryComp, *InventoryComp);
+		ChestUIWidget->UpdateUI();
 	}
 	
 }
@@ -84,7 +85,6 @@ void AChest::OpenChestUIWidget()
 	PlayerController->bShowMouseCursor = true;
 
 	ChestUIWidget->SetVisibility(ESlateVisibility::Visible);
-	ChestUIWidget->UpdateUI();
 }
 
 /// <summary>
