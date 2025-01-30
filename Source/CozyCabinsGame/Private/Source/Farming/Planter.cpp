@@ -19,7 +19,12 @@ APlanter::APlanter()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(RootComp);
+
 	PlanterMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Planter Mesh"));
+	PlanterMesh->SetupAttachment(RootComponent);
+
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 }
 

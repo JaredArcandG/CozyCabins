@@ -17,10 +17,14 @@ public:
 	APlanter();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> RootComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UStaticMeshComponent> PlanterMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UInventoryComponent> InventoryComponent;
+
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UGameTimeManager> GameTimeManager;
