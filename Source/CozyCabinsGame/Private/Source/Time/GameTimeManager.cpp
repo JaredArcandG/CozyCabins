@@ -36,6 +36,9 @@ void UGameTimeManager::BeginPlay()
 /// <param name="AddSeconds"></param>
 void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAddMonths, const int& InAddDays, const int& InAddHours, const int& InAddMinutes, const int& InAddSeconds)
 {
+	// Disable the timer to avoid timer/increment collision
+	GetWorld()->GetTimerManager().PauseTimer(GameTimerHandle);
+	
 	// Since timespan can only increase by a day max, convert years and months to days
 	int totalDays = InAddDays + (365 * InAddYears) + (30 * InAddMonths);
 	FTimespan incrementTS(totalDays, InAddHours, InAddMinutes, InAddSeconds);
@@ -44,6 +47,9 @@ void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAdd
 
 	// Broadcasts that X amount of time has passed
 	OnGameTimePassed.Broadcast(incrementTS, CurrentGameTime);
+
+	// Re-enable the timer
+	GetWorld()->GetTimerManager().UnPauseTimer(GameTimerHandle);
 }
 
 /// <summary>
