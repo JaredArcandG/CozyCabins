@@ -10,6 +10,36 @@
 #include "Engine/TimerHandle.h"
 #include "Item.generated.h"
 
+UENUM(Blueprintable, BlueprintType)
+enum class EItemAction : uint8
+{
+	None,
+	AddItem,
+	RemoveItem,
+	ConsumeItem
+};
+
+USTRUCT(Blueprintable, BlueprintType)
+struct COZYCABINSGAME_API FItemNotification
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	EItemAction ItemAction = EItemAction::None;
+
+	UPROPERTY()
+	TObjectPtr<class UImage> ItemImage = nullptr;
+
+	UPROPERTY()
+	int Quantity = -1;
+
+	UPROPERTY()
+	FText ItemName = FText::GetEmpty();
+
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class COZYCABINSGAME_API AItem : public AActor, public IUsable, public IInteractable
 {
