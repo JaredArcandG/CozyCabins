@@ -86,6 +86,12 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Get the time difference from input time"))
 	FTimespan GetTimeDifferenceFromCurrentTime(const FDateTime& InTime);
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Stop the GameTimeManager Timers"))
+	void StopGameTimer();
+
+	UFUNCTION(BlueprintCallable, meta = (Text = "Stop the GameTimeManager Timers"))
+	void StartGameTimer();
+
 protected:
 
 	UFUNCTION()

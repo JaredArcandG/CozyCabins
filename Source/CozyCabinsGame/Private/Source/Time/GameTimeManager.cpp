@@ -10,7 +10,7 @@ UGameTimeManager::UGameTimeManager()
 {
 	RealTimeMinutesPerGameHour = 2.5f;
 
-	CurrentGameTime = FDateTime(1, 1, 1);
+	CurrentGameTime = FDateTime(2024, 4, 1);
 
 }
 
@@ -36,9 +36,6 @@ void UGameTimeManager::BeginPlay()
 /// <param name="AddSeconds"></param>
 void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAddMonths, const int& InAddDays, const int& InAddHours, const int& InAddMinutes, const int& InAddSeconds)
 {
-	// Disable the timer to avoid timer/increment collision
-	GetWorld()->GetTimerManager().PauseTimer(GameTimerHandle);
-	
 	// Since timespan can only increase by a day max, convert years and months to days
 	int totalDays = InAddDays + (365 * InAddYears) + (30 * InAddMonths);
 	FTimespan incrementTS(totalDays, InAddHours, InAddMinutes, InAddSeconds);
@@ -48,8 +45,6 @@ void UGameTimeManager::IncrementGameTime(const int& InAddYears, const int& InAdd
 	// Broadcasts that X amount of time has passed
 	OnGameTimePassed.Broadcast(incrementTS, CurrentGameTime);
 
-	// Re-enable the timer
-	GetWorld()->GetTimerManager().UnPauseTimer(GameTimerHandle);
 }
 
 /// <summary>
@@ -69,6 +64,24 @@ FDateTime UGameTimeManager::GetCurrentGameTime()
 FTimespan UGameTimeManager::GetTimeDifferenceFromCurrentTime(const FDateTime& InTime)
 {
 	return CurrentGameTime - InTime;
+}
+
+void UGameTimeManager::StopGameTimer()
+{
+	if(!GetWorld()->GetTimerManager().IsTimerPaused(GameTimerHandle))
+	{
+		// Disable the timer to avoid timer/increment collision
+		GetWorld()->GetTimerManager().PauseTimer(GameTimerHandle);	
+	}
+}
+
+void UGameTimeManager::StartGameTimer()
+{
+	if (GetWorld()->GetTimerManager().IsTimerPaused(GameTimerHandle))
+	{
+		// Re-enable the timer
+		GetWorld()->GetTimerManager().UnPauseTimer(GameTimerHandle);
+	}
 }
 
 /// <summary>
