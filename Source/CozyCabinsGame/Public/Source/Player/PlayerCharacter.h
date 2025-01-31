@@ -48,7 +48,7 @@ protected:
 	TObjectPtr<class UInteractableComponent> InteractionComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	TObjectPtr<class UInventoryComponent> InventoryComp;
+	TObjectPtr<class UPlayerInventoryComponent> InventoryComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
 	TSubclassOf<class UItemSlotContainer> ItemSlotContainerClass;
@@ -99,7 +99,7 @@ public:
 	void AllowPlayerInteract(const bool& bCanInteractState);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Inventory Component", ToolTip = "Gets the player's inventory."))
-	class UInventoryComponent* GetInventoryComponent();
+	class UPlayerInventoryComponent* GetInventoryComponent();
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Stats Component", ToolTip = "Gets the player's stats"))
 	class UStatsComponent* GetStatsComponent();

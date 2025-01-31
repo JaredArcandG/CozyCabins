@@ -6,6 +6,7 @@
 #include <Source/Player/PlayerCharacter.h>
 #include <Source/UI/GlobalUIManager.h>
 #include <Source/UI/WorldDroppableItemWidget.h>
+#include <Source/UI/ItemNotificationContainer.h>
 
 /// <summary>
 /// ctor
@@ -30,5 +31,8 @@ void ACustomPlayerController::BeginPlay()
 	CHECK(PlayerHUD);
 
 	PlayerHUD->AddToViewport();
+
+	CHECK(PlayerItemNotificationClass);
+	ItemNotificationWidget = CreateWidget<UItemNotificationContainer>(this, PlayerItemNotificationClass);
 
 }

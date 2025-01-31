@@ -30,7 +30,7 @@ public:
 	EItemAction ItemAction = EItemAction::None;
 
 	UPROPERTY()
-	TObjectPtr<class UImage> ItemImage = nullptr;
+	TObjectPtr<class UTexture2D> ItemTexture = nullptr;
 
 	UPROPERTY()
 	int Quantity = -1;

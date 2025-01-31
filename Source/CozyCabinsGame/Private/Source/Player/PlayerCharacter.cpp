@@ -9,7 +9,7 @@
 #include <Source/Player/Input/InputConfigData.h>
 #include <EnhancedInputComponent.h>
 #include "Source/Components/InteractableComponent.h"
-#include "Source/Components/InventoryComponent.h"
+#include "Source/Components/PlayerInventoryComponent.h"
 #include "Source/Components/StatsComponent.h"
 #include "Source/UI/ItemSlotContainer.h"
 
@@ -56,7 +56,7 @@ APlayerCharacter::APlayerCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractionComponent"));
 
-	InventoryComp = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	InventoryComp = CreateDefaultSubobject<UPlayerInventoryComponent>(TEXT("InventoryComponent"));
 
 	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("StatsComponent"));
 
@@ -95,7 +95,7 @@ void APlayerCharacter::AllowPlayerInteract(const bool& bCanInteractState)
 /// Gets the inventory component
 /// </summary>
 /// <returns></returns>
-UInventoryComponent* APlayerCharacter::GetInventoryComponent()
+UPlayerInventoryComponent* APlayerCharacter::GetInventoryComponent()
 {
 	return InventoryComp;
 }

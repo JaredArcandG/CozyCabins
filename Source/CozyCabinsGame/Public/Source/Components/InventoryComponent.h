@@ -73,10 +73,10 @@ public:
 	bool TryRemove(const FGuid & ItemId, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to add 'quantity' number of items to the inventory for a specific index. Returns true if successful, false otherwise"))
-	bool TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
+	virtual bool TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to remove the item to the inventory for a specific index with a specific quantity for that index only. Returns true if successful, false otherwise"))
-	bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
+	virtual bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Tries to get an item from the item table if it exists in the inventory. ResultData is null if item not found or invalid. Index agnostic, quantity is the total over all indexes."))
 	bool TryGetItem(const FGuid& ItemId, FItemData& ResultData, int& Quantity);
@@ -107,6 +107,8 @@ public:
 
 	UFUNCTION(Blueprintcallable, meta = (Text = "Get all item indexes where the item meets the specified filter params"))
 	TArray<int> GetIndexesWithItemFilter(const struct FItemSearchFilterParams& FilterParams);
+
+	bool GetItemData(const FGuid& InTargetGuid, FItemData& OutResultData);
 
 protected:
 

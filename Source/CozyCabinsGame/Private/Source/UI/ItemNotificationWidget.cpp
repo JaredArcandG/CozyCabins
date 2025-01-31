@@ -7,14 +7,14 @@
 #include "Components/TextBlock.h"
 #include "Animation/WidgetAnimation.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Source/Items/Item.h"
 
-void UItemNotificationWidget::Setup(const UImage& Image, const FText& Message)
+void UItemNotificationWidget::Setup(const struct FItemNotification& ItemNotificationInfo)
 {
-	CHECK(ItemImage);
-	CHECK(NotificationMessage);
+	CHECK(ItemNotificationInfo.ItemTexture);
 
-	ItemImage->SetBrush(Image.GetBrush());
-	NotificationMessage->SetText(Message);
+	ItemImage->SetBrushFromTexture(ItemNotificationInfo.ItemTexture);
+	NotificationMessage->SetText(ItemNotificationInfo.ItemName);
 
 	// Create a timer for how long the item notification should be live
 	GetWorld()->GetTimerManager().SetTimer(hTimeActive, this, &UItemNotificationWidget::OnEndTimeActive, fTimeActive, false);

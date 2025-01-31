@@ -39,7 +39,7 @@ protected:
 
 public:
 
-	void Setup(const class UImage& Image, const FText& Message);
+	void Setup(const struct FItemNotification& ItemNotificationInfo);
 
 protected:
 

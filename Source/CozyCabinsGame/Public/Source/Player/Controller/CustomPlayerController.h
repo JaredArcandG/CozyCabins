@@ -24,6 +24,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UStatsHUD> PlayerHUD;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "Widgets")
+	TSubclassOf<class UItemNotificationContainer> PlayerItemNotificationClass;
+
+	UPROPERTY()
+	TObjectPtr<class UItemNotificationContainer> ItemNotificationWidget;
+
 	UPROPERTY();
 	TObjectPtr<class UGlobalUIManager> GlobalUIManager;
 

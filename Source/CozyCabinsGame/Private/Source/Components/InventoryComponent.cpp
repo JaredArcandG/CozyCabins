@@ -641,6 +641,22 @@ TArray<int> UInventoryComponent::GetIndexesWithItemFilter(const FItemSearchFilte
 	return targetItems;
 }
 
+bool UInventoryComponent::GetItemData(const FGuid& InTargetGuid, FItemData& OutResultData)
+{
+	FString sContextString;
+	FName rowName = FName(InTargetGuid.ToString(EGuidFormats::DigitsWithHyphens));
+	auto pItemData = DataTable->FindRow<FItemData>(rowName, sContextString);
+
+	if (!pItemData)
+	{
+		return false;
+	}
+
+	OutResultData = *pItemData;
+
+	return true;
+}
+
 /// <summary>
 /// Gets the quantity of an item at the index
 /// </summary>

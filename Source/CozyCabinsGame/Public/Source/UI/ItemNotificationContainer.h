@@ -19,6 +19,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<class UVerticalBox> NotificationContainer;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class UItemNotificationWidget> ItemNotificationClass;
+
 protected:
 
 	UPROPERTY()
@@ -29,4 +32,6 @@ public:
 	virtual void NativeConstruct() override;
 
 	void AddNotificationToContainer(UUserWidget& ChildToAdd);
+
+	void OnItemNotificationReceived(struct FItemNotification ItemNotification);
 };
