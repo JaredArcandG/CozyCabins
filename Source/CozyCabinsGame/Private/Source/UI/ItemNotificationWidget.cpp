@@ -14,7 +14,24 @@ void UItemNotificationWidget::Setup(const struct FItemNotification& ItemNotifica
 	CHECK(ItemNotificationInfo.ItemTexture);
 
 	ItemImage->SetBrushFromTexture(ItemNotificationInfo.ItemTexture);
-	NotificationMessage->SetText(ItemNotificationInfo.ItemName);
+
+	FString sItemMessage = FString();
+
+	switch (ItemNotificationInfo.ItemAction)
+	{
+		case EItemAction::AddItem:
+			sItemMessage = ItemAddString.Replace(*ITEM_NAME_STR, *ItemNotificationInfo.ItemName.ToString());
+			sItemMessage = sItemMessage.Replace(*ITEM_QTY_STR, *FString::FormatAsNumber(ItemNotificationInfo.Quantity));
+			NotificationMessage->SetText(FText::FromString(sItemMessage));
+			break;
+		case EItemAction::RemoveItem:
+			sItemMessage = ItemRemoveString.Replace(*ITEM_NAME_STR, *ItemNotificationInfo.ItemName.ToString());
+			sItemMessage = sItemMessage.Replace(*ITEM_QTY_STR, *FString::FormatAsNumber(ItemNotificationInfo.Quantity));
+			NotificationMessage->SetText(FText::FromString(sItemMessage));
+			break;
+		default:
+			break;
+	}
 
 	// Create a timer for how long the item notification should be live
 	GetWorld()->GetTimerManager().SetTimer(hTimeActive, this, &UItemNotificationWidget::OnEndTimeActive, fTimeActive, false);

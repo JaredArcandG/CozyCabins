@@ -33,5 +33,8 @@ public:
 
 	void AddNotificationToContainer(UUserWidget& ChildToAdd);
 
+protected:
+
+	UFUNCTION()
 	void OnItemNotificationReceived(struct FItemNotification ItemNotification);
 };

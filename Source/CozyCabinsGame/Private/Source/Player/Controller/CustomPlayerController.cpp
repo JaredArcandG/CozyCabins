@@ -34,5 +34,8 @@ void ACustomPlayerController::BeginPlay()
 
 	CHECK(PlayerItemNotificationClass);
 	ItemNotificationWidget = CreateWidget<UItemNotificationContainer>(this, PlayerItemNotificationClass);
+	
+	CHECK(ItemNotificationWidget);
+	ItemNotificationWidget->AddToViewport();
 
 }

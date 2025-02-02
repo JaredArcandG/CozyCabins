@@ -7,6 +7,9 @@
 #include "Engine/TimerHandle.h"
 #include "ItemNotificationWidget.generated.h"
 
+#define ITEM_NAME_STR FString("{ITEM_NAME}")
+#define ITEM_QTY_STR FString("{ITEM_QTY}")
+
 /**
  * 
  */
@@ -36,6 +39,12 @@ protected:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> FadeOut;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Text = "Custom Item Add message. Use {ITEM_NAME} and {ITEM_QTY} to replace automatically with item name and qty"))
+	FString ItemAddString;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Text = "Custom Item Remove message. Use {ITEM_NAME} and {ITEM_QTY} to replace automatically with item name and qty"))
+	FString ItemRemoveString;
 
 public:
 
