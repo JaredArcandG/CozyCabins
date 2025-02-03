@@ -10,7 +10,7 @@
 #include "Source/GameMode/CustomGameModeBase.h"
 #include "TimerManager.h"
 #include <Source/Player/PlayerCharacter.h>
-#include "Source/Components/InventoryComponent.h"
+#include "Source/Components/PlayerInventoryComponent.h"
 
 // Sets default values
 AItem::AItem()
