@@ -8,6 +8,7 @@
 #include <Source/Player/Controller/CustomPlayerController.h>
 #include <Source/Components/PlayerInventoryComponent.h>
 #include <Source/UI/ItemNotificationWidget.h>
+#include "Source/Notifications/BaseNotification.h"
 
 void UItemNotificationContainer::NativeConstruct()
 {
@@ -20,7 +21,8 @@ void UItemNotificationContainer::NativeConstruct()
 	TObjectPtr<UPlayerInventoryComponent> pInventoryComp = pPlayer->GetInventoryComponent();
 	CHECK(pInventoryComp);
 
-	pInventoryComp->OnPlayerInventoryChange.AddUniqueDynamic(this, &UItemNotificationContainer::OnItemNotificationReceived);
+	// Add all notifications hooks here
+	pInventoryComp->OnPlayerInventoryChange.AddUniqueDynamic(this, &UItemNotificationContainer::OnNotificationReceived);
 }
 
 void UItemNotificationContainer::AddNotificationToContainer(UUserWidget& ChildToAdd)
@@ -30,12 +32,18 @@ void UItemNotificationContainer::AddNotificationToContainer(UUserWidget& ChildTo
 	NotificationContainer->AddChildToVerticalBox(&ChildToAdd);
 }
 
-void UItemNotificationContainer::OnItemNotificationReceived(FItemNotification ItemNotification)
+void UItemNotificationContainer::OnNotificationReceived(UBaseNotification* Notification)
 {
-	TObjectPtr<UItemNotificationWidget> pNotification = CreateWidget<UItemNotificationWidget>(this, ItemNotificationClass);
-	CHECK(pNotification);
+	CHECK(Notification);
+	CHECK(Notification->GetWidgetNotificationClass());
 
-	pNotification->Setup(ItemNotification);
+	TObjectPtr<UUserWidget> pNotificationWidget = CreateWidget<UUserWidget>(this, Notification->GetWidgetNotificationClass());
+	CHECK(pNotificationWidget);
 
-	AddNotificationToContainer(*pNotification);
+	if (auto pINotification = Cast<INotification>(pNotificationWidget))
+	{
+		pINotification->SetupNotification(*Notification);
+		AddNotificationToContainer(*pNotificationWidget);
+	}
+
 }

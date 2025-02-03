@@ -36,5 +36,5 @@ public:
 protected:
 
 	UFUNCTION()
-	void OnItemNotificationReceived(struct FItemNotification ItemNotification);
+	void OnNotificationReceived(class UBaseNotification* Notification);
 };

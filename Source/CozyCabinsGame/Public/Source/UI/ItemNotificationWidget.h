@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/TimerHandle.h"
+#include "Source/Notifications/INotification.h"
 #include "ItemNotificationWidget.generated.h"
 
 #define ITEM_NAME_STR FString("{ITEM_NAME}")
@@ -14,7 +15,7 @@
  * 
  */
 UCLASS()
-class COZYCABINSGAME_API UItemNotificationWidget : public UUserWidget
+class COZYCABINSGAME_API UItemNotificationWidget : public UUserWidget, public INotification
 {
 	GENERATED_BODY()
 
@@ -48,7 +49,7 @@ protected:
 
 public:
 
-	void Setup(const struct FItemNotification& ItemNotificationInfo);
+	virtual void SetupNotification(class UBaseNotification& Notification);
 
 protected:
 

@@ -19,27 +19,6 @@ enum class EItemAction : uint8
 	ConsumeItem
 };
 
-USTRUCT(Blueprintable, BlueprintType)
-struct COZYCABINSGAME_API FItemNotification
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY()
-	EItemAction ItemAction = EItemAction::None;
-
-	UPROPERTY()
-	TObjectPtr<class UTexture2D> ItemTexture = nullptr;
-
-	UPROPERTY()
-	int Quantity = -1;
-
-	UPROPERTY()
-	FText ItemName = FText::GetEmpty();
-
-};
-
 UCLASS(Blueprintable, BlueprintType)
 class COZYCABINSGAME_API AItem : public AActor, public IUsable, public IInteractable
 {

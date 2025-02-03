@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Source/Components/InventoryComponent.h"
 #include "Source/Items/Item.h"
+#include "Source/Notifications/ItemNotification.h"
 #include "PlayerInventoryComponent.generated.h"
 
 /**
@@ -19,10 +20,13 @@ class COZYCABINSGAME_API UPlayerInventoryComponent : public UInventoryComponent
 public:
 
 	// Event for Inventory item change
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerInventoryChange, FItemNotification, ItemNotification);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerInventoryChange, UBaseNotification*, ItemNotification);
 
-	UPROPERTY(BlueprintAssignable, Category = "Events")
+	//UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnPlayerInventoryChange OnPlayerInventoryChange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> ItemWidgetNotificationClass;
 
 public:
 

@@ -39,13 +39,17 @@ void UPlayerInventoryComponent::SendItemNotification(const FGuid& ItemId, const 
 	// Try to send the notification
 	if (Super::GetItemData(ItemId, itemData))
 	{
-		// Broadcast an item add event
-		FItemNotification itemNotification;
-		itemNotification.ItemAction = Action;
-		itemNotification.Quantity = Quantity;
-		itemNotification.ItemTexture = itemData.Icon;
-		itemNotification.ItemName = FText::FromString(itemData.Name);
+		auto pNotification = NewObject<UItemNotification>(this);
+		CHECK(pNotification);
 
-		OnPlayerInventoryChange.Broadcast(itemNotification);
+		pNotification->Setup(ItemWidgetNotificationClass);
+		pNotification->ItemAction = Action;
+		pNotification->ItemTexture = itemData.Icon;
+		pNotification->Quantity = Quantity;
+		pNotification->ItemName = FText::FromString(itemData.Name);
+
+		// Broadcast an inventory item change event UI notification
+
+		OnPlayerInventoryChange.Broadcast(pNotification);
 	}
 }
