@@ -6,6 +6,7 @@
 #include "Source/UI/CraftingIngredientSlot.h"
 #include "Source/Components/InventoryComponent.h"
 #include "Source/Items/ItemData.h"
+#include "Source/Libraries/CraftingLibrary.h"
 #include "GameFramework/Character.h"
 #include "Components/WrapBox.h"
 #include "Components/TextBlock.h"
@@ -31,15 +32,34 @@ void UWorkStationUIBase::InitializeStation(TObjectPtr<class UDataTable> DataTabl
 			RequireFuelItem = RequireFuelItemValue;
 			FuelItem = FuelItemValue;
 
-
+			// Iterrate and Add all Default Unlocked Recipes
 			for (FName CurrentRow : DataTableRowNames)
 			{
 				FCraftingRecipe* NewRecipe = DataTable->FindRow<FCraftingRecipe>(CurrentRow, "");
-				TObjectPtr<UCraftingRecipeSlot> NewRecipeSlot = CreateWidget<UCraftingRecipeSlot>(GetWorld(), RecipeSlotWidget);
-				if (NewRecipe && NewRecipeSlot) 
+				if (NewRecipe->UnlockedByDefault) 
 				{
-					NewRecipeSlot->InitializeSlot(NewRecipe, this);
-					WrapBox->AddChildToWrapBox(NewRecipeSlot);
+					TObjectPtr<UCraftingRecipeSlot> NewRecipeSlot = CreateWidget<UCraftingRecipeSlot>(GetWorld(), RecipeSlotWidget);
+					if (NewRecipe && NewRecipeSlot) 
+					{
+						NewRecipeSlot->InitializeSlot(NewRecipe, this);
+						WrapBox->AddChildToWrapBox(NewRecipeSlot);
+					}
+				}
+			}
+
+			// Get All Unlocked Recipes from this DataTable
+			TArray<FName> UnlockedRecipes = UCraftingLibrary::ReturnUnlockedRecipes(DataTable, InventoryComponent->GetOwner());
+
+			// Iterrate and Add all Unlocked Recipes
+			for (FName CurrentRow : UnlockedRecipes)
+			{
+				FCraftingRecipe* NewUnlockedRecipe = DataTable->FindRow<FCraftingRecipe>(CurrentRow, "");
+
+				TObjectPtr<UCraftingRecipeSlot> NewUnlockedRecipeSlot = CreateWidget<UCraftingRecipeSlot>(GetWorld(), RecipeSlotWidget);
+				if (NewUnlockedRecipe && NewUnlockedRecipeSlot)
+				{
+					NewUnlockedRecipeSlot->InitializeSlot(NewUnlockedRecipe, this);
+					WrapBox->AddChildToWrapBox(NewUnlockedRecipeSlot);
 				}
 			}
 
