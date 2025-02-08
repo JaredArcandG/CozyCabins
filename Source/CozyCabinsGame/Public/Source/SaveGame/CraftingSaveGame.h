@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/SaveGame.h"
+#include "Source/SaveGame/BaseSaveGame.h"
 #include "Source/Crafting/CraftingData.h"
 #include "CraftingSaveGame.generated.h"
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class COZYCABINSGAME_API UCraftingSaveGame : public USaveGame
+class COZYCABINSGAME_API UCraftingSaveGame : public UBaseSaveGame
 {
 	GENERATED_BODY()
 	
@@ -25,4 +25,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UnlockRecipe(UDataTable* TableToScan, FName RecipeRow);
+
+public:
+
+	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+
+	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
 };

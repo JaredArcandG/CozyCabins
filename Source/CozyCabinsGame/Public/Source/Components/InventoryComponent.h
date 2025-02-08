@@ -105,10 +105,24 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Gets all indexes that have the specified item in the inventory"))
 	bool TryGetFirstItemWithId(const FGuid& InTargetGuid, FItemData& OutResultData, int& OutQuantity, int& OutIndex);
 
-	UFUNCTION(Blueprintcallable, meta = (Text = "Get all item indexes where the item meets the specified filter params"))
+	UFUNCTION(BlueprintCallable, meta = (Text = "Get all item indexes where the item meets the specified filter params"))
 	TArray<int> GetIndexesWithItemFilter(const struct FItemSearchFilterParams& FilterParams);
 
+	UFUNCTION(BlueprintCallable, meta = (Text = "Get the current item array size"))
+	int GetCurrentSize();
+
 	bool GetItemData(const FGuid& InTargetGuid, FItemData& OutResultData);
+
+	// Getters/Setters for Saving/Loading (Should not be exposed to blueprints)
+	void SetCurrentSize(const int& Size);
+
+	TArray<int> GetItemQtyArray();
+
+	void SetItemQtyArray(TArray<int>& ItemQtyArray);
+
+	TArray<FGuid> GetItemIdArray();
+
+	void SetItemIdArray(TArray<FGuid>& InItemIdArray);
 
 protected:
 

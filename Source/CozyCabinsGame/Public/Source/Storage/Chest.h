@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Source/Components/IInteractable.h"
+#include "Source/SaveGame/UniqueActor.h"
 #include "Chest.generated.h"
 
 UCLASS()
-class COZYCABINSGAME_API AChest : public AActor, public IInteractable
+class COZYCABINSGAME_API AChest : public AUniqueActor, public IInteractable
 {
 	GENERATED_BODY()
 	

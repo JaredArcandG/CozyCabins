@@ -219,6 +219,60 @@ float UStatsComponent::GetHungerRatio()
 }
 
 /// <summary>
+/// Gets the last time the hunger decay was triggered
+/// </summary>
+/// <returns></returns>
+FDateTime UStatsComponent::GetTimeSinceLastHungerDecay()
+{
+	return TimeSinceLastHungerDecay;
+}
+
+/// <summary>
+/// Sets the last time the hunger decay was triggered
+/// </summary>
+/// <param name="DateTime"></param>
+void UStatsComponent::SetTimeSinceLastHungerDecay(const FDateTime& DateTime)
+{
+	TimeSinceLastHungerDecay = DateTime;
+}
+
+/// <summary>
+/// Gets the hunger decay rate
+/// </summary>
+/// <returns></returns>
+int UStatsComponent::GetHungerDecayRate()
+{
+	return HungerDecayRate;
+}
+
+/// <summary>
+/// Sets the hunger decay rate
+/// </summary>
+/// <param name="DecayRate"></param>
+void UStatsComponent::SetHungerDecayRate(const int& DecayRate)
+{
+	HungerDecayRate = DecayRate;
+}
+
+/// <summary>
+/// Gets the hunger decay gametime in mins
+/// </summary>
+/// <returns></returns>
+int UStatsComponent::GetHungerDecayGameTimeMins()
+{
+	return HungerDecayGametimeMins;
+}
+
+/// <summary>
+/// Sets the hunger decay game time (in minutes)
+/// </summary>
+/// <param name="DecayTime"></param>
+void UStatsComponent::SetHungerDecayGameTimeMins(const int& DecayTime)
+{
+	HungerDecayGametimeMins = DecayTime;
+}
+
+/// <summary>
 /// Decays hunger based on the specified decay class params
 /// </summary>
 void UStatsComponent::DecayHunger(FTimespan Timespan, FDateTime CurrentDateTime)

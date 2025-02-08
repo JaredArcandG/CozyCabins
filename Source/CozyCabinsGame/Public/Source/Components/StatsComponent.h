@@ -130,6 +130,18 @@ public:
 
 	float GetHungerRatio();
 
+	FDateTime GetTimeSinceLastHungerDecay();
+
+	void SetTimeSinceLastHungerDecay(const FDateTime& DateTime);
+
+	int GetHungerDecayRate();
+
+	void SetHungerDecayRate(const int& DecayRate);
+
+	int GetHungerDecayGameTimeMins();
+
+	void SetHungerDecayGameTimeMins(const int& DecayTime);
+
 protected:
 
 	UFUNCTION()

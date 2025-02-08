@@ -92,6 +92,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (Text = "Stop the GameTimeManager Timers"))
 	void StartGameTimer();
 
+	void SetCurrentGameTime(const FDateTime& GameTime);
+
 protected:
 
 	UFUNCTION()

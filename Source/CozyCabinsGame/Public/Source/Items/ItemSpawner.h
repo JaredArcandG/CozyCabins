@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Source/SaveGame/UniqueActor.h"
 #include "Misc/DateTime.h"
 #include <Source/Time/GameTimeManager.h>
 #include "ItemSpawner.generated.h"
@@ -33,7 +33,7 @@ public:
 /// Responsible as a wrapper class that dictates spawning logic for items
 /// </summary>
 UCLASS()
-class COZYCABINSGAME_API AItemSpawner : public AActor
+class COZYCABINSGAME_API AItemSpawner : public AUniqueActor
 {
 	GENERATED_BODY()
 	
@@ -49,6 +49,16 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UStaticMeshComponent> VisualEditorMesh;
 
+	struct FDateTime PickupTime;
+
+	bool bAwaitingRespawnAfterPlayerPickup;
+
+	FTimespan RespawnTimeInGameTime;
+
+	// Used to track if the item was created in editor or manually on drop
+	// Override when created on drop
+	bool bOverrideItemDataRespawnSettings;
+
 protected:
 
 	UPROPERTY()
@@ -62,18 +72,8 @@ protected:
 
 	FTimerHandle SpawnTimeCheckHandle;
 
-	struct FDateTime PickupTime;
-
-	bool bAwaitingRespawnAfterPlayerPickup;
-
 	// Time to wait and then retry a spawn if it failed
 	static constexpr float TryRespawnRealSeconds = 60.f;
-
-	FTimespan RespawnTimeInGameTime;
-
-	// Used to track if the item was created in editor or manually on drop
-	// Override when created on drop
-	bool bOverrideItemDataRespawnSettings;
 
 protected:
 

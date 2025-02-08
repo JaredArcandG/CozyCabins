@@ -641,6 +641,36 @@ TArray<int> UInventoryComponent::GetIndexesWithItemFilter(const FItemSearchFilte
 	return targetItems;
 }
 
+int UInventoryComponent::GetCurrentSize()
+{
+	return CurrentSize;
+}
+
+void UInventoryComponent::SetCurrentSize(const int& Size)
+{
+	CurrentSize = Size;
+}
+
+TArray<int> UInventoryComponent::GetItemQtyArray()
+{
+	return ItemQuantityArr;
+}
+
+void UInventoryComponent::SetItemQtyArray(TArray<int>& ItemQtyArray)
+{
+	ItemQuantityArr = ItemQtyArray;
+}
+
+TArray<FGuid> UInventoryComponent::GetItemIdArray()
+{
+	return ItemIdArr;
+}
+
+void UInventoryComponent::SetItemIdArray(TArray<FGuid>& InItemIdArray)
+{
+	ItemIdArr = InItemIdArray;
+}
+
 bool UInventoryComponent::GetItemData(const FGuid& InTargetGuid, FItemData& OutResultData)
 {
 	FString sContextString;
@@ -656,6 +686,8 @@ bool UInventoryComponent::GetItemData(const FGuid& InTargetGuid, FItemData& OutR
 
 	return true;
 }
+
+
 
 /// <summary>
 /// Gets the quantity of an item at the index

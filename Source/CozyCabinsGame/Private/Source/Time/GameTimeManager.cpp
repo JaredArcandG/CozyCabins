@@ -85,6 +85,15 @@ void UGameTimeManager::StartGameTimer()
 }
 
 /// <summary>
+/// Sets the game time of the instance
+/// </summary>
+/// <param name="GameTime"></param>
+void UGameTimeManager::SetCurrentGameTime(const FDateTime& GameTime)
+{
+	CurrentGameTime = GameTime;
+}
+
+/// <summary>
 /// Increments the game time by one minute
 /// </summary>
 void UGameTimeManager::BroadCastGameTimeMinutePassed()

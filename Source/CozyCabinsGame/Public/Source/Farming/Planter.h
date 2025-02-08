@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Source/SaveGame/UniqueActor.h"
 #include "Source/Components/IInteractable.h"
 #include "Planter.generated.h"
 
 UCLASS()
-class COZYCABINSGAME_API APlanter : public AActor, public IInteractable
+class COZYCABINSGAME_API APlanter : public AUniqueActor, public IInteractable
 {
 	GENERATED_BODY()
 	

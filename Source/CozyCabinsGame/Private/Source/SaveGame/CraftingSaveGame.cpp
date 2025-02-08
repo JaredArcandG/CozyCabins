@@ -41,3 +41,11 @@ void UCraftingSaveGame::UnlockRecipe(UDataTable* TableToScan, FName RecipeRow)
 	UnlockedRecipesStruct->UnlockedRecipesMap.Add(RecipeRow, true);
 
 }
+
+void UCraftingSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+{
+}
+
+void UCraftingSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+{
+}
