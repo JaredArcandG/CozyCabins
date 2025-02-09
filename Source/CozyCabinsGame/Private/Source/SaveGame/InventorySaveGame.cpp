@@ -14,7 +14,7 @@ UInventorySaveGame::UInventorySaveGame()
 	CurrentSize = 0;
 }
 
-void UInventorySaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UInventorySaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	TObjectPtr<UInventoryComponent> pInventoryComp = Cast<UInventoryComponent>(&ObjectToSave);
 	CHECK(pInventoryComp);
@@ -27,7 +27,7 @@ void UInventorySaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSa
 	ItemIdArr = pInventoryComp->GetItemIdArray();
 }
 
-void UInventorySaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UInventorySaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
 	TObjectPtr<UInventoryComponent> pInventoryComp = Cast<UInventoryComponent>(&ObjectToLoad);
 	CHECK(pInventoryComp);

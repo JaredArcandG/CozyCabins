@@ -47,4 +47,10 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
     TObjectPtr<UInputAction> InputConsume;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TObjectPtr<UInputAction> InputQuickSave;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TObjectPtr<UInputAction> InputQuickLoad;
+
 };

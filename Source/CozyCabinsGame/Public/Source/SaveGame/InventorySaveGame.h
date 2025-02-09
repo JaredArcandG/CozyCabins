@@ -38,8 +38,8 @@ public:
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) override;
 	
 };

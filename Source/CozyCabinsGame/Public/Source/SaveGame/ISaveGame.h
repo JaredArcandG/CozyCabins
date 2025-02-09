@@ -29,12 +29,12 @@ public:
 	/// </summary>
 	/// <param name="WorldContextObject"></param>
 	/// <param name="ObjectToSave"></param>
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) = 0;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) = 0;
 
 	/// <summary>
 	/// Called when the object is loaded
 	/// </summary>
 	/// <param name="WorldContextObject"></param>
 	/// <param name="ObjectToLoad"></param>
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) = 0;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) = 0;
 };

@@ -11,7 +11,7 @@ UPlayerCoreSaveGame::UPlayerCoreSaveGame()
 	PlayerRotation = FRotator();
 }
 
-void UPlayerCoreSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UPlayerCoreSaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(&ObjectToSave);
 	CHECK(pPlayer);
@@ -20,7 +20,7 @@ void UPlayerCoreSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToS
 	PlayerRotation = pPlayer->GetActorRotation();
 }
 
-void UPlayerCoreSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UPlayerCoreSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
 	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(&ObjectToLoad);
 	CHECK(pPlayer);

@@ -38,7 +38,7 @@ void UCraftingLibrary::UnlockRecipe(UDataTable* TableToScan, const UObject* Worl
 			if (CustomGameInstance->CraftingSaveGame)
 			{
 				CustomGameInstance->CraftingSaveGame->UnlockRecipe(TableToScan, RecipeRow);
-				CustomGameInstance->SaveCraftingSaveGame();
+				CustomGameInstance->CraftingSaveGame->OnSave(*WorldContext, *CustomGameInstance->CraftingSaveGame);
 			}
 		}
 	}

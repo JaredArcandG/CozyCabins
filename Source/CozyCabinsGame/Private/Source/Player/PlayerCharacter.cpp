@@ -12,6 +12,8 @@
 #include "Source/Components/PlayerInventoryComponent.h"
 #include "Source/Components/StatsComponent.h"
 #include "Source/UI/ItemSlotContainer.h"
+#include "Source/GameInstance/CustomGameInstance.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -138,6 +140,8 @@ void APlayerCharacter::BeginPlay()
 	InventoryUI->SetVisibility(ESlateVisibility::Hidden);
 	InventoryUI->AddToViewport(3);
 	InventoryUI->Setup(*InventoryComp);
+
+	GameInstance = Cast<UCustomGameInstance>(UGameplayStatics::GetGameInstance(this));
 	
 }
 
@@ -169,6 +173,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	pInputComponent->BindAction(InputActions->InputConfirm, ETriggerEvent::Triggered, this, &APlayerCharacter::Interact);
 	pInputComponent->BindAction(InputActions->InputInventory, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerInventory);
 	pInputComponent->BindAction(InputActions->InputConsume, ETriggerEvent::Triggered, this, &APlayerCharacter::Consume);
+	pInputComponent->BindAction(InputActions->InputQuickSave, ETriggerEvent::Triggered, this, &APlayerCharacter::OnQuickSave);
+	pInputComponent->BindAction(InputActions->InputQuickLoad, ETriggerEvent::Triggered, this, &APlayerCharacter::OnQuickLoad);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -322,4 +328,27 @@ void APlayerCharacter::TriggerInventory(const FInputActionValue& InputValue)
 			InventoryUI->HandleOnCloseSlotContainer();
 		}
 	}
+}
+
+/// <summary>
+/// Saves the current state of the game
+/// Note: Quick Save slot is always 0
+/// </summary>
+void APlayerCharacter::OnQuickSave()
+{
+	CHECK(GameInstance);
+
+	GameInstance->OnSaveGame(0);
+}
+
+/// <summary>
+/// Loads the current state of the game
+/// Note: Quick Load slot is always 0
+/// </summary>
+void APlayerCharacter::OnQuickLoad()
+{
+	CHECK(GameInstance);
+
+	GameInstance->OnLoadGame(0);
+
 }

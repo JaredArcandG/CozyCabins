@@ -4,32 +4,73 @@
 #include "Source/GameInstance/CustomGameInstance.h"
 #include "Source/SaveGame/CraftingSaveGame.h"
 #include "Kismet/GameplayStatics.h"
+#include <Source/Utils/CheckUtils.h>
+#include <Source/SaveGame/SaveGameSlot.h>
 
 void UCustomGameInstance::Init()
 {
-	// If multiple SaveGame Slots are supported, this should be called when selecting a Save instead and use said Index
-	InitializeSaveGames();
+	// Initialize the gameslots array
+	GameSlots.SetNum(NumMaxGameSlots, false);
+
+	// Load all the save game slots for all instances
+	InitializeSaveGameSlots();
 }
 
-void UCustomGameInstance::InitializeSaveGames()
+void UCustomGameInstance::InitializeSaveGameSlots()
 {
-	// Check if Crafting SaveGame exists already, otherwise create one
-	if (UGameplayStatics::DoesSaveGameExist(CraftingSaveGame_SlotName, SaveGameSlotIndex))
+	for (int slotIdx = 0; slotIdx < NumMaxGameSlots; slotIdx++)
 	{
-		CraftingSaveGame = Cast<UCraftingSaveGame>(UGameplayStatics::LoadGameFromSlot(CraftingSaveGame_SlotName, SaveGameSlotIndex));
-	}
-	else 
-	{
-		CraftingSaveGame = Cast<UCraftingSaveGame>(UGameplayStatics::CreateSaveGameObject(CraftingSaveGameClass));
-		SaveCraftingSaveGame();
+		// Check if Crafting SaveGame exists already
+		if (UGameplayStatics::DoesSaveGameExist(SaveGameSlotName, slotIdx))
+		{
+			GameSlots[slotIdx] = Cast<USaveGameSlot>(UGameplayStatics::LoadGameFromSlot(SaveGameSlotName, slotIdx));
+		}
 	}
 }
 
-void UCustomGameInstance::SaveCraftingSaveGame()
+/// <summary>
+/// Called when a game save is initiated
+/// </summary>
+void UCustomGameInstance::OnSaveGame(const int& ChosenSlotIdx)
 {
-	if (CraftingSaveGame) 
+	// Invalid slot index chosen
+	if (!GameSlots.IsValidIndex(ChosenSlotIdx))
 	{
-		UGameplayStatics::SaveGameToSlot(CraftingSaveGame, CraftingSaveGame_SlotName, SaveGameSlotIndex);
+		return;
+	}
+
+	// Make a new game slot if it didn't exist
+	if (!GameSlots[ChosenSlotIdx])
+	{
+		GameSlots[ChosenSlotIdx] = Cast<USaveGameSlot>(UGameplayStatics::CreateSaveGameObject(CraftingSaveGameClass));
+		GameSlots[ChosenSlotIdx]->SetupNewSlot(CraftingSaveGameClass, CraftingDataTables);
+	}
+
+	// Clear the slot (in case existing slot was there)
+
+	// Process the game slot (Store all required elements)
+	GameSlots[ChosenSlotIdx]->ProcessSaveSlot(*this);
+
+	// Save the game slot
+	UGameplayStatics::SaveGameToSlot(GameSlots[ChosenSlotIdx], SaveGameSlotName, ChosenSlotIdx);
+}
+
+/// <summary>
+/// Called when the game load is initiated
+/// </summary>
+/// <param name="ChosenSlotIdx"></param>
+void UCustomGameInstance::OnLoadGame(const int& ChosenSlotIdx)
+{
+	// Invalid slot index chosen
+	if (!GameSlots.IsValidIndex(ChosenSlotIdx))
+	{
+		return;
+	}
+
+	// Valid slot
+	if (GameSlots[ChosenSlotIdx])
+	{
+		GameSlots[ChosenSlotIdx]->ProcessLoadSlot(*this);
 	}
 }
 

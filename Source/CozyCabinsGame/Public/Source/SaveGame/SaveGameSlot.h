@@ -44,14 +44,23 @@ protected:
 	// Game Time
 	UPROPERTY()
 	TObjectPtr<class UGameTimeSaveGame> GameTimeSaveGame;
-	
+
+	// Crafting
+	UPROPERTY()
+	TObjectPtr<class UCraftingSaveGame> CraftingSaveGame;
+
+	UPROPERTY()
+	TSubclassOf<class UCraftingSaveGame> CraftingSaveGameClass;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class UDataTable>> CraftingDataTables;
 
 public:
 
-	void Setup();
+	void SetupNewSlot(const TSubclassOf<class UCraftingSaveGame>& InCraftingSaveGameClass, const TArray<TObjectPtr<class UDataTable>>& InCraftingDataTables);
 
-	void SaveSlot(UObject& WorldContextObject, const FString& SaveSlot);
+	void ProcessSaveSlot(const UObject& WorldContextObject);
 
-	void LoadSlot(UObject& WorldContextObject, const FString& SaveSlot);
+	void ProcessLoadSlot(const UObject& WorldContextObject);
 	
 };

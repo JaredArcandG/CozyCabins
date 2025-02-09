@@ -11,7 +11,7 @@ UPlayerStatsSaveGame::UPlayerStatsSaveGame()
 	TimeSinceLastHungerDecay = FDateTime::UtcNow();
 }
 
-void UPlayerStatsSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UPlayerStatsSaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	TObjectPtr<UStatsComponent> pStats = Cast<UStatsComponent>(&ObjectToSave);
 	CHECK(pStats);
@@ -26,7 +26,7 @@ void UPlayerStatsSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectTo
 	ActorStats.TotalStamina = pStats->GetTotalStamina();
 }
 
-void UPlayerStatsSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UPlayerStatsSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
 	TObjectPtr<UStatsComponent> pStats = Cast<UStatsComponent>(&ObjectToLoad);
 	CHECK(pStats);

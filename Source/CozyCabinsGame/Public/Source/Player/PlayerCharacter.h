@@ -72,6 +72,9 @@ protected:
 	// Whether the character's inventory is open or not
 	bool bIsInventoryOpen;
 
+	UPROPERTY()
+	TObjectPtr<class UCustomGameInstance> GameInstance;
+
 public:
 
 	// Called every frame
@@ -136,5 +139,11 @@ protected:
 
 	// Handle show/hide inventory
 	void TriggerInventory(const FInputActionValue& InputValue);
+
+	// Action to take on a quick save
+	void OnQuickSave();
+
+	// Action to take on a quick load
+	void OnQuickLoad();
 
 };
