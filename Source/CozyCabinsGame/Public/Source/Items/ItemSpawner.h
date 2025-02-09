@@ -54,6 +54,7 @@ public:
 	bool bAwaitingRespawnAfterPlayerPickup;
 
 	FTimespan RespawnTimeInGameTime;
+	FTimespan AccumulatedTime;
 
 	// Used to track if the item was created in editor or manually on drop
 	// Override when created on drop

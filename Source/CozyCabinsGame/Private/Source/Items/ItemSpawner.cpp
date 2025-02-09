@@ -39,6 +39,11 @@ void AItemSpawner::BeginPlay()
 	GameTimeManagerRef = pGameMode->FindComponentByClass<UGameTimeManager>();
 	CHECK(GameTimeManagerRef);
 
+	if (!bOverrideItemDataRespawnSettings)
+	{
+		RespawnTimeInGameTime = SpawnSettings.RespawnTimeInGameTimeCustom.ConvertToFTimespan();
+	}
+
 	// If awaiting respawn, try spawn item fails, but we need to set the timer appropriately to try again
 	// Otherwise, it spawns the item normally
 	if (!CheckSpawnItemBeginPlay())
@@ -111,6 +116,8 @@ bool AItemSpawner::TrySpawnItem()
 				RespawnTimeInGameTime = SpawnedItem->GetData().RespawnTimeInGameTime.ConvertToFTimespan();
 			}
 
+			AccumulatedTime = FTimespan(0);
+
 			return true;
 		}
 	}
@@ -128,7 +135,7 @@ void AItemSpawner::OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime
 	// Only look to respawn if it's possible
 	if (bAwaitingRespawnAfterPlayerPickup && !SpawnedItem && SpawnSettings.bIsRespawnable)
 	{
-		if (TimePassed >= RespawnTimeInGameTime)
+		if (AccumulatedTime >= RespawnTimeInGameTime)
 		{
 			if (TrySpawnItem())
 			{
@@ -136,6 +143,10 @@ void AItemSpawner::OnCheckRespawnItemAfterPickup(FTimespan TimePassed, FDateTime
 				bAwaitingRespawnAfterPlayerPickup = false;
 				GameTimeManagerRef->OnGameTimePassed.RemoveDynamic(this, &AItemSpawner::OnCheckRespawnItemAfterPickup);
 			}
+		}
+		else 
+		{
+			AccumulatedTime += TimePassed;
 		}
 	}
 }
