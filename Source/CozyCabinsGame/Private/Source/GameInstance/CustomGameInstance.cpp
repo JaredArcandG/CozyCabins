@@ -42,7 +42,7 @@ void UCustomGameInstance::OnSaveGame(const int& ChosenSlotIdx)
 	// Make a new game slot if it didn't exist
 	if (!GameSlots[ChosenSlotIdx])
 	{
-		GameSlots[ChosenSlotIdx] = Cast<USaveGameSlot>(UGameplayStatics::CreateSaveGameObject(CraftingSaveGameClass));
+		GameSlots[ChosenSlotIdx] = Cast<USaveGameSlot>(UGameplayStatics::CreateSaveGameObject(USaveGameSlot::StaticClass()));
 		GameSlots[ChosenSlotIdx]->SetupNewSlot(CraftingSaveGameClass, CraftingDataTables);
 	}
 
