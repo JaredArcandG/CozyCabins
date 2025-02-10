@@ -18,10 +18,10 @@ public:
 
 	UPlayerCoreSaveGame();
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FVector PlayerLocation;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FRotator PlayerRotation;
 
 public:

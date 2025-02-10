@@ -142,6 +142,9 @@ void APlayerCharacter::BeginPlay()
 	InventoryUI->Setup(*InventoryComp);
 
 	GameInstance = Cast<UCustomGameInstance>(UGameplayStatics::GetGameInstance(this));
+	CHECK(GameInstance);
+
+	GameInstance->InitializeSaveGameSlots(GetWorld());
 	
 }
 

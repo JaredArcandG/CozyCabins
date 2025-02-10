@@ -12,19 +12,17 @@ void UCustomGameInstance::Init()
 	// Initialize the gameslots array
 	GameSlots.SetNum(NumMaxGameSlots, false);
 
-	// Load all the save game slots for all instances
-	InitializeSaveGameSlots();
 }
 
-void UCustomGameInstance::InitializeSaveGameSlots()
+void UCustomGameInstance::InitializeSaveGameSlots(UWorld* World)
 {
 	for (int slotIdx = 0; slotIdx < NumMaxGameSlots; slotIdx++)
 	{
-		// Check if Crafting SaveGame exists already
-		if (UGameplayStatics::DoesSaveGameExist(SaveGameSlotName, slotIdx))
-		{
-			GameSlots[slotIdx] = Cast<USaveGameSlot>(UGameplayStatics::LoadGameFromSlot(SaveGameSlotName, slotIdx));
-		}
+
+		GameSlots[slotIdx] = NewObject<USaveGameSlot>(this);
+		CHECK(GameSlots[slotIdx]);
+
+		GameSlots[slotIdx]->Setup(SaveGameSlotNameBase, slotIdx, CraftingSaveGameClass, CraftingDataTables);
 	}
 }
 
@@ -39,20 +37,11 @@ void UCustomGameInstance::OnSaveGame(const int& ChosenSlotIdx)
 		return;
 	}
 
-	// Make a new game slot if it didn't exist
-	if (!GameSlots[ChosenSlotIdx])
-	{
-		GameSlots[ChosenSlotIdx] = Cast<USaveGameSlot>(UGameplayStatics::CreateSaveGameObject(USaveGameSlot::StaticClass()));
-		GameSlots[ChosenSlotIdx]->SetupNewSlot(CraftingSaveGameClass, CraftingDataTables);
-	}
-
-	// Clear the slot (in case existing slot was there)
+	CHECK(GameSlots[ChosenSlotIdx]);
 
 	// Process the game slot (Store all required elements)
 	GameSlots[ChosenSlotIdx]->ProcessSaveSlot(*this);
 
-	// Save the game slot
-	UGameplayStatics::SaveGameToSlot(GameSlots[ChosenSlotIdx], SaveGameSlotName, ChosenSlotIdx);
 }
 
 /// <summary>

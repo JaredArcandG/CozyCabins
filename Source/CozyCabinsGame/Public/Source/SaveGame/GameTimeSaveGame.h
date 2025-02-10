@@ -18,7 +18,7 @@ public:
 
 	UGameTimeSaveGame();
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FDateTime CurrentGameTime;
 
 public:

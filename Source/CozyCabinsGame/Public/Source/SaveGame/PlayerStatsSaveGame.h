@@ -19,16 +19,16 @@ public:
 
 	UPlayerStatsSaveGame();
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FActorStats ActorStats;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int HungerDecayRate;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int HungerDecayGametimeMins;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FDateTime TimeSinceLastHungerDecay;
 
 public:

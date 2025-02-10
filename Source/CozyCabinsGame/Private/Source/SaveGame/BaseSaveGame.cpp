@@ -12,3 +12,18 @@ void UBaseSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToL
 {
 	// Common functionality 
 }
+
+void UBaseSaveGame::OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave)
+{
+	// Common functionality
+}
+
+void UBaseSaveGame::OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad)
+{
+	// Common functionality
+}
+
+void UBaseSaveGame::ClearOverwrite()
+{
+	// Common functionality
+}

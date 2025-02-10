@@ -8,34 +8,35 @@
 
 UInventorySaveGame::UInventorySaveGame()
 {
-	MaxInventorySize = 0;
-	MaxItemStackSize = 0;
-	bCanUseInventory = false;
-	CurrentSize = 0;
+
 }
 
-void UInventorySaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
+void UInventorySaveGame::OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave)
 {
+	Super::OnSaveUnique(WorldContextObject, ObjId, ObjectToSave);
+
+	FInventorySaveGameData SaveData;
+
 	TObjectPtr<UInventoryComponent> pInventoryComp = Cast<UInventoryComponent>(&ObjectToSave);
 	CHECK(pInventoryComp);
 
-	MaxInventorySize = pInventoryComp->MaxInventorySize;
-	MaxItemStackSize = pInventoryComp->MaxItemStackSize;
-	bCanUseInventory = pInventoryComp->bCanUseInventory;
-	CurrentSize = pInventoryComp->GetCurrentSize();
-	ItemQuantityArr = pInventoryComp->GetItemQtyArray();
-	ItemIdArr = pInventoryComp->GetItemIdArray();
+	SaveData.MaxInventorySize = pInventoryComp->MaxInventorySize;
+	SaveData.MaxItemStackSize = pInventoryComp->MaxItemStackSize;
+	SaveData.bCanUseInventory = pInventoryComp->bCanUseInventory;
+	SaveData.CurrentSize = pInventoryComp->GetCurrentSize();
+	SaveData.ItemQuantityArr = pInventoryComp->GetItemQtyArray();
+	SaveData.ItemIdArr = pInventoryComp->GetItemIdArray();
+
+	TTuple<FGuid, FInventorySaveGameData> kvp = TTuple<FGuid, FInventorySaveGameData>();
+	kvp.Key = ObjId;
+	kvp.Value = SaveData;
+
+	DataMap.Add(kvp);
 }
 
-void UInventorySaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
+void UInventorySaveGame::ClearOverwrite()
 {
-	TObjectPtr<UInventoryComponent> pInventoryComp = Cast<UInventoryComponent>(&ObjectToLoad);
-	CHECK(pInventoryComp);
+	Super::ClearOverwrite();
 
-	pInventoryComp->MaxInventorySize = MaxInventorySize;
-	pInventoryComp->MaxItemStackSize = MaxItemStackSize;
-	pInventoryComp->bCanUseInventory = bCanUseInventory;
-	pInventoryComp->SetCurrentSize(CurrentSize);
-	pInventoryComp->SetItemQtyArray(ItemQuantityArr);
-	pInventoryComp->SetItemIdArray(ItemIdArr);
+	DataMap.Empty();
 }

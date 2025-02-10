@@ -23,13 +23,13 @@ public:
 	int NumMaxGameSlots = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString SaveGameSlotNameBase = "CozySaveGame";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCraftingSaveGame> CraftingSaveGame;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class UCraftingSaveGame> CraftingSaveGameClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString SaveGameSlotName = "CozySaveGame";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<class UDataTable>> CraftingDataTables;
@@ -48,16 +48,9 @@ public:
 
 	UFUNCTION()
 	void OnLoadGame(const int& ChosenSlotIdx);
-	
 
-private:
-
-	/// Save Game PrivateFunctions ///
-
-	// Gets all SaveGame Slots
 	UFUNCTION()
-	void InitializeSaveGameSlots();
-
+	void InitializeSaveGameSlots(UWorld* World);
 
 protected:
 

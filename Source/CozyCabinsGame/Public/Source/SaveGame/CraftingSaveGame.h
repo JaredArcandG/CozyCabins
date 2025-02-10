@@ -17,7 +17,7 @@ class COZYCABINSGAME_API UCraftingSaveGame : public UBaseSaveGame
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Text = "Map of Recipes which are unlocked"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta = (Text = "Map of Recipes which are unlocked"))
 	TMap<TObjectPtr<class UDataTable>, FCraftingRecipeUnlock> UnlockedRecipesMap;
 
 	UPROPERTY()

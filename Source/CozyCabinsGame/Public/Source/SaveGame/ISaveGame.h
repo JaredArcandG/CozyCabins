@@ -37,4 +37,26 @@ public:
 	/// <param name="WorldContextObject"></param>
 	/// <param name="ObjectToLoad"></param>
 	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) = 0;
+
+	/// <summary>
+	/// Called for multiple unique objects being saved into the save game
+	/// </summary>
+	/// <param name="WorldContextObject"></param>
+	/// <param name="ObjId"></param>
+	/// <param name="ObjectToSave"></param>
+	virtual void OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave) = 0;
+
+	/// <summary>
+	/// Called to load multiple unique objects if needed
+	/// </summary>
+	/// <param name="WorldContextObject"></param>
+	/// <param name="ObjId"></param>
+	/// <param name="ObjectToLoad"></param>
+	virtual void OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad) = 0;
+
+	/// <summary>
+	/// Called to clear a slot if it's being overwritten
+	/// Used to avoid old save data being saved with the new save
+	/// </summary>
+	virtual void ClearOverwrite() = 0;
 };
