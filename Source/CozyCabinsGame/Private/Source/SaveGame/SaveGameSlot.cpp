@@ -154,123 +154,120 @@ void USaveGameSlot::ProcessSaveSlot(const UObject& WorldContextObject)
 
 void USaveGameSlot::ProcessLoadSlot(const UObject& WorldContextObject)
 {
-	//CHECK(PlayerCoreSaveGame);
-	//CHECK(PlayerInventorySaveGame);
-	//CHECK(PlayerStatsSaveGame);
-	//CHECK(GameTimeSaveGame);
-	//CHECK(CraftingSaveGame);
+	CHECK(PlayerCoreSaveGame);
+	CHECK(PlayerInventorySaveGame);
+	CHECK(InventorySaveGame);
+	CHECK(ItemSpawnerSaveGame);
+	CHECK(PlayerStatsSaveGame);
+	CHECK(GameTimeSaveGame);
+	CHECK(CraftingSaveGame);
 
-	//TObjectPtr<UWorld> pWorld = WorldContextObject.GetWorld();
-	//CHECK(pWorld);
+	TObjectPtr<UWorld> pWorld = WorldContextObject.GetWorld();
+	CHECK(pWorld);
 
-	//TObjectPtr<APlayerCharacter> pCharacter = Cast<APlayerCharacter>(pWorld->GetFirstPlayerController()->GetPawn());
-	//CHECK(pCharacter);
+	TObjectPtr<APlayerCharacter> pCharacter = Cast<APlayerCharacter>(pWorld->GetFirstPlayerController()->GetPawn());
+	CHECK(pCharacter);
 
-	//// Load player core
-	//PlayerCoreSaveGame->OnLoad(WorldContextObject, *pCharacter);
+	// Load player core
+	PlayerCoreSaveGame->OnLoad(WorldContextObject, *pCharacter);
 
-	//// Get and load the player inventory instance
-	//TObjectPtr<UPlayerInventoryComponent> pPlayerInventoryComp = pCharacter->GetComponentByClass<UPlayerInventoryComponent>();
-	//CHECK(pPlayerInventoryComp);
+	// Get and load the player inventory instance
+	TObjectPtr<UPlayerInventoryComponent> pPlayerInventoryComp = pCharacter->GetComponentByClass<UPlayerInventoryComponent>();
+	CHECK(pPlayerInventoryComp);
 
-	//PlayerInventorySaveGame->OnLoad(WorldContextObject, *pPlayerInventoryComp);
+	PlayerInventorySaveGame->OnLoad(WorldContextObject, *pPlayerInventoryComp);
 
-	//// 1. Load Chests
-	//TArray<TObjectPtr<AChest>> chestArr = UCommonUtils::GetAllActorsInWorld<AChest>(*pWorld);
+	// 1. Load Chests
+	TArray<TObjectPtr<AChest>> chestArr = UCommonUtils::GetAllActorsInWorld<AChest>(*pWorld);
 
-	//for (auto pChest : chestArr)
-	//{
-	//	if (pChest)
-	//	{
-	//		FGuid objUniqueId = pChest->GetCustomUniqueId();
+	for (auto pChest : chestArr)
+	{
+		if (pChest)
+		{
+			FGuid objUniqueId = pChest->GetCustomUniqueId();
 
-	//		if (InventorySaveGames.Contains(objUniqueId))
-	//		{
-	//			TObjectPtr<UInventorySaveGame> pInvSaveGame = InventorySaveGames[objUniqueId];
-	//			CHECK(pInvSaveGame);
+			// The chest exists
+			if (InventorySaveGame->DataMap.Contains(objUniqueId))
+			{
+				if (pChest->GetComponentByClass<UInventoryComponent>())
+				{
+					InventorySaveGame->OnLoadUnique(WorldContextObject, objUniqueId, *pChest->GetComponentByClass<UInventoryComponent>());
+				}
+			} 
+		}
+	}
 
-	//			pInvSaveGame->OnLoad(WorldContextObject, *pChest->GetComponentByClass<UInventoryComponent>());
-	//		}
-	//	}
-	//}
+	// 2. Load Planters
+	TArray<TObjectPtr<APlanter>> planterArr = UCommonUtils::GetAllActorsInWorld<APlanter>(*pWorld);
 
-	//// 2. Load Planters
-	//TArray<TObjectPtr<APlanter>> planterArr = UCommonUtils::GetAllActorsInWorld<APlanter>(*pWorld);
+	for (auto pPlanter : planterArr)
+	{
+		if (pPlanter)
+		{
+			FGuid objUniqueId = pPlanter->GetCustomUniqueId();
 
-	//for (auto pPlanter : planterArr)
-	//{
-	//	if (pPlanter)
-	//	{
-	//		FGuid objUniqueId = pPlanter->GetCustomUniqueId();
+			if (InventorySaveGame->DataMap.Contains(objUniqueId))
+			{
+				if (pPlanter->GetComponentByClass<UInventoryComponent>())
+				{
+					InventorySaveGame->OnLoadUnique(WorldContextObject, objUniqueId, *pPlanter->GetComponentByClass<UInventoryComponent>());
+				}
+			}
+		}
+	}
 
-	//		if (InventorySaveGames.Contains(objUniqueId))
-	//		{
-	//			TObjectPtr<UInventorySaveGame> pInvSaveGame = InventorySaveGames[objUniqueId];
-	//			CHECK(pInvSaveGame);
+	// Load Player Stats
+	TObjectPtr<UStatsComponent> pStatsComponent = pCharacter->GetComponentByClass<UStatsComponent>();
+	CHECK(pStatsComponent);
 
-	//			pInvSaveGame->OnLoad(WorldContextObject, *pPlanter->GetComponentByClass<UInventoryComponent>());
-	//		}
-	//	}
-	//}
+	PlayerStatsSaveGame->OnLoad(WorldContextObject, *pStatsComponent);
 
-	//// Load Player Stats
-	//TObjectPtr<UStatsComponent> pStatsComponent = pCharacter->GetComponentByClass<UStatsComponent>();
-	//CHECK(pStatsComponent);
+	// Items - Existing
+	TArray<TObjectPtr<AItemSpawner>> itemArr = UCommonUtils::GetAllActorsInWorld<AItemSpawner>(*pWorld);
+	TArray<FGuid> foundItems;
 
-	//PlayerStatsSaveGame->OnLoad(WorldContextObject, *pStatsComponent);
+	for (auto pItemSpawner : itemArr)
+	{
+		if (pItemSpawner)
+		{
+			FGuid objUniqueId = pItemSpawner->GetCustomUniqueId();
 
-	//// Items - Existing
-	//TArray<TObjectPtr<AItemSpawner>> itemArr = UCommonUtils::GetAllActorsInWorld<AItemSpawner>(*pWorld);
-	//TArray<FGuid> foundItems;
+			if (ItemSpawnerSaveGame->DataMap.Contains(objUniqueId))
+			{
+				foundItems.Add(objUniqueId);
 
-	//for (auto pItemSpawner : itemArr)
-	//{
-	//	if (pItemSpawner)
-	//	{
-	//		FGuid objUniqueId = pItemSpawner->GetCustomUniqueId();
+				ItemSpawnerSaveGame->OnLoadUnique(WorldContextObject, objUniqueId, *pItemSpawner);
+			}
+		}
+	}
 
-	//		if (ItemSpawnerSaveGames.Contains(objUniqueId))
-	//		{
-	//			foundItems.Add(objUniqueId);
+	// Items to respawn - not by default, placed by player
+	for (const TPair<FGuid, FItemSpawnerSaveGameData>& kvp : ItemSpawnerSaveGame->DataMap)
+	{
+		if (!foundItems.Contains(kvp.Key))
+		{
+			// Respawn the item deferred
+			// Set the values
+			// Complete spawn
+			TObjectPtr<AItemSpawner> pItem = UItemFactory::SpawnDeferredItem(*pWorld, kvp.Value.ActorTransform, kvp.Value.SpawnSettings.ItemClassToSpawn);
 
-	//			TObjectPtr<UItemSpawnerSaveGame> pItemSaveGame = ItemSpawnerSaveGames[objUniqueId];
-	//			CHECK(pItemSaveGame);
+			if (pItem)
+			{
+				pItem->CustomUniqueId = kvp.Key;
+				ItemSpawnerSaveGame->OnLoadUnique(WorldContextObject, kvp.Key, *pItem);
+				UGameplayStatics::FinishSpawningActor(pItem, kvp.Value.ActorTransform);
+			}
+		}
+	}
 
-	//			pItemSaveGame->OnSave(WorldContextObject, *pItemSpawner);
-	//		}
-	//	}
-	//}
+	// GameTime
+	TObjectPtr<AGameModeBase> pGameMode = UGameplayStatics::GetGameMode(pWorld);
+	CHECK(pGameMode);
 
-	//// Items to respawn - not by default, placed by player
-	//for (const TPair<FGuid, TObjectPtr<UItemSpawnerSaveGame>>& kvp : ItemSpawnerSaveGames)
-	//{
-	//	if (!foundItems.Contains(kvp.Key))
-	//	{
-	//		// Respawn the item deferred
-	//		// Set the values
-	//		// Complete spawn
-	//		if (kvp.Value)
-	//		{
-	//			TObjectPtr<AItemSpawner> pItem = UItemFactory::SpawnDeferredItem(*pWorld, kvp.Value->ActorTransform, kvp.Value->SpawnSettings.ItemClassToSpawn);
+	TObjectPtr<UGameTimeManager> pGameTimeManager = pGameMode->FindComponentByClass<UGameTimeManager>();
+	CHECK(pGameTimeManager);
 
-	//			if (pItem)
-	//			{
-	//				pItem->CustomUniqueId = kvp.Key;
-	//				kvp.Value->OnLoad(*pWorld, *pItem);
-	//				UGameplayStatics::FinishSpawningActor(pItem, kvp.Value->ActorTransform);
-	//			}
-	//		}
-	//	}
-	//}
-
-	//// GameTime
-	//TObjectPtr<AGameModeBase> pGameMode = UGameplayStatics::GetGameMode(pWorld);
-	//CHECK(pGameMode);
-
-	//TObjectPtr<UGameTimeManager> pGameTimeManager = pGameMode->FindComponentByClass<UGameTimeManager>();
-	//CHECK(pGameTimeManager);
-
-	//GameTimeSaveGame->OnLoad(WorldContextObject, *pGameTimeManager);
+	GameTimeSaveGame->OnLoad(WorldContextObject, *pGameTimeManager);
 
 	// Crafting - No action since we are using the SaveGame Instance directly
 }
@@ -297,6 +294,15 @@ T* USaveGameSlot::PreProcessSaveGame(const FString& InSlotExt, const int& InSlot
 	}
 }
 
+/// <summary>
+/// Ensure all game save slots are preprocessed correctly
+/// Ensures saving and loading the slot works as expected
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="SaveGameClass"></param>
+/// <param name="InSlotExt"></param>
+/// <param name="InSlotIndex"></param>
+/// <returns></returns>
 template <typename T>
 T* USaveGameSlot::PreProcessSaveGame(const TSubclassOf<T>& SaveGameClass, const FString& InSlotExt, const int32 InSlotIndex)
 {

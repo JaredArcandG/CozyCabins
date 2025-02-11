@@ -52,6 +52,8 @@ public:
 
 	virtual void OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave) override;
 
+	virtual void OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad) override;
+
 	virtual void ClearOverwrite() override;
 	
 };

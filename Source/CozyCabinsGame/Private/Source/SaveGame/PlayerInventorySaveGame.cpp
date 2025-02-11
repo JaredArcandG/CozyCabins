@@ -46,5 +46,7 @@ void UPlayerInventorySaveGame::OnLoad(const UObject& WorldContextObject, UObject
 	pPlayerInventory->SetCurrentSize(CurrentSize);
 	pPlayerInventory->SetItemQtyArray(ItemQuantityArr);
 	pPlayerInventory->SetItemIdArray(ItemIdArr);
+
+	pPlayerInventory->OnInventoryChange.Broadcast();
 }
 

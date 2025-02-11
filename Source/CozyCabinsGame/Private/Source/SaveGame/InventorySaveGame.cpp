@@ -34,6 +34,28 @@ void UInventorySaveGame::OnSaveUnique(const UObject& WorldContextObject, const F
 	DataMap.Add(kvp);
 }
 
+void UInventorySaveGame::OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad)
+{
+	Super::OnLoadUnique(WorldContextObject, ObjId, ObjectToLoad);
+
+	TObjectPtr<UInventoryComponent> pInventoryComp = Cast<UInventoryComponent>(&ObjectToLoad);
+	CHECK(pInventoryComp);
+
+	if (DataMap.Contains(ObjId))
+	{
+		FInventorySaveGameData SaveData = DataMap[ObjId];
+		pInventoryComp->MaxInventorySize = SaveData.MaxInventorySize;
+		pInventoryComp->MaxItemStackSize = SaveData.MaxItemStackSize;
+		pInventoryComp->bCanUseInventory = SaveData.bCanUseInventory;
+		pInventoryComp->SetCurrentSize(SaveData.CurrentSize);
+		pInventoryComp->SetItemQtyArray(SaveData.ItemQuantityArr);
+		pInventoryComp->SetItemIdArray(SaveData.ItemIdArr);
+
+		// Broadcast the change so the UI is also aware
+		pInventoryComp->OnInventoryChange.Broadcast();
+	}
+}
+
 void UInventorySaveGame::ClearOverwrite()
 {
 	Super::ClearOverwrite();

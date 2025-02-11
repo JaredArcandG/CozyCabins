@@ -33,6 +33,26 @@ void UItemSpawnerSaveGame::OnSaveUnique(const UObject& WorldContextObject, const
 	DataMap.Add(kvp);
 }
 
+void UItemSpawnerSaveGame::OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave)
+{
+	TObjectPtr<AItemSpawner> pItemSpawner = Cast<AItemSpawner>(&ObjectToSave);
+	CHECK(pItemSpawner);
+
+	if (DataMap.Contains(ObjId))
+	{
+		FItemSpawnerSaveGameData SaveData = DataMap[ObjId];
+		pItemSpawner->SetActorLocation(SaveData.ActorLocation);
+		pItemSpawner->SetActorRotation(SaveData.ActorRotation);
+		pItemSpawner->SetActorScale3D(SaveData.ActorScale);
+		pItemSpawner->SetActorTransform(SaveData.ActorTransform);
+		pItemSpawner->SpawnSettings = SaveData.SpawnSettings;
+		pItemSpawner->PickupTime = SaveData.PickupTime;
+		pItemSpawner->bAwaitingRespawnAfterPlayerPickup = SaveData.bAwaitingRespawnAfterPlayerPickup;
+		pItemSpawner->RespawnTimeInGameTime = SaveData.RespawnTimeInGameTime;
+		pItemSpawner->bOverrideItemDataRespawnSettings = SaveData.bOverrideItemDataRespawnSettings;
+	}
+}
+
 void UItemSpawnerSaveGame::ClearOverwrite()
 {
 	DataMap.Empty();
