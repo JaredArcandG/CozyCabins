@@ -6,6 +6,32 @@
 #include "Source/SaveGame/BaseSaveGame.h"
 #include "InventorySaveGame.generated.h"
 
+USTRUCT(BlueprintType, Blueprintable)
+struct COZYCABINSGAME_API FInventorySaveGameData
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	int MaxInventorySize = 0;
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	int MaxItemStackSize = 0;
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	bool bCanUseInventory = 0;
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	TArray<int> ItemQuantityArr;
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	TArray<FGuid> ItemIdArr;
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	int CurrentSize = 0;
+};
+
 /**
  * 
  */
@@ -18,28 +44,14 @@ public:
 
 	UInventorySaveGame();
 
-	UPROPERTY()
-	int MaxInventorySize;
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
+	TMap<FGuid, FInventorySaveGameData> DataMap;
 
-	UPROPERTY()
-	int MaxItemStackSize;
-
-	UPROPERTY()
-	bool bCanUseInventory;
-
-	UPROPERTY()
-	TArray<int> ItemQuantityArr;
-
-	UPROPERTY()
-	TArray<FGuid> ItemIdArr;
-
-	UPROPERTY()
-	int CurrentSize;
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void ClearOverwrite() override;
 	
 };

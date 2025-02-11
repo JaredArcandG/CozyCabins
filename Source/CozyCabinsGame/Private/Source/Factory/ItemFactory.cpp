@@ -100,3 +100,21 @@ TObjectPtr<AItemSpawner> UItemFactory::SpawnBPDefaultItemSpawnerInWorld(UWorld& 
 	return Cast<AItemSpawner>(UGameplayStatics::FinishSpawningActor(pItemSpawner, Transform));
 
 }
+
+/// <summary>
+/// Spawns the item deferred. Useful for custom setup if required
+/// Note: Caller must call UGameplayStatics::FinishSpawningActor to finish the process
+/// </summary>
+/// <param name="World"></param>
+/// <param name="Transform"></param>
+/// <param name="ItemClass"></param>
+/// <returns></returns>
+TObjectPtr<class AItemSpawner> UItemFactory::SpawnDeferredItem(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass)
+{
+	CHECK_NULLPTR(ItemClass);
+
+	TObjectPtr<AItemSpawner> pItemSpawner = World.SpawnActorDeferred<AItemSpawner>(AItemSpawner::StaticClass(), Transform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+	CHECK_NULLPTR(pItemSpawner);
+
+	return pItemSpawner;
+}

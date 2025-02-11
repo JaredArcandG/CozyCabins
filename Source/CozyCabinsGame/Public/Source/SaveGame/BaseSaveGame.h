@@ -29,12 +29,18 @@ class COZYCABINSGAME_API UBaseSaveGame : public USaveGame, public ICustomSaveGam
 
 	// 6. Player Location/Rotation [DONE]
 
-	// 7. Game Time
+	// 7. Game Time [DONE]
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) override;
+
+	virtual void OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave) override;
+
+	virtual void OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad) override;
+
+	virtual void ClearOverwrite() override;
 
 };

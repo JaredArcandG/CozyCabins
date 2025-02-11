@@ -29,7 +29,7 @@ TArray<FName> UCraftingSaveGame::ReturnUnlockedRecipes(UDataTable* TableToScan)
 }
 
 
-void UCraftingSaveGame::UnlockRecipe(UDataTable* TableToScan, FName RecipeRow)
+void UCraftingSaveGame::UnlockRecipe(UDataTable* TableToScan, const FName& RecipeRow)
 {
 	if (!UnlockedRecipesMap.Contains(TableToScan))
 	{
@@ -42,10 +42,23 @@ void UCraftingSaveGame::UnlockRecipe(UDataTable* TableToScan, FName RecipeRow)
 
 }
 
-void UCraftingSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UCraftingSaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
+	for (auto pDataTable : DataTables)
+	{
+		if (pDataTable)
+		{
+			TArray<FName> recipesArr = ReturnUnlockedRecipes(pDataTable);
+
+			for (const FName& recipeName : recipesArr)
+			{
+				UnlockRecipe(pDataTable, recipeName);
+			}
+		}
+	}
 }
 
-void UCraftingSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UCraftingSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
+	// No actions needed as we are using the save game values directly
 }

@@ -19,22 +19,22 @@ public:
 
 	UPlayerStatsSaveGame();
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FActorStats ActorStats;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int HungerDecayRate;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int HungerDecayGametimeMins;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	FDateTime TimeSinceLastHungerDecay;
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) override;
 
 };

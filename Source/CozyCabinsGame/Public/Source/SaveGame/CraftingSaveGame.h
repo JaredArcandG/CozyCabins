@@ -17,18 +17,21 @@ class COZYCABINSGAME_API UCraftingSaveGame : public UBaseSaveGame
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Text = "Map of Recipes which are unlocked"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta = (Text = "Map of Recipes which are unlocked"))
 	TMap<TObjectPtr<class UDataTable>, FCraftingRecipeUnlock> UnlockedRecipesMap;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class UDataTable>> DataTables;
 
 	UFUNCTION(BlueprintCallable)
 	TArray<FName> ReturnUnlockedRecipes(UDataTable* TableToScan);
 
 	UFUNCTION(BlueprintCallable)
-	void UnlockRecipe(UDataTable* TableToScan, FName RecipeRow);
+	void UnlockRecipe(UDataTable* TableToScan, const FName& RecipeRow);
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) override;
 };

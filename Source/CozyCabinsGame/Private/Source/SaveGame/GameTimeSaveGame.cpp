@@ -10,7 +10,7 @@ UGameTimeSaveGame::UGameTimeSaveGame()
 	CurrentGameTime = FDateTime::UtcNow();
 }
 
-void UGameTimeSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UGameTimeSaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	TObjectPtr<UGameTimeManager> pManager = Cast<UGameTimeManager>(&ObjectToSave);
 	CHECK(pManager);
@@ -18,7 +18,7 @@ void UGameTimeSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSav
 	CurrentGameTime = pManager->GetCurrentGameTime();
 }
 
-void UGameTimeSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UGameTimeSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
 	TObjectPtr<UGameTimeManager> pManager = Cast<UGameTimeManager>(&ObjectToLoad);
 	CHECK(pManager);

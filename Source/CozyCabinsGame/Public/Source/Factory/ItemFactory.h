@@ -21,5 +21,7 @@ public:
 	static TObjectPtr<class AItem> SpawnBPDefaultItemInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass, const int& Quantity);
 
 	static TObjectPtr<class AItemSpawner> SpawnBPDefaultItemSpawnerInWorld(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass, const int& Quantity);
+
+	static TObjectPtr<class AItemSpawner> SpawnDeferredItem(UWorld& World, const FTransform& Transform, TSubclassOf<class AItem> ItemClass);
 	
 };

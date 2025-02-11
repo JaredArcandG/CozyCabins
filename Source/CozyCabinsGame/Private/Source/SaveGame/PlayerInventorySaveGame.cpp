@@ -18,7 +18,7 @@ UPlayerInventorySaveGame::UPlayerInventorySaveGame()
 	CurrentSize = 0;
 }
 
-void UPlayerInventorySaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UPlayerInventorySaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	Super::OnSave(WorldContextObject, ObjectToSave);
 
@@ -33,7 +33,7 @@ void UPlayerInventorySaveGame::OnSave(UObject& WorldContextObject, UObject& Obje
 	ItemIdArr = pPlayerInventory->GetItemIdArray();
 }
 
-void UPlayerInventorySaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToSave)
+void UPlayerInventorySaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	Super::OnLoad(WorldContextObject, ObjectToSave);
 

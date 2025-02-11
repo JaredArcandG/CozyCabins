@@ -3,12 +3,27 @@
 
 #include "Source/SaveGame/BaseSaveGame.h"
 
-void UBaseSaveGame::OnSave(UObject& WorldContextObject, UObject& ObjectToSave)
+void UBaseSaveGame::OnSave(const UObject& WorldContextObject, UObject& ObjectToSave)
 {
 	// Common functionality
 }
 
-void UBaseSaveGame::OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad)
+void UBaseSaveGame::OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad)
 {
 	// Common functionality 
+}
+
+void UBaseSaveGame::OnSaveUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToSave)
+{
+	// Common functionality
+}
+
+void UBaseSaveGame::OnLoadUnique(const UObject& WorldContextObject, const FGuid& ObjId, UObject& ObjectToLoad)
+{
+	// Common functionality
+}
+
+void UBaseSaveGame::ClearOverwrite()
+{
+	// Common functionality
 }

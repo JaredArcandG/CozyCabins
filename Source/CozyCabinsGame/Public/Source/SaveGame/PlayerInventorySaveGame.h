@@ -18,28 +18,28 @@ public:
 
 	UPlayerInventorySaveGame();
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int MaxInventorySize;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int MaxItemStackSize;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	bool bCanUseInventory;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	TArray<int> ItemQuantityArr;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	TArray<FGuid> ItemIdArr;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadWrite)
 	int CurrentSize;
 
 public:
 
-	virtual void OnSave(UObject& WorldContextObject, UObject& ObjectToSave) override;
+	virtual void OnSave(const UObject& WorldContextObject, UObject& ObjectToSave) override;
 
-	virtual void OnLoad(UObject& WorldContextObject, UObject& ObjectToLoad) override;
+	virtual void OnLoad(const UObject& WorldContextObject, UObject& ObjectToLoad) override;
 	
 };
