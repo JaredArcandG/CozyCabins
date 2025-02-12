@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/GlobalUIManager.h"
+#include "Source/UI/Common/GlobalUIManager.h"
 #include "Blueprint/UserWidget.h"
 
 /// <summary>

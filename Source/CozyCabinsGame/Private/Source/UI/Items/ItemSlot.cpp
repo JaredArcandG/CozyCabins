@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/ItemSlot.h"
+#include "Source/UI/Items/ItemSlot.h"
 #include <Source/Utils/CheckUtils.h>
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include <Source/UI/CustomDragDropOperation.h>
+#include <Source/UI/Common/CustomDragDropOperation.h>
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
-#include "Source/UI/ItemSlotDragPreview.h"
-#include "Source/UI/ItemSlotHoverPreview.h"
+#include "Source/UI/Items/ItemSlotDragPreview.h"
+#include "Source/UI/Items/ItemSlotHoverPreview.h"
 #include <Source/Components/InventoryComponent.h>
 #include "Components/Button.h"
 #include <Source/Items/Item.h>
@@ -19,7 +19,7 @@
 #include "Components/Sizebox.h"
 #include <Blueprint/WidgetLayoutLibrary.h>
 #include <Source/Player/Controller/CustomPlayerController.h>
-#include <Source/UI/GlobalUIManager.h>
+#include <Source/UI/Common/GlobalUIManager.h>
 #include <Source/Components/InteractableComponent.h>
 
 /// <summary>

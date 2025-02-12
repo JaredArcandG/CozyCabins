@@ -11,7 +11,7 @@
 #include "Source/Components/InteractableComponent.h"
 #include "Source/Components/PlayerInventoryComponent.h"
 #include "Source/Components/StatsComponent.h"
-#include "Source/UI/ItemSlotContainer.h"
+#include "Source/UI/Items/ItemSlotContainer.h"
 #include "Source/GameInstance/CustomGameInstance.h"
 #include <Kismet/GameplayStatics.h>
 

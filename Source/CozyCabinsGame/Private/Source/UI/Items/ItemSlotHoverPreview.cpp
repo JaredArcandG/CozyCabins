@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/ItemSlotHoverPreview.h"
+#include "Source/UI/Items/ItemSlotHoverPreview.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include <Source/Utils/CheckUtils.h>

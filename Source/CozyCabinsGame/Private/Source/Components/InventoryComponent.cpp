@@ -4,7 +4,7 @@
 #include "Source/Components/InventoryComponent.h"
 #include "Engine/DataTable.h"
 #include <Source/Utils/CheckUtils.h>
-#include "Source/UI/ItemSlotContainer.h"
+#include "Source/UI/Items/ItemSlotContainer.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()

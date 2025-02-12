@@ -3,7 +3,7 @@
 
 #include "Source/Crafting/WorkStationBase.h"
 #include "Components/BoxComponent.h"
-#include "Source/UI/WorkStationUIBase.h"
+#include "Source/UI/Crafting/WorkStationUIBase.h"
 #include "Engine/DataTable.h"
 
 // Sets default values

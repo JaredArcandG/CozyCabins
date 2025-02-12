@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/CraftingRecipeSlot.h"
-#include "Source/UI/WorkStationUIBase.h"
+#include "Source/UI/Crafting/CraftingRecipeSlot.h"
+#include "Source/UI/Crafting/WorkStationUIBase.h"
 #include "Source/Items/ItemData.h"
 #include "Components/Image.h"
 #include "Components/Button.h"

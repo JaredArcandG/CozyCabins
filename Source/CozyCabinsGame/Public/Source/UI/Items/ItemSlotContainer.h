@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include <UObject/NoExportTypes.h>
-#include "Source/UI/ItemSlotHoverPreview.h"
+#include "Source/UI/Items/ItemSlotHoverPreview.h"
 #include "ItemSlotContainer.generated.h"
 
 

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/PlanterUI.h"
-#include "Source/UI/ItemSlotContainer.h"
+#include "Source/UI/Planter/PlanterUI.h"
+#include "Source/UI/Items/ItemSlotContainer.h"
 
 void UPlanterUI::InitUI(UInventoryComponent* PlayerComponent, UInventoryComponent* PlanterComponent)
 {

@@ -8,7 +8,7 @@
 #include "Source/Items/ItemData.h"
 #include "Source/GameMode/CustomGameModeBase.h"
 #include "Source/Items/Item.h"
-#include "Source/UI/PlanterUI.h"
+#include "Source/UI/Planter/PlanterUI.h"
 #include "Source/Player/PlayerCharacter.h"
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"

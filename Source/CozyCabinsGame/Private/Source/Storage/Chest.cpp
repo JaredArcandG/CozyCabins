@@ -5,7 +5,7 @@
 #include "Source/Components/InventoryComponent.h"
 #include <Source/Utils/CheckUtils.h>
 #include <Source/Player/PlayerCharacter.h>
-#include <Source/UI/ChestUI.h>
+#include <Source/UI/Storage/ChestUI.h>
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/ItemSlotContainer.h"
-#include "Source/UI/ItemSlot.h"
+#include "Source/UI/Items/ItemSlotContainer.h"
+#include "Source/UI/Items/ItemSlot.h"
 #include <Source/Utils/CheckUtils.h>
 #include "Source/Components/InventoryComponent.h"
 #include "Components/WrapBox.h"

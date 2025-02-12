@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Source/UI/DraggableWidget.h"
-#include <Source/UI/CustomDragDropOperation.h>
+#include "Source/UI/Common/DraggableWidget.h"
+#include <Source/UI/Common/CustomDragDropOperation.h>
 #include <Source/Utils/CheckUtils.h>
 #include <Blueprint/WidgetBlueprintLibrary.h>
 

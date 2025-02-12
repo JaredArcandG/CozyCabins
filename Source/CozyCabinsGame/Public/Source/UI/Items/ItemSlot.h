@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include <Source/Items/ItemData.h>
-#include "Source/UI/DraggableWidget.h"
+#include "Source/UI/Common/DraggableWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
-#include "Source/UI/ItemSlotHoverPreview.h"
+#include "Source/UI/Items/ItemSlotHoverPreview.h"
 #include "ItemSlot.generated.h"
 
 

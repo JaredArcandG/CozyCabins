@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/ItemNotificationContainer.h"
+#include "Source/UI/Notifications/ItemNotificationContainer.h"
 #include <Source/Utils/CheckUtils.h>
 #include "Components/VerticalBox.h"
 #include <Source/Player/PlayerCharacter.h>
 #include <Source/Player/Controller/CustomPlayerController.h>
 #include <Source/Components/PlayerInventoryComponent.h>
-#include <Source/UI/ItemNotificationWidget.h>
+#include <Source/UI/Notifications/ItemNotificationWidget.h>
 #include "Source/Notifications/BaseNotification.h"
 
 void UItemNotificationContainer::NativeConstruct()

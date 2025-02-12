@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/StatsHUD.h"
+#include "Source/UI/HUD/StatsHUD.h"
 #include "Source/Player/PlayerCharacter.h"
 #include "Source/Components/StatsComponent.h"
 #include "Components/ProgressBar.h"

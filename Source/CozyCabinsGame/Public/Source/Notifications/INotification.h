@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "UObject/Interface.h"
-#include "Source/UI/ItemNotificationContainer.h"
+#include "Source/UI/Notifications/ItemNotificationContainer.h"
 #include "INotification.generated.h"
 
 

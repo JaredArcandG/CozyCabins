@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Source/UI/CraftingIngredientSlot.h"
+#include "Source/UI/Crafting/CraftingIngredientSlot.h"
 #include "Source/Components/InventoryComponent.h"
 #include "Source/Items/ItemData.h"
 #include "Components/TextBlock.h"
