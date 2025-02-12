@@ -88,10 +88,10 @@ public:
 	bool Resize(const int& NewMaxSize);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Swaps the slot between the same or different inventories. Useful for drop functionality calls"))
-	bool TryTransferSlots(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& TargetSlotIdx);
+	virtual bool TryTransferSlots(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& TargetSlotIdx);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Swaps the slot between the same or different inventories for specific quantities. Useful for drop functionality calls"))
-	bool TryTransferSlotsWithQuantity(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& SourceQtyToTransfer, const int& TargetSlotIdx);
+	virtual bool TryTransferSlotsWithQuantity(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& SourceQtyToTransfer, const int& TargetSlotIdx);
 
 	UFUNCTION(BlueprintCallable, meta = (Text = "Checks if it is possible to remove the item to the inventory for a specific index with a specific quantity for that index only. Returns true if successful, false otherwise"))
 	bool CanRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity);

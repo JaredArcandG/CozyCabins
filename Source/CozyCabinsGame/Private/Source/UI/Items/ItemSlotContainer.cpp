@@ -16,7 +16,7 @@ void UItemSlotContainer::NativeConstruct()
 	Super::NativeConstruct();
 
 	TotalSlots = 36;
-	bIsFocusable = true;
+	SetIsFocusable(true);
 
 	CHECK(HoverPreviewWidget);
 	HoverPreviewWidget->SetVisibility(ESlateVisibility::Hidden);

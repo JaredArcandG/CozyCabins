@@ -19,6 +19,8 @@ class COZYCABINSGAME_API UPlayerInventoryComponent : public UInventoryComponent
 
 public:
 
+	UPlayerInventoryComponent();
+
 	// Event for Inventory item change
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerInventoryChange, UBaseNotification*, ItemNotification);
 
@@ -28,11 +30,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> ItemWidgetNotificationClass;
 
+protected:
+
+	bool bDisableNotification;
+
 public:
 
 	virtual bool TryAddAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity) override;
 
 	virtual bool TryRemoveAtIndex(const FGuid& ItemId, const int& ArrIdx, const int& Quantity) override;
+
+	virtual bool TryTransferSlots(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& TargetSlotIdx);
+
+	virtual bool TryTransferSlotsWithQuantity(UInventoryComponent* TargetInventory, const int& SourceSlotIdx, const int& SourceQtyToTransfer, const int& TargetSlotIdx);
 
 protected:
 
