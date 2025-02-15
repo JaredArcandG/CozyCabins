@@ -52,6 +52,8 @@ public:
 	UFUNCTION()
 	void InitializeSaveGameSlots(UWorld* World);
 
+	TArray<TObjectPtr<class USaveGameSlot>> GetGameSlots();
+
 protected:
 
 	// Called on Start of Application

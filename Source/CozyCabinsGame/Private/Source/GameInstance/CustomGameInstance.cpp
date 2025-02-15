@@ -27,6 +27,15 @@ void UCustomGameInstance::InitializeSaveGameSlots(UWorld* World)
 }
 
 /// <summary>
+/// Returns all the save game slots available
+/// </summary>
+/// <returns></returns>
+TArray<TObjectPtr<USaveGameSlot>> UCustomGameInstance::GetGameSlots()
+{
+	return GameSlots;
+}
+
+/// <summary>
 /// Called when a game save is initiated
 /// </summary>
 void UCustomGameInstance::OnSaveGame(const int& ChosenSlotIdx)

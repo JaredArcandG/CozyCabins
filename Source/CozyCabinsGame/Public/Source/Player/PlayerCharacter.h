@@ -53,6 +53,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory Settings")
 	TSubclassOf<class UItemSlotContainer> ItemSlotContainerClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UPauseMenu> PauseMenuClass;
+
+	// UI for the pause menu
+	TObjectPtr<class UPauseMenu> PauseMenuUI;
+
 	// UI For the inventory
 	UPROPERTY()
 	TObjectPtr<class UItemSlotContainer> InventoryUI;
@@ -145,5 +151,8 @@ protected:
 
 	// Action to take on a quick load
 	void OnQuickLoad();
+
+	// Action to take to toggle pause menu
+	void OnTogglePauseMenu(const FInputActionValue& InputValue);
 
 };

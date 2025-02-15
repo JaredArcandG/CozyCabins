@@ -75,6 +75,8 @@ public:
 
 	void ProcessLoadSlot(const UObject& WorldContextObject);
 
+	FString GetBaseSaveName();
+
 protected:
 
 	template <typename T>

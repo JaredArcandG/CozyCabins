@@ -272,6 +272,11 @@ void USaveGameSlot::ProcessLoadSlot(const UObject& WorldContextObject)
 	// Crafting - No action since we are using the SaveGame Instance directly
 }
 
+FString USaveGameSlot::GetBaseSaveName()
+{
+	return BaseSaveName;
+}
+
 /// <summary>
 /// Ensure all game save slots are preprocessed correctly 
 /// Ensures saving and loading the slot works as expected

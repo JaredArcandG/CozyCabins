@@ -14,6 +14,7 @@
 #include "Source/UI/Items/ItemSlotContainer.h"
 #include "Source/GameInstance/CustomGameInstance.h"
 #include <Kismet/GameplayStatics.h>
+#include "Source/UI/Menus/PauseMenu.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -145,6 +146,11 @@ void APlayerCharacter::BeginPlay()
 	CHECK(GameInstance);
 
 	GameInstance->InitializeSaveGameSlots(GetWorld());
+
+	CHECK(PauseMenuClass);
+	PauseMenuUI = CreateWidget<UPauseMenu>(pPlayerController, PauseMenuClass);
+	PauseMenuUI->SetVisibility(ESlateVisibility::Hidden);
+	PauseMenuUI->AddToViewport(4);
 	
 }
 
@@ -178,6 +184,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	pInputComponent->BindAction(InputActions->InputConsume, ETriggerEvent::Triggered, this, &APlayerCharacter::Consume);
 	pInputComponent->BindAction(InputActions->InputQuickSave, ETriggerEvent::Triggered, this, &APlayerCharacter::OnQuickSave);
 	pInputComponent->BindAction(InputActions->InputQuickLoad, ETriggerEvent::Triggered, this, &APlayerCharacter::OnQuickLoad);
+	pInputComponent->BindAction(InputActions->InputPause, ETriggerEvent::Triggered, this, &APlayerCharacter::OnTogglePauseMenu);
 
 	// Get the local player subsystem
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> pSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pPlayerController->GetLocalPlayer());
@@ -354,4 +361,15 @@ void APlayerCharacter::OnQuickLoad()
 
 	GameInstance->OnLoadGame(0);
 
+}
+
+/// <summary>
+/// Toggles the pause menu
+/// </summary>
+/// <param name="InputValue"></param>
+void APlayerCharacter::OnTogglePauseMenu(const FInputActionValue& InputValue)
+{
+	CHECK(PauseMenuUI);
+
+	PauseMenuUI->TogglePauseMenu();
 }
