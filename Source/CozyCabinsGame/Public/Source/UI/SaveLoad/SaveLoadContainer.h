@@ -47,6 +47,7 @@ public:
 
 private: 
 
+	UFUNCTION()
 	void OnSlotClicked(int SlotIdx);
 	
 };

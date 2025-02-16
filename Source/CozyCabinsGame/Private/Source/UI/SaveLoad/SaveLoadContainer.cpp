@@ -37,9 +37,11 @@ void USaveLoadContainer::NativeConstruct()
 				CHECK(pTexture);
 
 				pSaveSlotUI->SetSlotData(*pTexture, FText::FromString(pSlot->GetBaseSaveName()), slotIdx);
+				pSaveSlotUI->OnSlotClicked.AddUniqueDynamic(this, &USaveLoadContainer::OnSlotClicked);
 				slotIdx++;
 
 				SaveLoadSlotContainer->AddChild(pSaveSlotUI);
+				pSaveSlotUI->SetPadding(FMargin(10));
 				
 			}
 		}

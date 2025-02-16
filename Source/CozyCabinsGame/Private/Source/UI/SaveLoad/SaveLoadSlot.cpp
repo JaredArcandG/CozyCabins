@@ -12,6 +12,11 @@ void USaveLoadSlot::NativeConstruct()
 	Super::NativeConstruct();
 	SlotIdx = -1;
 
+	CHECK(SlotButton);
+
+	SlotButton->OnClicked.AddUniqueDynamic(this, &USaveLoadSlot::ExecuteSlotClicked);
+	SlotButton->SetVisibility(ESlateVisibility::Visible);
+
 }
 
 void USaveLoadSlot::SetSlotData(class UTexture2D& InImage, const FText& InSaveTimeText, const int& InSlotIdx)
@@ -20,7 +25,8 @@ void USaveLoadSlot::SetSlotData(class UTexture2D& InImage, const FText& InSaveTi
 	CHECK(SaveTimeText);
 	CHECK(SlotButton);
 
-	SlotButton->OnClicked.AddUniqueDynamic(this, &USaveLoadSlot::ExecuteSlotClicked);
+	SlotButton->SetIsEnabled(true);
+
 
 	GameImage->SetBrushFromTexture(&InImage);
 	SaveTimeText->SetText(InSaveTimeText);
@@ -39,5 +45,6 @@ void USaveLoadSlot::ClearSlot()
 
 void USaveLoadSlot::ExecuteSlotClicked()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Execute Slot Clicked!!!!!!"));
 	OnSlotClicked.Broadcast(SlotIdx);
 }

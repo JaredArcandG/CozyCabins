@@ -76,7 +76,6 @@ void UPauseMenu::OnSaveClicked()
 {
 	CHECK(SaveLoadMenu);
 
-	SaveLoadMenu->SetFocus();
 	SaveLoadMenu->UpdateSlots();
 	SaveLoadMenu->SetSlotMode(ESaveLoadMode::Save);
 	SaveLoadMenu->SetVisibility(ESlateVisibility::Visible);
