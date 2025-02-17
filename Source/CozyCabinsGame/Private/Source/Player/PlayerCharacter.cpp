@@ -15,6 +15,8 @@
 #include "Source/GameInstance/CustomGameInstance.h"
 #include <Kismet/GameplayStatics.h>
 #include "Source/UI/Menus/PauseMenu.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Components/SceneCaptureComponent2D.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()

@@ -19,10 +19,11 @@ void USaveLoadSlot::NativeConstruct()
 
 }
 
-void USaveLoadSlot::SetSlotData(class UTexture2D& InImage, const FText& InSaveTimeText, const int& InSlotIdx)
+void USaveLoadSlot::SetSlotData(class UTexture2D& InImage, const FText& InSaveSlotName, const FText& InSaveTimeText, const int& InSlotIdx)
 {
 	CHECK(GameImage);
 	CHECK(SaveTimeText);
+	CHECK(SlotNameText);
 	CHECK(SlotButton);
 
 	SlotButton->SetIsEnabled(true);
@@ -30,6 +31,7 @@ void USaveLoadSlot::SetSlotData(class UTexture2D& InImage, const FText& InSaveTi
 
 	GameImage->SetBrushFromTexture(&InImage);
 	SaveTimeText->SetText(InSaveTimeText);
+	SlotNameText->SetText(InSaveSlotName);
 	SlotIdx = InSlotIdx;
 }
 
@@ -40,11 +42,11 @@ void USaveLoadSlot::ClearSlot()
 
 	GameImage->SetBrushFromTexture(nullptr);
 	SaveTimeText->SetText(FText::GetEmpty());
+	SlotNameText->SetText(FText::GetEmpty());
 	SlotIdx = -1;
 }
 
 void USaveLoadSlot::ExecuteSlotClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Execute Slot Clicked!!!!!!"));
 	OnSlotClicked.Broadcast(SlotIdx);
 }

@@ -15,7 +15,7 @@ class COZYCABINSGAME_API USaveGameSlot : public UObject
 {
 	GENERATED_BODY()
 
-protected:
+public:
 
 	FString BaseSaveName;
 

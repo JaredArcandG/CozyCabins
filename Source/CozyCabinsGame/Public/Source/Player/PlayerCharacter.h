@@ -113,9 +113,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Stats Component", ToolTip = "Gets the player's stats"))
 	class UStatsComponent* GetStatsComponent();
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Stats Component", ToolTip = "Gets the player's interactable component"))
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Interaction Component", ToolTip = "Gets the player's interactable component"))
 	class UInteractableComponent* GetInteractionComponent();
-
 
 protected:
 

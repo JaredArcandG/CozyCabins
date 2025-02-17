@@ -31,15 +31,16 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> SaveTimeText;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> SlotNameText;
+
 	int SlotIdx;
 
 public:
 
-	void Setup();
-
 	virtual void NativeConstruct() override;
 
-	void SetSlotData(class UTexture2D& InImage, const FText& InSaveTimeText, const int& InSlotIdx);
+	void SetSlotData(class UTexture2D& InImage, const FText& InSaveSlotName, const FText& InSaveTimeText, const int& InSlotIdx);
 
 	void ClearSlot();
 

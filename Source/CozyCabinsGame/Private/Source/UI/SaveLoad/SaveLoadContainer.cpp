@@ -9,6 +9,7 @@
 #include <Source/GameInstance/CustomGameInstance.h>
 #include <Source/SaveGame/SaveGameSlot.h>
 #include <Components/Button.h>
+#include <Source/SaveGame/PlayerCoreSaveGame.h>
 
 void USaveLoadContainer::NativeConstruct()
 {
@@ -31,20 +32,20 @@ void USaveLoadContainer::NativeConstruct()
 			// Create SaveLoadSlot, then add to container
 			TObjectPtr<USaveLoadSlot> pSaveSlotUI = CreateWidget<USaveLoadSlot>(this, SaveLoadSlotClass);
 			
-			if (pSaveSlotUI)
+			if (pSaveSlotUI && pSlot->PlayerCoreSaveGame)
 			{
-				TObjectPtr<UTexture2D> pTexture = NewObject<UTexture2D>();
-				CHECK(pTexture);
+				TObjectPtr<UTexture2D> pTexture = pSlot->PlayerCoreSaveGame->GetGameImageTexture();
 
-				pSaveSlotUI->SetSlotData(*pTexture, FText::FromString(pSlot->GetBaseSaveName()), slotIdx);
+				pSaveSlotUI->SetSlotData(*pTexture, FText::FromString(pSlot->BaseSaveName), FText::FromString(pSlot->PlayerCoreSaveGame->GameTime), slotIdx);
 				pSaveSlotUI->OnSlotClicked.AddUniqueDynamic(this, &USaveLoadContainer::OnSlotClicked);
-				slotIdx++;
 
 				SaveLoadSlotContainer->AddChild(pSaveSlotUI);
 				pSaveSlotUI->SetPadding(FMargin(10));
 				
 			}
 		}
+
+		slotIdx++;
 	}
 }
 
@@ -58,12 +59,11 @@ void USaveLoadContainer::UpdateSlots()
 		{
 			TObjectPtr<USaveGameSlot> pSaveGameSlot = CustomGameInstance->GetGameSlots()[i];
 
-			if (pSaveGameSlot)
+			if (pSaveGameSlot && pSaveGameSlot->PlayerCoreSaveGame)
 			{
-				TObjectPtr<UTexture2D> pTexture = NewObject<UTexture2D>();
-				CHECK(pTexture);
+				TObjectPtr<UTexture2D> pTexture = pSaveGameSlot->PlayerCoreSaveGame->GetGameImageTexture();
 
-				pSaveSlotUI->SetSlotData(*pTexture, FText::FromString(pSaveGameSlot->GetBaseSaveName()), i);
+				pSaveSlotUI->SetSlotData(*pTexture, FText::FromString(pSaveGameSlot->BaseSaveName), FText::FromString(pSaveGameSlot->PlayerCoreSaveGame->GameTime), i);
 			}
 		}
 	}
@@ -91,4 +91,6 @@ void USaveLoadContainer::OnSlotClicked(int SlotIdx)
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("%hs: Specified SaveLoadMode is unsupported."), __FUNCTION__);
 	}
+
+	UpdateSlots();
 }

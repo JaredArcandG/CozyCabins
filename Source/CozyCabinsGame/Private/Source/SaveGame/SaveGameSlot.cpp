@@ -29,6 +29,11 @@ void USaveGameSlot::Setup(const FString& InBaseSaveName, const int& InSaveIndex,
 
 	PlayerCoreSaveGameExtString = BaseSaveName + FString("_PlayerCore");
 	PlayerCoreSaveGame = PreProcessSaveGame<UPlayerCoreSaveGame>(PlayerCoreSaveGameExtString, SaveIndex);
+	
+	if (PlayerCoreSaveGame)
+	{
+		PlayerCoreSaveGame->LoadGameImageTexture();
+	}
 
 	PlayerInventorySaveGameExtString = BaseSaveName + FString("_PlayerInventory");
 	PlayerInventorySaveGame = PreProcessSaveGame<UPlayerInventorySaveGame>(PlayerInventorySaveGameExtString, SaveIndex);
