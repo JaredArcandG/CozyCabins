@@ -34,6 +34,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<class UDataTable>> CraftingDataTables;
 
+	/// Thought Bubble Properties ///
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTimerHandle ThoughtBubbleTimerHandle;
+
 protected:
 	
 	UPROPERTY()
@@ -53,6 +58,15 @@ public:
 	void InitializeSaveGameSlots(UWorld* World);
 
 	TArray<TObjectPtr<class USaveGameSlot>> GetGameSlots();
+
+	/// Thought Bubble Public Functions ///
+
+	UFUNCTION(BlueprintCallable)
+	bool ReturnTBCooldown();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTBCooldown(float Time);
+
 
 protected:
 

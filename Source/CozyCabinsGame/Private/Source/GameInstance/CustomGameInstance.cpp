@@ -35,6 +35,22 @@ TArray<TObjectPtr<USaveGameSlot>> UCustomGameInstance::GetGameSlots()
 	return GameSlots;
 }
 
+bool UCustomGameInstance::ReturnTBCooldown()
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(ThoughtBubbleTimerHandle))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void UCustomGameInstance::SetTBCooldown(float Time)
+{
+	GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTimerHandle, Time, false);
+}
+
+
 /// <summary>
 /// Called when a game save is initiated
 /// </summary>
