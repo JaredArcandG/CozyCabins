@@ -37,7 +37,7 @@ public:
 	/// Thought Bubble Properties ///
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTimerHandle ThoughtBubbleTimerHandle;
+	TObjectPtr<UUserWidget> ThoughtBubbleWidget;
 
 protected:
 	
@@ -62,10 +62,10 @@ public:
 	/// Thought Bubble Public Functions ///
 
 	UFUNCTION(BlueprintCallable)
-	bool ReturnTBCooldown();
+	bool ReturnTBValid();
 
 	UFUNCTION(BlueprintCallable)
-	void SetTBCooldown(float Time);
+	void SetTBWidget(UUserWidget* TBWidget);
 
 
 protected:

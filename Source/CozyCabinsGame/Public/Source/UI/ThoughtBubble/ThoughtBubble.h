@@ -13,16 +13,19 @@ struct COZYCABINSGAME_API FThoughtBubbleData : public FTableRowBase
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText TextToDisplay;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeToDisplay;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseTypeWriterEffect;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool DisplayOnceOnly = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDataTableRowHandle TextStyle;
 
 };
@@ -35,10 +38,19 @@ class COZYCABINSGAME_API UThoughtBubble : public UUserWidget
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TypewriterSpeed = 0.05f;
+
+	UPROPERTY()
 	FTimerHandle ThoughtBubbleTimerHandle;
+
+	UPROPERTY()
+	FTimerHandle ThoughtBubbleTypewriterHandle;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class URichTextBlock> TXT_DisplayText;
+
+	UPROPERTY()
+	TObjectPtr<class UCustomGameInstance> CustomGameInstance;
 
 	UFUNCTION()
 	void UpdateText(FDataTableRowHandle ThoughtBubbleEntry, class UCustomGameInstance* GameInstance);
@@ -51,7 +63,12 @@ public:
 
 private:
 
-	FString FullDisplayText;
 	struct FThoughtBubbleData* TBData;
+
+	UPROPERTY()
+	FString CurrentText;
+
+	UPROPERTY()
+	int TypeWriterIndex;
 
 };

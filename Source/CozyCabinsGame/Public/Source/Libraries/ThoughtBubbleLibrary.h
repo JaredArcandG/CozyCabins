@@ -15,6 +15,6 @@ class COZYCABINSGAME_API UThoughtBubbleLibrary : public UBlueprintFunctionLibrar
 	
 public:
 
-	UFUNCTION()
-	void DisplayThoughtBubble(const UObject* WorldContext, FDataTableRowHandle ThoughtBubbleEntry, TSubclassOf<UThoughtBubble> ThoughtBubbleClass);
+	UFUNCTION(BlueprintCallable)
+	static bool DisplayThoughtBubble(const UObject* WorldContext, FDataTableRowHandle ThoughtBubbleEntry, TSubclassOf<UThoughtBubble> ThoughtBubbleClass);
 };

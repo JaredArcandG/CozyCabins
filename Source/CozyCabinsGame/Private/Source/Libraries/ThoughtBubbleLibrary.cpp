@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Source/UI/ThoughtBubble/ThoughtBubble.h"
 
-void UThoughtBubbleLibrary::DisplayThoughtBubble(const UObject* WorldContext, FDataTableRowHandle ThoughtBubbleEntry, TSubclassOf<UThoughtBubble> ThoughtBubbleClass)
+bool UThoughtBubbleLibrary::DisplayThoughtBubble(const UObject* WorldContext, FDataTableRowHandle ThoughtBubbleEntry, TSubclassOf<UThoughtBubble> ThoughtBubbleClass)
 {
 	if (WorldContext)
 	{
@@ -15,14 +15,18 @@ void UThoughtBubbleLibrary::DisplayThoughtBubble(const UObject* WorldContext, FD
 
 		if (CustomGameInstance)
 		{
-			if (!CustomGameInstance->ReturnTBCooldown()) 
+			if (!CustomGameInstance->ReturnTBValid()) 
 			{
 				if (!ThoughtBubbleEntry.IsNull()) 
 				{
 					TObjectPtr<UThoughtBubble> TB = CreateWidget<UThoughtBubble>(WorldContext->GetWorld(), ThoughtBubbleClass);
 					TB->UpdateText(ThoughtBubbleEntry, CustomGameInstance);
+
+					return true;
 				}
 			}
 		}
 	}
+
+	return false;
 }

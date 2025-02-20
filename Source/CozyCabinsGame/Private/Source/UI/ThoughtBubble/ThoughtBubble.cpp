@@ -9,41 +9,65 @@
 
 void UThoughtBubble::UpdateText(FDataTableRowHandle ThoughtBubbleEntry, class UCustomGameInstance* GameInstance)
 {
+	CustomGameInstance = GameInstance;
 	TBData = ThoughtBubbleEntry.GetRow<FThoughtBubbleData>("");
+
+	CustomGameInstance->SetTBWidget(this);
+	float TimerTime = TBData->TimeToDisplay;
+	GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTimerHandle, this, &UThoughtBubble::DestroySelf, TimerTime, false);
+
 
 	if (TBData)
 	{
-		GameInstance->SetTBCooldown(TBData->TimeToDisplay);
-		GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTimerHandle, this, &UThoughtBubble::DestroySelf, TBData->TimeToDisplay, false);
-
-		FullDisplayText = TBData->TextToDisplay.ToString();
+		FString DisplayText = TBData->TextToDisplay.ToString();
 
 		if (!TBData->TextStyle.IsNull())
 		{
-			FullDisplayText = "<" + TBData->TextStyle.RowName.ToString() + ">" + TBData->TextToDisplay.ToString() + "</>";
+			DisplayText = "<" + TBData->TextStyle.RowName.ToString() + ">" + TBData->TextToDisplay.ToString() + "</>";
 		}
 
 		if (TBData->UseTypeWriterEffect)
 		{
-			GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTimerHandle, this, &UThoughtBubble::UpdateTextWithTypewriter, 0.1f, true);
+			TypeWriterIndex = 0;
+			CurrentText = "";
+			GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTypewriterHandle, this, &UThoughtBubble::UpdateTextWithTypewriter, TypewriterSpeed, true);
 		}
-
 		else 
 		{
-			TXT_DisplayText->SetText(FText::AsCultureInvariant(FullDisplayText));
+			TXT_DisplayText->SetText(FText::AsCultureInvariant(DisplayText));
+			Invalidate(EInvalidateWidget::LayoutAndVolatility | EInvalidateWidgetReason::Prepass);
 		}
 
-		AddToViewport();
 	}
+
+	AddToViewport();
 }
 
 void UThoughtBubble::DestroySelf()
 {
+	CustomGameInstance->SetTBWidget(nullptr);
 	RemoveFromParent();
 }
 
 void UThoughtBubble::UpdateTextWithTypewriter()
 {
+	if (CurrentText == TBData->TextToDisplay.ToString())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ThoughtBubbleTypewriterHandle);
+	}
+	else 
+	{
+		CurrentText += TBData->TextToDisplay.ToString()[TypeWriterIndex];
+		FString DisplayText = CurrentText;
 
-	FullDisplayText = "<" + TBData->TextStyle.RowName.ToString() + ">" + TBData->TextToDisplay.ToString() + "</>";
+		if (!TBData->TextStyle.IsNull()) 
+		{
+			DisplayText = "<" + TBData->TextStyle.RowName.ToString() + ">" + CurrentText + "</>";
+		}
+
+		TXT_DisplayText->SetText(FText::AsCultureInvariant(DisplayText));
+		Invalidate(EInvalidateWidget::LayoutAndVolatility | EInvalidateWidgetReason::Prepass);
+
+		TypeWriterIndex += 1;
+	}
 }

@@ -35,9 +35,9 @@ TArray<TObjectPtr<USaveGameSlot>> UCustomGameInstance::GetGameSlots()
 	return GameSlots;
 }
 
-bool UCustomGameInstance::ReturnTBCooldown()
+bool UCustomGameInstance::ReturnTBValid()
 {
-	if (GetWorld()->GetTimerManager().IsTimerActive(ThoughtBubbleTimerHandle))
+	if (ThoughtBubbleWidget)
 	{
 		return true;
 	}
@@ -45,9 +45,9 @@ bool UCustomGameInstance::ReturnTBCooldown()
 	return false;
 }
 
-void UCustomGameInstance::SetTBCooldown(float Time)
+void UCustomGameInstance::SetTBWidget(UUserWidget* TBWidget)
 {
-	GetWorld()->GetTimerManager().SetTimer(ThoughtBubbleTimerHandle, Time, false);
+	ThoughtBubbleWidget = TBWidget;
 }
 
 
