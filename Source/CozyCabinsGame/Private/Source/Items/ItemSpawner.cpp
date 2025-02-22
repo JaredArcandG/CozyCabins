@@ -12,7 +12,7 @@
 AItemSpawner::AItemSpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	SpawnedItem = nullptr;
 	bAwaitingRespawnAfterPlayerPickup = false;
 
@@ -63,14 +63,17 @@ void AItemSpawner::SpawnPreviewMesh()
 	CHECK(VisualEditorMesh);
 	CHECK(SpawnSettings.ItemClassToSpawn);
 
-	auto pWorld = GetWorld();
-	CHECK(pWorld);
-
-	auto pItem = GetWorld()->SpawnActorDeferred<AItem>(SpawnSettings.ItemClassToSpawn, FTransform(), nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	auto pItem = NewObject<AItem>(this, SpawnSettings.ItemClassToSpawn);
 	CHECK(pItem);
-	CHECK(pItem->Mesh);
 
-	VisualEditorMesh->SetStaticMesh(pItem->Mesh->GetStaticMesh());
+	FString sDataTablePath = TEXT("/Game/DataTables/ItemsDataTable.ItemsDataTable");
+	TObjectPtr<UDataTable> pDataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *sDataTablePath));
+	CHECK(pDataTable);
+
+	pItem->CacheItemData(*pDataTable);
+
+	FItemData itemData = pItem->GetData();
+	VisualEditorMesh->SetStaticMesh(itemData.Mesh);
 
 	pItem->Destroy();
 	
@@ -217,5 +220,28 @@ void AItemSpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	SpawnPreviewMesh();
+}
+
+void AItemSpawner::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+
+	// Check if the property that changed is the item class
+	static const FName spawnSettingsPropertyName = GET_MEMBER_NAME_CHECKED(AItemSpawner, SpawnSettings.ItemClassToSpawn);
+	FString sSpawnSettingsNodeName = PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetValue()->GetName();
+	FString sItemClassNodeName = FString();
+
+	if (auto pNode = PropertyChangedEvent.PropertyChain.GetActiveMemberNode()->GetNextNode())
+	{
+		sItemClassNodeName = pNode->GetValue()->GetName();
+	}
+
+	FName fullPropertyName = FName(*(sSpawnSettingsNodeName + FString(".") + sItemClassNodeName));
+
+	if (fullPropertyName == spawnSettingsPropertyName)
+	{
+		// Update the visual editor mesh
+		SpawnPreviewMesh();
+	}
 }
 #endif

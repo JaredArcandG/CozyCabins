@@ -76,9 +76,9 @@ public:
 
 	virtual void OnInteract_Implementation(UWorld* World, ACharacter* SourceCharacter) override;
 
-private:
+	void CacheItemData(const UDataTable& Table);
 
-	void CacheItemData();
+private:
 
 	void OnDestroy();
 

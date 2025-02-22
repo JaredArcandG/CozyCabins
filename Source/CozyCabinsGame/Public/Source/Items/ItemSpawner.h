@@ -15,16 +15,16 @@ struct COZYCABINSGAME_API FItemSpawnSettings
 
 public:
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<class AItem> ItemClassToSpawn;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsRespawnable = false;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (ClampMin = 1.0f, Text="Time in game time that the item should respawn. Must be 1 minute or more"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 1.0f, Text="Time in game time that the item should respawn. Must be 1 minute or more"))
 	FCustomTimespan RespawnTimeInGameTimeCustom = FCustomTimespan();
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Quantity = 1;
 
 };
@@ -42,7 +42,7 @@ public:
 	// Sets default values for this actor's properties
 	AItemSpawner();
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Item Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Settings")
 	FItemSpawnSettings SpawnSettings;
 
 	// This is a temporary mesh to see the item in the editor
@@ -105,6 +105,7 @@ public:
 
 #if WITH_EDITOR 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override; 
+	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
 
 };

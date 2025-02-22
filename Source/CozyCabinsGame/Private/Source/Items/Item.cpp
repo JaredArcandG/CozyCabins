@@ -40,7 +40,13 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CacheItemData();
+	// Get the table pointer from the game mode
+	TObjectPtr<ACustomGameModeBase> pGameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	CHECK(pGameMode);
+
+	DataTable = pGameMode->ItemsDataTable;
+	CHECK(DataTable);
+	CacheItemData(*DataTable);
 
 	// If an explicit TTL was specified in the BP spawn params, then the item should be destroyed by the end of the TTL
 	if (TimeToLiveSeconds != -1)
@@ -79,10 +85,11 @@ void AItem::SetData(FName InItemDataRowName, int InQuantity)
 	ItemDataRowName = InItemDataRowName;
 	TimeToLiveSeconds = -1;
 
-	CacheItemData();
-
 	// Clear any past timers on the handle
 	GetWorld()->GetTimerManager().ClearTimer(ItemTimerHandle);
+
+	CHECK(DataTable);
+	CacheItemData(*DataTable);
 }
 
 /// <summary>
@@ -104,19 +111,11 @@ void AItem::SetDataWithTTL(FName InItemDataRowName, int InQuantity, int InTimeTo
 /// <summary>
 /// Caches data from the table so it can be easily retrieved from the actor itself
 /// </summary>
-void AItem::CacheItemData()
+void AItem::CacheItemData(const UDataTable& Table)
 {
-	// Get the table pointer from the game mode
-	TObjectPtr<ACustomGameModeBase> pGameMode = Cast<ACustomGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	CHECK(pGameMode);
-
-	DataTable = pGameMode->ItemsDataTable;
-
-	CHECK(DataTable);
-
 	// Update the cached data
 	FString ContextString;
-	auto pData = DataTable->FindRow<FItemData>(ItemDataRowName, ContextString);
+	auto pData = Table.FindRow<FItemData>(ItemDataRowName, ContextString);
 
 	if (pData)
 	{
