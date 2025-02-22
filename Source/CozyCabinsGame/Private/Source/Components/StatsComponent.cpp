@@ -5,6 +5,10 @@
 #include <Kismet/GameplayStatics.h>
 #include <Source/Utils/CheckUtils.h>
 #include "GameFramework/GameModeBase.h"
+#include <Source/Player/PlayerCharacter.h>
+#include <Source/Player/Spawn/SpawnPoint.h>
+#include <Source/Utils/CommonUtils.h>
+#include "Source/UI/Death/PlayerDeathWidget.h"
 
 // Sets default values for this component's properties
 UStatsComponent::UStatsComponent()
@@ -13,7 +17,8 @@ UStatsComponent::UStatsComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	HungerDecayRate = 1.0f;
+	HungerDecayRate = 1;
+	HungerHealthDecayRate = 1;
 	HungerDecayGametimeMins = 1;
 
 	// ...
@@ -33,6 +38,15 @@ void UStatsComponent::BeginPlay()
 	TimeSinceLastHungerDecay = GameTimeManager->GetCurrentGameTime();
 
 	GameTimeManager->OnGameTimePassed.AddUniqueDynamic(this, &UStatsComponent::DecayHunger);
+
+	CHECK(DeathScreenWidgetClass);
+
+	DeathScreenWidget = CreateWidget<UPlayerDeathWidget>(GetWorld()->GetFirstPlayerController(), DeathScreenWidgetClass);
+	CHECK(DeathScreenWidget);
+
+	DeathScreenWidget->AddToViewport();
+
+	DeathScreenWidget->SetVisibility(ESlateVisibility::Hidden);
 	
 }
 
@@ -107,6 +121,11 @@ void UStatsComponent::SetCurrentHealth(const int& NewHealth)
 	ActorStats.CurrentHealth = FMath::Clamp(NewHealth, MIN_TOTAL_STAT_VALUE, MAX_TOTAL_STAT_VALUE);
 
 	OnStatChanged.Broadcast(EActorStatType::Health);
+
+	if (ActorStats.CurrentHealth == MIN_TOTAL_STAT_VALUE)
+	{
+		OnPlayerDeathStart();
+	}
 }
 
 /// <summary>
@@ -285,7 +304,69 @@ void UStatsComponent::DecayHunger(FTimespan Timespan, FDateTime CurrentDateTime)
 	{
 		SetCurrentHunger(ActorStats.CurrentHunger - HungerDecayRate);
 		TimeSinceLastHungerDecay = CurrentDateTime;
+
+		if (ActorStats.CurrentHunger == MIN_TOTAL_STAT_VALUE)
+		{
+			// Take Damage
+			SetCurrentHealth(GetCurrentHealth() - HungerHealthDecayRate);
+		}
 	}
 
 }
+
+void UStatsComponent::OnPlayerDeathStart()
+{
+	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(GetOwner());
+	CHECK(pPlayer);
+	
+	// Play animation
+	CHECK(DeathScreenWidget);
+	DeathScreenWidget->SetVisibility(ESlateVisibility::Visible);
+
+	// On animation end, start the second part of death sequence
+	if (DeathScreenWidget->OnDeath)
+	{
+		FWidgetAnimationDynamicEvent OnEndFadeOutEvent;
+		OnEndFadeOutEvent.BindUFunction(this, FName("OnPlayerDeathEnd"));
+		DeathScreenWidget->BindToAnimationFinished(DeathScreenWidget->OnDeath, OnEndFadeOutEvent);
+		DeathScreenWidget->PlayAnimation(DeathScreenWidget->OnDeath);
+
+		// Restrict movement
+		pPlayer->bBlockInput = true;
+	}
+
+}
+
+void UStatsComponent::OnPlayerDeathEnd()
+{
+	TObjectPtr<APlayerCharacter> pPlayer = Cast<APlayerCharacter>(GetOwner());
+	CHECK(pPlayer);
+
+	// Respawn at respawn point
+	auto pWorld = GetWorld();
+	CHECK(pWorld);
+
+	TArray<TObjectPtr<ASpawnPoint>> arrSpawnPoints = UCommonUtils::GetAllActorsInWorld<ASpawnPoint>(*pWorld);
+
+	if (arrSpawnPoints.Num() > 0)
+	{
+		// Set health, stamina, hunger back to full
+		SetCurrentHealth(GetTotalHealth());
+		SetCurrentStamina(GetTotalStamina());
+		SetCurrentHunger(GetTotalHunger());
+
+		auto pSpawnPoint = arrSpawnPoints[0];
+		CHECK(pSpawnPoint);
+
+		pPlayer->SetActorLocation(pSpawnPoint->GetActorLocation());
+
+		CHECK(DeathScreenWidget);
+		DeathScreenWidget->SetVisibility(ESlateVisibility::Hidden);
+		DeathScreenWidget->ResetWidget();
+
+		// Restore movement
+		pPlayer->bBlockInput = false;
+	}
+}
+
 

@@ -70,8 +70,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int HungerDecayRate;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Text="How much to decay health based on hunger decay gametime mins if hunger is zero"))
+	int HungerHealthDecayRate;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int HungerDecayGametimeMins;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UPlayerDeathWidget> DeathScreenWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UPlayerDeathWidget> DeathScreenWidget;
 
 	FDateTime TimeSinceLastHungerDecay;
 
@@ -146,5 +155,10 @@ protected:
 
 	UFUNCTION()
 	void DecayHunger(FTimespan Timespan, FDateTime CurrentDateTime);
+
+	UFUNCTION()
+	void OnPlayerDeathEnd();
+
+	void OnPlayerDeathStart();
 		
 };
