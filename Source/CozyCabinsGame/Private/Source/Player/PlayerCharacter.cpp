@@ -46,6 +46,9 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	CHECK(GetMesh());
+	GetMesh()->AttachToComponent(FollowCamera, FAttachmentTransformRules::KeepRelativeTransform);
+
 	// Rotation should affect the Camera only, not the Controller
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
